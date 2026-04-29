@@ -12,27 +12,27 @@ PROJECT=""
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --project=*)
-      PROJECT="${1#*=}"
-      shift
-      ;;
-    --project)
-      PROJECT="$2"
-      shift 2
-      ;;
-    -h|--help)
-      usage
-      ;;
-    --) # end of options
-      shift
-      break
-      ;;
-    *)
-      echo "Unknown option: $1" >&2
-      usage
-      ;;
-  esac
+    case "$1" in
+        --project=*)
+            PROJECT="${1#*=}"
+            shift
+            ;;
+        --project)
+            PROJECT="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            ;;
+        --) # end of options
+            shift
+            break
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            usage
+            ;;
+    esac
 done
 
 #######################################################################
@@ -61,9 +61,10 @@ setup cmake v3_27_4
 ups active
 
 # Build medulla
-git clone https://github.com/justinjmueller/medulla.git
+git clone https://github.com/kyjung123/medulla.git
 cd medulla
-git checkout develop
+git checkout ccpionproton
+
 mkdir build && cd build
 export CC=$(which gcc)
 export CXX=$(which g++)
@@ -90,18 +91,20 @@ ifdh cp --cp_maxretries=0 --web_timeout=100 $PROJECT/systematics.toml systematic
 mkdir data
 
 # Extract all paths
-full_paths=($(grep '"/pnfs' job_config.toml | sed -E 's/.*"(.*)".*/\1/'))
+full_paths=$(grep '"/pnfs' job_config.toml | grep -o '"[^"]*"' | sed 's/"//g')
+echo "Found $(echo "$full_paths" | wc -l) input files to copy."
 
 # Copy input files
 mkdir -p data
-for p in "${full_paths[@]}"; do
+for p in $full_paths; do
+    echo "Copying input file: $p"
     ifdh cp --cp_maxretries=0 --web_timeout=100 "$p" data/
 done
+ls -lrth data/
 
 # Modify the job_config.toml to use local paths
-for p in "${full_paths[@]}"; do
+for p in $full_paths; do
     b=$(basename "$p")
-    #sed -i "s#$p#$b#g" job_config.toml
     sed -i "s#\"$p\"#\"data/$b\"#g" job_config.toml
 done
 

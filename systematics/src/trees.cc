@@ -16,6 +16,7 @@
 #include "configuration.h"
 #include "systematic.h"
 #include "weight_reader.h"
+#include <set>
 
 #include "TFile.h"
 #include "TDirectory.h"
@@ -148,6 +149,12 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
     for(int i(0); i < input_tree->GetNbranches()-3; ++i)
     {
         std::string brname = input_tree->GetListOfBranches()->At(i)->GetName();
+
+        // We explicitly handle this branch, so we skip it in this loop.
+        if(brname == "true_neutrino_id")
+            continue;
+
+        // Initialize the branch value to 0 and set the branch address.
         brs[brname] = 0;
         input_tree->SetBranchAddress(brname.c_str(), &brs[brname]);
     }
@@ -171,9 +178,12 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
     TTree * output_tree = new TTree(table.get_string_field("name").c_str(), table.get_string_field("name").c_str());
     for(auto & br : brs)
         output_tree->Branch(br.first.c_str(), &br.second);
+    output_tree->Branch("true_neutrino_id", &nu_id);
     output_tree->Branch("Run", &run);
     output_tree->Branch("Subrun", &subrun);
     output_tree->Branch("Evt", &event);
+
+
 
     /**
      * @brief Create an output TTree for non-matched signal candidates.
@@ -201,16 +211,110 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
      * run, subrun, event, nu_id, and nu_energy branches as the key. The
      * value is the index of the entry in the input TTree.
      */
+
+
     std::map<index_t, size_t> candidates;
     bool use_additional_hash = config.get_bool_field("input.use_additional_hash", false);
+    /* =========================
+       🔎 DEBUG: nu_id == -1 충돌 체크
+       ========================= */
+    {
+        using key5_t = std::tuple<int,int,int,int,double>;
+
+        size_t n_nuidm1 = 0;
+        size_t n_nuidm1_dup = 0;
+        std::set<key5_t> seen;
+
+        for (int i=0; i<input_tree->GetEntries(); ++i) {
+            input_tree->GetEntry(i);
+
+            if ((int)nu_id != -1) continue;
+            n_nuidm1++;
+
+            double E = use_additional_hash ? brs["true_neutrino_energy"] : 0.0;
+            key5_t key = { (int)run, (int)subrun, (int)event, -1, E };
+
+            if (!seen.insert(key).second)
+                n_nuidm1_dup++;
+        }
+
+//        std::cout << "[DBG] n(nu_id==-1)            = " << n_nuidm1 << "\n";
+//        std::cout << "[DBG] dup among nu_id==-1     = " << n_nuidm1_dup << "\n";
+//        std::cout << "[DBG] unique keys (nu_id==-1) = " << seen.size() << "\n";
+    }
     for(int i(0); i < input_tree->GetEntries(); ++i)
     {
         input_tree->GetEntry(i);
-        if(!use_additional_hash)
-            candidates.insert(std::make_pair<index_t, size_t>(std::make_tuple(run, subrun, event, nu_id, 0), i));
-        else
-            candidates.insert(std::make_pair<index_t, size_t>(std::make_tuple(run, subrun, event, nu_id, brs["true_neutrino_energy"]), i));
+        // Only consider entries with a valid neutrino ID. That is, cosmics and
+        // failed truth matching will not be included in the candidates map and
+        // will be copied to the non-matched TTree if it has been created.
+        if(nu_id >= 0)
+        {
+            if(!use_additional_hash)
+                candidates.insert(std::make_pair<index_t, size_t>(std::make_tuple(run, subrun, event, nu_id, 0), i));
+            else
+                candidates.insert(std::make_pair<index_t, size_t>(std::make_tuple(run, subrun, event, nu_id, brs["true_neutrino_energy"]), i));
+        }
     }
+//    std::cout << "[DBG] input_tree entries = " << input_tree->GetEntries() << "\n";
+//    std::cout << "[DBG] candidates.size()  = " << candidates.size() << "\n";
+//    std::cout << "[DBG] lost_from_map_dup  = "
+//        << ( (Long64_t)input_tree->GetEntries() - (Long64_t)candidates.size() )
+//        << "\n";
+//    size_t dup_total=0, dup_cosmic=0;
+//    size_t dup_cosmic_nuidm1=0;
+//
+//    for (int i=0; i<input_tree->GetEntries(); ++i){
+//        input_tree->GetEntry(i);
+//
+//        index_t key = use_additional_hash
+//            ? std::make_tuple(run, subrun, event, nu_id, brs["true_neutrino_energy"])
+//            : std::make_tuple(run, subrun, event, nu_id, 0.0);
+//
+//        auto [it, inserted] = candidates.insert({key, (size_t)i});
+//
+//        if(!inserted){
+//            dup_total++;
+//            if ((int)brs["true_category"]==6) dup_cosmic++;
+//            if ((int)nu_id==-1) dup_cosmic_nuidm1++;
+//        }
+//    }
+//
+//    std::cout << "[DBG] dup_total=" << dup_total
+//        << " dup_cosmic(cat6)=" << dup_cosmic
+//        << " dup_nuidm1=" << dup_cosmic_nuidm1
+//        << std::endl;
+//    size_t n_dups = 0;
+//    size_t n_print = 0;
+//
+//    for(int i(0); i < input_tree->GetEntries(); ++i)
+//    {
+//        input_tree->GetEntry(i);
+//
+//        index_t key;
+//        if(!use_additional_hash)
+//            key = std::make_tuple(run, subrun, event, nu_id, 0);
+//        else
+//            key = std::make_tuple(run, subrun, event, nu_id, brs["true_neutrino_energy"]);
+//
+//        auto ret = candidates.insert({key, (size_t)i});
+//        if(!ret.second){
+//            n_dups++;
+//            if(n_print < 20){
+//                std::cout << "[DUP] i=" << i
+//                    << " run=" << run
+//                    << " subrun=" << subrun
+//                    << " evt=" << event
+//                    << " nu_id=" << nu_id
+//                    << " E=" << brs["true_neutrino_energy"]
+//                    << " true_category=" << brs["true_category"]
+//                    << "\n";
+//                n_print++;
+//            }
+//        }
+//    }
+//
+//    std::cout << "[DBG] n_dups=" << n_dups << "\n";
 
     /**
      * @brief Configure the weight-based systematics.
@@ -383,9 +487,19 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
         }
     }
 
+//    std::cout << "[DBG] matched(saved_indices) = " << saved_indices.size() << "\n";
+//    std::cout << "[DBG] candidates.size()      = " << candidates.size() << "\n";
+//    std::cout << "[DBG] expect nonmatched ~= candidates - matched (not exact if dup index mismatch)\n";
     // Fill the non-matched TTree if it has been created.
     if(nonmatched_tree)
     {
+        // Non-matched signal candidates that are actually neutrinos can happen
+        // due to file mismatching. Though the user is expected to ensure that
+        // the input TTree and the input weights file correspond to the same
+        // set of events, this is not enforced by the code. Therefore, we copy
+        // any neutrino entries that do not have a match in the input weights
+        // file to the non-matched TTree as a "audible" sign that something is
+        // amiss.
         for(auto & [key, value] : candidates)
         {
             if(std::find(saved_indices.begin(), saved_indices.end(), key) != saved_indices.end())
@@ -396,9 +510,27 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
             event = std::get<2>(key);
             nonmatched_tree->Fill();
         }
+        // The primary use case for the non-matched TTree is to capture cosmics
+        // and failed truth matching. We explicitly write all entries of the
+        // input tree that have a neutrino ID less than 0 to the non-matched
+        // TTree to capture these cases.
+        for(int i(0); i < input_tree->GetEntries(); ++i)
+        {
+            input_tree->GetEntry(i);
+            if(nu_id < 0)
+            {
+                run = reader.get_run();
+                subrun = reader.get_subrun();
+                event = reader.get_event();
+                nonmatched_tree->Fill();
+            }
+        }
         directory->WriteObject(nonmatched_tree, nonmatched_tree->GetName());
         delete nonmatched_tree;
     }
+//    std::cout << "[DBG] output_tree entries    = " << output_tree->GetEntries() << "\n";
+//    if(nonmatched_tree)
+//        std::cout << "[DBG] nonmatched_tree entries = " << nonmatched_tree->GetEntries() << "\n";
 
     // Write the output TTree to the output file.
     directory->WriteObject(output_tree, table.get_string_field("name").c_str());

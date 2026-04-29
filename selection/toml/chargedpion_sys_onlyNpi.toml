@@ -1,0 +1,380 @@
+[general]
+output = "/exp/icarus/data/users/kyjung/NUMI_cc1pion/icarus_charged_pion_kink_michel_sys_new_Npi"
+primfn = "default_primary_classification"
+
+pidfn = "default_pid"
+
+[[category]] # 0 : Fiducial, single muon, single pion
+cuts = [
+    { name = "neutrino"        },
+    { name = "fiducial_cut"    },
+    { name = "no_photons",       parameters = [25.0] },
+    { name = "no_electrons",     parameters = [25.0] },
+    { name = "single_muon",      parameters = [143.425] },
+    { name = "single_pion",    parameters = [25.0] },
+]
+
+[[category]] # 1 : Single muon, multiple pion
+cuts = [
+    { name = "neutrino" },
+    { name = "fiducial_cut"    },
+    { name = "no_photons",       parameters = [25.0] },
+    { name = "no_electrons",     parameters = [25.0] },
+    { name = "single_muon",      parameters = [143.425] },
+    { name = "!no_charged_pions", parameters = [25.0] },
+    { name = "!single_pion",    parameters = [25.0] },
+]
+
+[[category]] # 2 : Single muon, zero pion
+cuts = [
+    { name = "neutrino" },
+    { name = "fiducial_cut"    },
+    { name = "no_photons",       parameters = [25.0] },
+    { name = "no_electrons",     parameters = [25.0] },
+    { name = "single_muon",      parameters = [143.425] },
+    { name = "no_charged_pions", parameters = [25.0] },
+]
+
+[[category]] # 3 : Neutrino, charged current
+cuts = [
+    { name = "neutrino" },
+    { name = "fiducial_cut"    },
+    { name = "iscc"     },
+]
+
+[[category]] # 4 : Neutrino, neutral current
+cuts = [
+    { name = "neutrino" },
+    { name = "fiducial_cut"    },
+    { name = "!iscc"    },
+]
+
+[[category]] # 5 : Out of FV
+cuts = [
+    { name = "!fiducial_cut" },
+    { name = "neutrino" },
+]
+
+[[category]] # 6 : Cosmic
+cuts = [
+    { name = "!neutrino" },
+]
+
+[[sample]]
+name = "nominal"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_CV_flat_cafs_2/NuMI_CV_flat_cafs_2_01.root"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_CV_flat_cafs_2/NuMI_CV_flat_cafs_2_0[0-2].root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_CV_flat_cafs_2/NuMI_CV_flat_cafs_2_0*.root"
+ismc = true
+disable = false
+
+[[sample]]
+name = "onbeam"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_data_flat_cafs_2/*.root"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_data_flat_cafs_2/NuMI_data_flat_cafs_2_00.root"
+ismc = false
+disable = false
+
+[[sample]]
+name = "var00"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Null_var/*.root"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Null_var/larcv_mc_20250622_144031_209243-d3e26fc2-bd1b-4711-9401-973cb75a930f_caf.root.flat.root"
+ismc = true
+disable = false
+
+[[sample]]
+name = "var01p"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Gain_high/*.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Gain_high/larcv_mc_20250926_010341_730937-a97fbe76-f86a-4ee1-a597-272fba33f883_caf.root.flat.root"
+ismc = true
+disable = false
+
+[[sample]]
+name = "var01m"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Gain_low/*.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Gain_low/larcv_mc_20250618_134332_554739-634bef30-dafe-487c-b330-cbd109ea3b09_caf.root.flat.root"
+ismc = true
+disable = false
+
+[[sample]]
+name = "var02p"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Coh_high/*.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Coh_high/larcv_mc_20250626_060451_542296-9291fe93-abd6-428d-8461-f498c680ced9_caf.root.flat.root"
+ismc = true
+disable = false
+
+[[sample]]
+name = "var02m"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Coh_low/*.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Coh_low/larcv_mc_20250921_024214_569556-b9253047-5e14-4817-918b-3b88de804663_caf.root.flat.root"
+ismc = true
+disable = false
+
+[[sample]]
+name = "var03p"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Int_high/*.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Int_high/larcv_mc_20250930_071339_251177-c6ea7402-793d-4e7e-945a-565bfe5aab86_caf.root.flat.root"
+ismc = true
+disable = false
+
+[[sample]]
+name = "var03m"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Int_low/*.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Int_low/larcv_mc_20250701_012930_894503-97f84932-0323-4421-a5db-576ebb51683a_caf.root.flat.root"
+ismc = true
+disable = false
+
+[[sample]]
+name = "var04p"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Lifetime_high/*.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Lifetime_high/larcv_mc_20250625_111815_098127-d18c05ae-618c-40a8-8420-b696aafe0e67_caf.root.flat.root"
+ismc = true
+disable = false
+
+[[sample]]
+name = "var04m"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Lifetime_low/*.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Lifetime_low/larcv_mc_20250625_132307_515258-dc8d5809-c9d5-4e0d-9bc7-8b6fc329f73e_caf.root.flat.root"
+ismc = true
+disable = false
+
+
+[[sample]]
+name = "var05"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Scint_Var/*.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Scint_Var/larcv_mc_20250701_142001_575863-2663ab98-8f26-47fe-8dc2-24a51733c97f_caf.root.flat.root"
+ismc = true
+disable = false
+
+[[sample]]
+name = "var06"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/WireGap/*.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/WireGap/larcv_mc_20250702_145620_275361-2bf97429-f1d2-4f87-9967-8bfb38cc68d7_caf.root.flat.root"
+ismc = true
+disable = false
+
+[[sample]]
+name = "var07"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/YZ_unif/*.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/YZ_unif/larcv_mc_20250808_223735_489987-41697273-c518-4720-abf7-5cd96a625d80_caf.root.flat.root"
+ismc = true
+disable = false
+
+
+
+
+[[tree]]
+name = "selected_multiple"
+sim_only = false
+add_exposure = false
+mode = "reco"
+cut = [
+    { name = "fiducial_cut",              type = "reco" },
+    { name = "flash_cut",                 type = "reco",  parameters = [0.0, 9.6] },
+    { name = "no_photons",                type = "reco",  parameters = [25.0] },
+    { name = "no_electrons",              type = "reco",  parameters = [25.0] },
+    { name = "single_muon",               type = "reco",  parameters = [143.425] },
+    { name = "!no_charged_pions",         type = "reco",  parameters = [25.0] },
+#    { name = "multiple_pion_michel_tag_cut",       type = "reco",  parameters = [25.0, 20.0] },
+    { name = "trigger_emulation_cut",     type = "event", decrements_exposure = false },
+    { name = "data_quality_cut",          type = "event", decrements_exposure = true },
+]
+branch = [
+    # interaction-level truth/reco branches
+    { name = "neutrino_id",             type = "true"    },
+    { name = "baseline",                type = "mctruth" },
+    { name = "cc",                      type = "mctruth" },
+    { name = "pdg",                     type = "mctruth" },
+    { name = "parent_pdg",              type = "mctruth" },
+    { name = "interaction_type",        type = "mctruth" },
+    { name = "interaction_mode",       type = "mctruth" },
+    { name = "category",                type = "true"    },
+    { name = "neutrino_energy",         type = "mctruth" },
+    { name = "q_squared",         type = "mctruth" },
+    { name = "visible_energy",          type = "both"    },
+    { name = "visible_energy_calosub",  type = "both"    },
+    { name = "photon_multiplicity",     type = "both",    parameters = [25.0]},
+    { name = "electron_multiplicity",   type = "both",    parameters = [25.0]},
+    { name = "muon_multiplicity",       type = "both",    parameters = [143.425]},
+    { name = "pion_multiplicity",       type = "both",    parameters = [25.0]},
+    { name = "proton_multiplicity",     type = "both",    parameters = [50.0]},
+    { name = "count_michel_tags", type = "reco"},
+    # kinematic imbalance & angles
+    { name = "opening_angle", type = "both" ,parameters = [1.0]},
+    { name = "opening_angle_proton", type = "both" },
+    { name = "opening_angle_pion", type = "both" },
+    { name = "hadronic_invariant_mass", type = "true" },
+    { name = "hadron_invariant_mass_hadron", type = "both" },
+    { name = "hadron_invariant_mass_general",     type = "both"},
+    { name = "hadron_invariant_mass_general_calo",     type = "both"},
+    { name = "energy_init", type = "true" },
+    { name = "momentum_transfer", type = "true" },
+    { name = "dpT",           type = "both" },
+    { name = "dphiT",         type = "both" },
+    { name = "dalphaT",       type = "both" },
+    { name = "dpL",           type = "both" },
+    { name = "pn",            type = "both" },
+    { name = "muon_cos_angle",     type = "both"},
+    { name = "pion_cos_angle",     type = "both"},
+    { name = "four_mom_transfer_squared",     type = "both"},
+    { name = "four_mom_transfer_squared_calo",     type = "both"},
+    { name = "q3_transfer",     type = "both"},
+    { name = "q0_transfer",     type = "both"},
+    { name = "count_michel_tags", type = "reco"},
+    { name = "Q2_exp", type = "true" },
+    { name = "W_exp", type = "true" },
+    { name = "muon_pT_wrt_beam", type = "both" },
+
+    #For gundam
+    {name = "is_nu",            type = "both"},
+    {name = "is_data",            type = "both"},
+    {name = "cut_type",            type = "both", parameters=[3]},
+    {name = "energy_init",      type = "true"},
+
+    # vertex & flash
+    { name = "vertex_x",         type = "both" },
+    { name = "vertex_y",         type = "both" },
+    { name = "vertex_z",         type = "both" },
+    { name = "containment",      type = "both" },
+    { name = "fiducial",         type = "both" },
+
+    # leading muon interaction-level
+    { name = "end_x",             type = "both_particle", selector = "leading_muon"   },
+    { name = "end_y",             type = "both_particle", selector = "leading_muon"   },
+    { name = "end_z",             type = "both_particle", selector = "leading_muon"   },
+    { name = "px",             type = "both_particle", selector = "leading_muon" },
+    { name = "py",             type = "both_particle", selector = "leading_muon" },
+    { name = "pz",             type = "both_particle", selector = "leading_muon" },
+    { name = "ke",                type = "both_particle", selector = "leading_muon"   },
+    { name = "length",            type = "both_particle", selector = "leading_muon"   },
+    { name = "polar_angle",       type = "both_particle", selector = "leading_muon" },
+    { name = "azimuthal_angle",   type = "both_particle", selector = "leading_muon" },
+    { name = "cos_wrt_beam",   type = "both_particle", selector = "leading_muon" },
+    { name = "containment",   type = "both_particle", selector = "leading_muon" },
+    { name = "primary_classification",   type = "both_particle", selector = "leading_muon" },
+
+    # leading pion particle-level
+    { name = "end_x",             type = "both_particle", selector = "leading_pion" },
+    { name = "end_y",             type = "both_particle", selector = "leading_pion" },
+    { name = "end_z",             type = "both_particle", selector = "leading_pion" },
+    { name = "px",             type = "both_particle", selector = "leading_pion" },
+    { name = "py",             type = "both_particle", selector = "leading_pion" },
+    { name = "pz",             type = "both_particle", selector = "leading_pion" },
+    { name = "ke",                type = "both_particle", selector = "leading_pion" },
+    { name = "length",            type = "both_particle", selector = "leading_pion" },
+    { name = "polar_angle",       type = "both_particle", selector = "leading_pion" },
+    { name = "azimuthal_angle",   type = "both_particle", selector = "leading_pion" },
+    { name = "cos_wrt_beam",   type = "both_particle", selector = "leading_pion" },
+    { name = "containment",   type = "both_particle", selector = "leading_pion" },
+
+    { name = "end_x",             type = "both_particle", selector = "second_leading_pion" },
+    { name = "end_y",             type = "both_particle", selector = "second_leading_pion" },
+    { name = "end_z",             type = "both_particle", selector = "second_leading_pion" },
+    { name = "px",             type = "both_particle", selector = "second_leading_pion" },
+    { name = "py",             type = "both_particle", selector = "second_leading_pion" },
+    { name = "pz",             type = "both_particle", selector = "second_leading_pion" },
+    { name = "ke",                type = "both_particle", selector = "second_leading_pion" },
+    { name = "length",            type = "both_particle", selector = "second_leading_pion" },
+    { name = "polar_angle",       type = "both_particle", selector = "second_leading_pion" },
+    { name = "azimuthal_angle",   type = "both_particle", selector = "second_leading_pion" },
+    { name = "cos_wrt_beam",   type = "both_particle", selector = "second_leading_pion" },
+    { name = "containment",   type = "both_particle", selector = "second_leading_pion" },
+]
+
+
+
+
+
+
+
+[[tree]]
+name = "signal_multiple"
+sim_only = true
+add_exposure = true
+mode = "true"
+cut = [
+    { name = "neutrino",              type = "true" },
+    { name = "fiducial_cut",          type = "true" },
+    { name = "no_photons",            type = "true",  parameters = [25.0] },
+    { name = "no_electrons",          type = "true",  parameters = [25.0] },
+    { name = "single_muon",               type = "true",  parameters = [143.425] },
+    { name = "!no_charged_pions",         type = "true",  parameters = [25.0] },
+#    { name = "multiple_pion_michel_tag_cut",       type = "reco",  parameters = [25.0, 20.0] },
+    { name = "trigger_emulation_cut",     type = "event", decrements_exposure = false },
+    { name = "data_quality_cut",          type = "event", decrements_exposure = true },
+]
+branch = [
+    # Interaction-level truth branches
+    { name = "neutrino_id",            type = "true"    },
+    { name = "containment_cut",        type = "reco"    },
+    { name = "fiducial_cut",           type = "reco"    },
+    { name = "baseline",               type = "mctruth" },
+    { name = "cc",                     type = "mctruth" },
+    { name = "pdg",                     type = "mctruth" },
+    { name = "parent_pdg",              type = "mctruth" },
+    { name = "neutrino_energy",         type = "mctruth" },
+    { name = "q_squared",         type = "mctruth" },
+    { name = "interaction_mode",       type = "mctruth" },
+    { name = "interaction_type",       type = "mctruth" },
+    { name = "category",               type = "true"    },
+    { name = "visible_energy",         type = "reco"    },
+    { name = "visible_energy_calosub", type = "reco"    },
+    {name = "energy_init",      type = "true"},
+
+    # Interaction-level selection variables
+    { name = "photon_multiplicity",   type = "both", parameters = [25.0,]},
+    { name = "electron_multiplicity", type = "both", parameters = [25.0,]},
+    { name = "muon_multiplicity",     type = "both", parameters = [143.425,]},
+    { name = "pion_multiplicity",     type = "both", parameters = [25,]},
+    { name = "proton_multiplicity",   type = "both", parameters = [50.0,]},
+    { name = "pion_michel_tag", type = "both", parameters = [20.0]},
+    { name = "flash_time",            type = "reco" },
+    { name = "selected_pion_ke",     type = "both",    parameters = [25.0,]},
+    { name = "selected_muon_ke",     type = "both",    parameters = [143.425,]},
+    # Kinematic imbalance & angles
+    { name = "opening_angle", type = "both" ,parameters = [1.0]},
+    { name = "opening_angle_proton", type = "both" },
+    { name = "opening_angle_pion", type = "both" },
+    { name = "dpT",           type = "both" },
+    { name = "dalphaT",       type = "both" },
+    { name = "dpL",           type = "both" },
+    { name = "muon_cos_angle",     type = "both"},
+    { name = "pion_cos_angle",     type = "both"},
+    { name = "four_mom_transfer_squared",     type = "both"},
+    { name = "four_mom_transfer_squared_calo",     type = "both"},
+    { name = "hadronic_invariant_mass", type = "true" },
+    { name = "hadron_invariant_mass_hadron", type = "both" },
+    { name = "hadron_invariant_mass_general",     type = "both"},
+    { name = "hadron_invariant_mass_general_calo",     type = "both"},
+    { name = "energy_init", type = "true" },
+    { name = "momentum_transfer", type = "true" },
+    { name = "q3_transfer",     type = "both"},
+    { name = "q0_transfer",     type = "both"},
+    { name = "count_michel_tags", type = "reco"},
+    { name = "Q2_exp", type = "true" },
+    { name = "W_exp", type = "true" },
+
+
+    # Leading MUON particle-level
+    { name = "ke",                type = "both_particle", selector = "leading_muon" },
+    { name = "length",            type = "both_particle", selector = "leading_muon" },
+    { name = "dpT",               type = "both_particle", selector = "leading_muon" },
+    { name = "polar_angle",       type = "both_particle", selector = "leading_muon" },
+    { name = "azimuthal_angle",   type = "both_particle", selector = "leading_muon" },
+    { name = "cos_wrt_beam",   type = "both_particle", selector = "leading_muon" },
+
+    # Leading PION particle-level
+    { name = "ke",                type = "both_particle", selector = "leading_pion" },
+    { name = "length",            type = "both_particle", selector = "leading_pion" },
+    { name = "dpT",               type = "both_particle", selector = "leading_pion" },
+    { name = "polar_angle",       type = "both_particle", selector = "leading_pion" },
+    { name = "azimuthal_angle",   type = "both_particle", selector = "leading_pion" },
+    { name = "cos_wrt_beam",   type = "both_particle", selector = "leading_pion" },
+
+    { name = "ke",                type = "both_particle", selector = "second_leading_pion" },
+    { name = "length",            type = "both_particle", selector = "second_leading_pion" },
+    { name = "dpT",               type = "both_particle", selector = "second_leading_pion" },
+    { name = "polar_angle",       type = "both_particle", selector = "second_leading_pion" },
+    { name = "azimuthal_angle",   type = "both_particle", selector = "second_leading_pion" },
+    { name = "cos_wrt_beam",   type = "both_particle", selector = "second_leading_pion" },
+]

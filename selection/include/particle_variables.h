@@ -72,6 +72,13 @@ namespace pvars
     }
     REGISTER_VAR_SCOPE(RegistrationScope::BothParticle, pid, pid);
 
+    template<class T>
+    double particle_index(const T & p)
+    {
+        return p.id;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::BothParticle, particle_index, particle_index);
+
     /**
      * @brief Variable for the semantic type of the particle.
      * @details This variable returns the semantic type of the particle. The
@@ -941,5 +948,98 @@ namespace pvars
         return p.primary_scores[0];
     }
     REGISTER_VAR_SCOPE(RegistrationScope::RecoParticle, secondary_softmax, secondary_softmax);
+
+    template<class T>
+    double cos_wrt_beam(const T & p)
+    {
+        utilities::three_vector vtx = {pvars::start_x(p), pvars::start_y(p), pvars::start_z(p)};
+        utilities::three_vector p_unit = std::make_tuple(p.start_dir[0], p.start_dir[1], p.start_dir[2]);
+        utilities::three_vector beam_unit = utilities::numi_beam_direction(vtx);
+        return utilities::dot_product(p_unit, beam_unit);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::BothParticle, cos_wrt_beam, cos_wrt_beam);
+
+
+    template<class T>
+    double startdir_vs_displacement(const T & p)
+    {
+        utilities::three_vector dis_vec_norm;
+        utilities::three_vector start_dir_norm;
+        utilities::three_vector dis_vec = {pvars::end_x(p)-pvars::start_x(p), pvars::end_y(p)-pvars::start_y(p), pvars::end_z(p)-pvars::start_z(p)};
+        dis_vec_norm = utilities::normalize(dis_vec);
+        utilities::three_vector start_dir = {pvars::start_dir_x(p), pvars::start_dir_y(p), pvars::start_dir_z(p)};
+        start_dir_norm = utilities::normalize(start_dir);
+//        std::cout<<utilities::dot_product(start_dir_norm, dis_vec_norm)<<std::endl;
+        //return utilities::dot_product(start_dir_norm, dis_vec_norm);
+        return utilities::dot_product(dis_vec_norm, start_dir_norm);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::BothParticle, startdir_vs_displacement, startdir_vs_displacement);
+
+    template<class T>
+    float p_start_straightness(const caf::SRParticleDLPProxy & p)
+    {
+        return p.start_straightness;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::RecoParticle, p_start_straightness, p_start_straightness);
+
+
+    template<class T>
+    int64_t p_parent_pdg_code(const caf::SRParticleTruthDLPProxy & p)
+    {
+        return p.parent_pdg_code;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::TrueParticle, p_parent_pdg_code, p_parent_pdg_code);
+
+    template<class T>
+    int64_t pion_children_counts_shower(const caf::SRParticleTruthDLPProxy & p)
+    {
+        return p.children_counts[0];
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::TrueParticle, pion_children_counts_shower, pion_children_counts_shower);
+
+    template<class T>
+    int64_t pion_children_counts_track(const caf::SRParticleTruthDLPProxy & p)
+    {
+        return p.children_counts[1];
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::TrueParticle, pion_children_counts_track, pion_children_counts_track);
+
+    template<class T>
+    int64_t pion_children_counts_michel(const caf::SRParticleTruthDLPProxy & p)
+    {
+        return p.children_counts[2];
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::TrueParticle, pion_children_counts_michel, pion_children_counts_michel);
+
+    template<class T>
+    int64_t pion_children_counts_delta_e(const caf::SRParticleTruthDLPProxy & p)
+    {
+        return p.children_counts[3];
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::TrueParticle, pion_children_counts_delta_e, pion_children_counts_delta_e);
+
+    template<class T>
+    int64_t pion_children_counts_lowenergy(const caf::SRParticleTruthDLPProxy & p)
+    {
+        return p.children_counts[4];
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::TrueParticle, pion_children_counts_lowenergy, pion_children_counts_lowenergy);
+
+    template<class T>
+    double pdg_code(const T & p)
+    {
+        return p.pdg_code;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::BothParticle, pdg_code, pdg_code);
+
+    template<class T>
+    int64_t pindex(const T & p)
+    {
+        return p.id;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::BothParticle, pindex, pindex);
+
+
+
 }
 #endif // PARTICLE_VARIABLES_H

@@ -35,8 +35,24 @@ namespace mctruth
      * @return the true neutrino energy.
      */
     template<typename T>
-        double neutrino_energy(const T & obj) { return obj.E; }
+        double neutrino_energy(const T & obj)
+        { 
+        if (!obj.E>0.0 || !std::isfinite(obj.E))
+            return -999.0;
+        else
+            return obj.E;
+        }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, neutrino_energy, neutrino_energy);
+
+    template<typename T>
+        double q_squared(const T & obj)
+        { 
+        if (!obj.Q2>0.0 || !std::isfinite(obj.Q2))
+            return -999.0;
+        else
+            return obj.Q2;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, q_squared, q_squared);
 
     /**
      * @brief Variable for the true neutrino baseline.
@@ -111,5 +127,345 @@ namespace mctruth
     template<typename T>
         double interaction_type(const T & obj) { return obj.genie_inttype; }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, interaction_type, interaction_type);
+
+    template<typename T>
+        int nneutron_bf_FSI(const T & obj) { return obj.nneutron; }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, nneutron_bf_FSI, nneutron_bf_FSI);
+
+    template<typename T>
+        int npiplus_bf_FSI(const T & obj) { return obj.npiplus; }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, npiplus_bf_FSI, npiplus_bf_FSI);
+
+    template<typename T>
+        int npiminus_bf_FSI(const T & obj) { return obj.npiminus; }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, npiminus_bf_FSI, npiminus_bf_FSI);
+
+    template<typename T>
+        int npizero_bf_FSI(const T & obj) { return obj.npizero; }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, npizero_bf_FSI, npizero_bf_FSI);
+
+    template<typename T>
+        int nproton_bf_FSI(const T & obj) { return obj.nproton; }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, nproton_bf_FSI, nproton_bf_FSI);
+
+
+
+
+
+    template<typename T>
+        double nneutron_G4(const T & obj)
+        {
+//            std::cout<<"resnum:"<<obj.resnum<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
+//            std::cout<<"parent pdg:"<<obj.parent_pdg<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
+//            std::cout<<"target pdg:"<<obj.targetPDG<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
+            size_t count(0);
+            for(const auto & p : obj.prim)
+            {
+//            std::cout<<"Prim particle pad:"<<p.pdg<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
+//            std::cout<<"parent id:"<<p.parent<<std::endl;
+            unsigned parentid=p.parent;
+
+                if (p.pdg==2112) ++count;
+            }
+//            for(const auto & p : obj)
+//            {
+//                std::cout<<"parent pdg:"<<p.pdg<<std::endl;
+//            }
+
+//            std::cout<<"count:"<<count<<std::endl;
+            return count;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, nneutron_G4, nneutron_G4);
+
+    template<typename T>
+        double prim_pion_process(const T & obj)
+        {
+            int process = -9999;
+            for(const auto & p : obj.prim)
+            {
+                if ( (p.pdg==211 || p.pdg==-211) && (p.genE-0.139)>0.05 )
+                {
+//                    std::cout << "pion:" << std::endl;
+//                    std::cout<<"genE:"<<p.genE<<std::endl;
+//                    std::cout<<"end_process:"<<p.end_process<<std::endl;
+                    process=p.end_process;
+                }
+            }
+            return process;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, prim_pion_process, prim_pion_process);
+
+    template<typename T>
+        double prim_proton_process(const T & obj)
+        {
+            int process = -9999;
+            for (const auto & p : obj.prim)
+            {
+                unsigned parentid = p.parent;
+                if (p.pdg==2212 && (p.genE-0.93827)>0.05)
+                {
+//                    std::cout << "proton:" << std::endl;
+//                    std::cout << "genE:" << p.genE << std::endl;
+//                    std::cout << "end_process:" << p.end_process << std::endl;
+                    process = p.end_process;
+                }
+            }
+            return process;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, prim_proton_process, prim_proton_process);
+    template<typename T>
+        double prim_muon_process(const T & obj)
+        {
+            int process = -9999;
+            for (const auto & p : obj.prim)
+            {
+                unsigned parentid = p.parent;
+                if ( (p.pdg==13 || p.pdg==-13) && (p.genE-0.10566)>0.143 )
+                {
+//                    std::cout << "muon:" << std::endl;
+//                    std::cout << "genE:" << p.genE << std::endl;
+//                    std::cout << "end_process:" << p.end_process << std::endl;
+                    process = p.end_process;
+                }
+            }
+            return process;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, prim_muon_process, prim_muon_process);
+
+
+    template<typename T>
+        bool is_neutrino_pandora(const T & obj)
+        {
+            int pdg = obj.pdg;
+            return (abs(pdg) == 12 || abs(pdg) == 14 || abs(pdg) == 16);
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, is_neutrino_pandora, is_neutrino_pandora);
+
+    template<typename T>
+        bool single_pion_pandora(const T & obj)
+        {
+            int count = 0;
+            for (const auto & p : obj.prim)
+            {
+                if ( (p.pdg==211 || p.pdg==-211) && (p.genE - 0.13957) > 0.05 )
+                {
+                    count++;
+                }
+            }
+            return (count == 1);
+        }
+    template<typename T>
+        bool single_proton_pandora(const T & obj)
+        {
+            int count = 0;
+            for (const auto & p : obj.prim)
+            {
+                if (p.pdg==2212 && (p.genE - 0.93827) > 0.05)
+                {
+                    count++;
+                }
+            }
+            return (count == 1);
+        }
+    template<typename T>
+        bool single_muon_pandora(const T & obj)
+        {
+            int count = 0;
+            for (const auto & p : obj.prim)
+            {
+                if ( (p.pdg==13 || p.pdg==-13) && (p.genE - 0.10566) > 0.143 )
+                {
+                    count++;
+                }
+            }
+            return (count == 1);
+        }
+    template<typename T>
+        bool no_photon_pandora(const T & obj)
+        {
+            for (const auto & p : obj.prim)
+            {
+                if (p.pdg == 22 && p.genE > 0.025)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    template<typename T>
+        bool no_electron_pandora(const T & obj)
+        {
+            for (const auto & p : obj.prim)
+            {
+                if ( (p.pdg==11 || p.pdg==-11) && p.genE > 0.025 )
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, single_pion_pandora, single_pion_pandora);
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, single_proton_pandora, single_proton_pandora);
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, single_muon_pandora, single_muon_pandora);
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, no_photon_pandora, no_photon_pandora);
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, no_electron_pandora, no_electron_pandora);
+
+    template<typename T>
+        int pion_num_pandora(const T & obj)
+        {
+            int count = 0;
+            for (const auto & p : obj.prim)
+            {
+                if ( (p.pdg==211 || p.pdg==-211) && (p.genE - 0.13957) > 0.05 )
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, pion_num_pandora, pion_num_pandora);
+    template<typename T>
+        int proton_num_pandora(const T & obj)
+        {
+            int count = 0;
+            for (const auto & p : obj.prim)
+            {
+                if (p.pdg==2212 && (p.genE - 0.93827) > 0.05)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, proton_num_pandora, proton_num_pandora);
+    template<typename T>
+        int muon_num_pandora(const T & obj)
+        {
+            int count = 0;
+            for (const auto & p : obj.prim)
+            {
+                if ( (p.pdg==13 || p.pdg==-13) && (p.genE - 0.10566) > 0.143 )
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, muon_num_pandora, muon_num_pandora);
+
+    template<typename T>
+        bool pion_process_not_9_or_10(const T & obj)
+        {
+            for (const auto & p : obj.prim)
+            {
+                if ( (p.pdg==211 || p.pdg==-211) && (p.genE-0.139)>0.05 )
+                {
+                    int process = p.end_process;
+
+                    if (process == 9 || process == 10)
+                        return false;
+                }
+            }
+            return true;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, pion_process_not_9_or_10, pion_process_not_9_or_10);
+
+
+    template<typename T>
+        double resnum(const T & obj)
+        {
+//            std::cout<<"resnum:"<<obj.resnum<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
+//            std::cout<<"parent pdg:"<<obj.parent_pdg<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
+//            std::cout<<"target pdg:"<<obj.targetPDG<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
+//            for(const auto & p : obj)
+//            {
+//                std::cout<<"parent pdg:"<<p.pdg<<std::endl;
+//            }
+//            std::cout<<"count:"<<count<<std::endl;
+            return obj.resnum;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, resnum, resnum);
+
+
+    template<typename T>
+        double muon_length(const T & obj)
+        {
+            int process = -9999;
+            for (const auto & p : obj.prim)
+            {
+                unsigned parentid = p.parent;
+                if ( (p.pdg==13 || p.pdg==-13) && (p.genE-0.10566)>0.143 )
+                {
+                    process = p.length;
+                }
+            }
+            return process;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, muon_length, muon_length);
+
+    template<typename T>
+        double muon_end_x(const T & obj)
+        {
+            int process = -9999;
+            for (const auto & p : obj.prim)
+            {
+                unsigned parentid = p.parent;
+                if ( (p.pdg==13 || p.pdg==-13) && (p.genE-0.10566)>0.143 )
+                {
+                    process = p.end.x;
+                }
+            }
+            return process;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, muon_end_x, muon_end_x);
+
+    template<typename T>
+        double muon_end_y(const T & obj)
+        {
+            int process = -9999;
+            for (const auto & p : obj.prim)
+            {
+                unsigned parentid = p.parent;
+                if ( (p.pdg==13 || p.pdg==-13) && (p.genE-0.10566)>0.143 )
+                {
+                    process = p.end.y;
+                }
+            }
+            return process;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, muon_end_y, muon_end_y);
+
+
+    template<typename T>
+        double muon_end_z(const T & obj)
+        {
+            int process = -9999;
+            for (const auto & p : obj.prim)
+            {
+                unsigned parentid = p.parent;
+                if ( (p.pdg==13 || p.pdg==-13) && (p.genE-0.10566)>0.143 )
+                {
+                    process = p.end.z;
+                }
+            }
+            return process;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, muon_end_z, muon_end_z);
+
+    template<typename T>
+        double pion_pdg(const T & obj)
+        {
+            double pdg = -999;
+            for (const auto & p : obj.prim)
+            {
+                if ( (p.pdg==211 || p.pdg==-211) && (p.genE - 0.13957) > 0.05 )
+                {
+                    pdg=p.pdg;
+                }
+            }
+            return pdg;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, pion_pdg, pion_pdg);
+
 } // namespace mctruth
 #endif

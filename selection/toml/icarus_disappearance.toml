@@ -18,7 +18,6 @@ pion_threshold = 25.0
 proton_threshold = 50.0
 flash_low_t = -0.5
 flash_high_t = 1.6
-bnb_fom2_cut = 0.98
 
 [[category]] # 0 : Contained, fiducial, single muon, single proton
 cuts = [
@@ -97,7 +96,7 @@ cuts = [
 
 [[sample]]
 name = "nominal"
-path = "/pnfs/icarus/persistent/users/mueller/production/simulation/nominal/input*.flat.root"
+path = "/pnfs/icarus/persistent/users/mueller/production/simulation/nominal/input006.flat.root"
 ismc = true
 disable = false
 
@@ -105,127 +104,127 @@ disable = false
 name = "cvext"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/cvext/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var00"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var00/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var01"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var01/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var02"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var02/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var03m"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var03m/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var03p"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var03p/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var04"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var04/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var05"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var05/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var06"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var06/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var07"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var07/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var09m"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var09m/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var09p"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var09p/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var10m"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var10m/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var10p"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var10p/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var11"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var11/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var12m"
 path = "/pnfs/icarus/scratch/users/mueller/production/simulation/var12m/flat/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var12p"
 path = "/pnfs/icarus/scratch/users/mueller/production/simulation/var12p/flat/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var13m"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var13m/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "var13p"
 path = "/pnfs/icarus/persistent/users/mueller/production/simulation/var13p/input*.flat.root"
 ismc = true
-disable = false
+disable = true
 
 [[sample]]
 name = "offbeam"
 path = "/pnfs/icarus/persistent/users/mueller/production/data/offbeam/input*.flat.root"
-ismc = false
-disable = false
+ismc = true
+disable = true
 
 [[sample]]
 name = "onbeam"
 path = "/pnfs/icarus/persistent/users/mueller/production/data/onbeam/input*.flat.root"
-ismc = false
-disable = false
+ismc = true
+disable = true
 
 [[tree]]
 name = "selected"
@@ -244,7 +243,6 @@ cut = [
     { name = "trigger_emulation_cut",     type = "event", decrements_exposure = false },
     { name = "data_quality_cut",          type = "event", decrements_exposure = true },
     { name = "beam_quality_cut",          type = "spill", decrements_exposure = false }, # Should decrement exposure, but CAF files are bugged
-    { name = "bnb_fom2_cut",              type = "event", decrements_exposure = false, parameters = [ "@bnb_fom2_cut" ]}, # Should decrement exposure, but CAF files are bugged
 ]
 branch = [
     # Interaction-level truth/reco branches

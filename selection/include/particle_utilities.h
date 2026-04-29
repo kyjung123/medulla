@@ -197,5 +197,20 @@ namespace utilities
         double scale = dot_product(p, unit);
         return std::make_tuple(scale*std::get<0>(unit), scale*std::get<1>(unit), scale*std::get<2>(unit));
     }
+
+     //NUMI_BEAM direction
+     three_vector numi_beam_direction(const three_vector &vtx) {
+         // Beam reference point (from your code)
+         three_vector beam = std::make_tuple(
+                 31512.0380 + std::get<0>(vtx),
+                 3364.4912  + std::get<1>(vtx),
+                 73363.2532 + std::get<2>(vtx)
+                 );
+
+         // Normalize to unit vector
+         return normalize(beam);
+     }
+
+
 }
 #endif // PARTICLE_UTILITIES_H

@@ -49,10 +49,13 @@ namespace selectors
         {
             const auto & p = obj.particles[i];
             double energy(pvars::ke(p));
-            if(pvars::pid(p) == pid && energy > leading_ke)
+//            if(pvars::pid(p) == pid && energy > leading_ke)
+            if(pvars::pid(p) == pid && energy > leading_ke && pvars::primary_classification(p)) 
+
             {
                 leading_ke = energy;
                 index = i;
+//                std::cout<<"pid:"<<pid<<"leading_ke :"<<leading_ke<<", index: "<<index<<", p id: "<<pvars::pindex(p)<<std::endl;
             }
         }
         return index;
@@ -230,5 +233,81 @@ namespace selectors
         return leading_particle_index(obj, pvars::kProton);
     }
     REGISTER_SELECTOR(leading_proton, leading_proton);
+
+
+
+    template <class T>
+    size_t least_ke_particle_index(const T &obj, uint16_t pid)
+    {
+        double min_ke = std::numeric_limits<double>::max();
+        size_t index = kNoMatch;
+
+        for (size_t i = 0; i < obj.particles.size(); ++i)
+        {
+            const auto &p = obj.particles[i];
+            double energy = pvars::ke(p);
+
+            if (pvars::pid(p) == pid && energy < min_ke && pvars::primary_classification(p))
+            {
+                min_ke = energy;
+                index = i;
+            }
+        }
+
+        return index;
+    }
+
+    template<class T>
+    size_t least_proton(const T & obj)
+    {
+        return least_ke_particle_index(obj, pvars::kProton);
+    }
+    REGISTER_SELECTOR(least_proton, least_proton);
+
+
+    template <class T>
+    size_t second_leading_particle_index(const T& obj, uint16_t pid)
+    {
+        double best_ke   = -1.0;
+        double second_ke = -1.0;
+
+        size_t best_idx   = kNoMatch;
+        size_t second_idx = kNoMatch;
+
+        for (size_t i = 0; i < obj.particles.size(); ++i)
+        {
+            const auto& p = obj.particles[i];
+
+            if (pvars::pid(p) != pid) continue;
+            if (!pvars::primary_classification(p)) continue;
+
+            const double ke = pvars::ke(p);
+
+            // Strict '>' means ties keep earlier ordering; change if you want tie-breaking.
+            if (ke > best_ke)
+            {
+                // demote best -> second
+                second_ke  = best_ke;
+                second_idx = best_idx;
+
+                best_ke  = ke;
+                best_idx = i;
+            }
+            else if (ke > second_ke && i != best_idx)
+            {
+                second_ke  = ke;
+                second_idx = i;
+            }
+        }
+
+        return second_idx; // kNoMatch if fewer than 2 matches
+    }
+    template<class T>
+    size_t second_leading_pion(const T & obj)
+    {
+        return second_leading_particle_index(obj, pvars::kPion);
+    }
+    REGISTER_SELECTOR(second_leading_pion, second_leading_pion);
+
 }
 #endif // SELECTORS_H

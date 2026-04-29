@@ -471,6 +471,53 @@ namespace evar
         return nbnbs;
     }
     REGISTER_VAR_SCOPE(RegistrationScope::Event, unfolded_event_nbnb, unfolded_event_nbnb);
+
+    /** 
+     *      * @brief Dummy GUNDAM variable for sample classification (data or not).
+     *           * @details "is_data" specifies whether or not sample comes from data.
+     *                * @param obj the interaction to apply the variable on.
+     *                     * @return the sample classification (data or not.)    
+     *                          */
+     template<class T>      
+     double is_data(const T & obj)   
+     {                      
+             double cat(-5);    
+         return cat;            
+         }                      
+     REGISTER_VAR_SCOPE(RegistrationScope::Both, is_data, is_data);                                                                                                                                                                                                          
+                            
+     /**                    
+      *      * @brief Dummy GUNDAM variable for interaction classification (neutrino or not).
+      *           * @details "is_nu" specifies wheter or not an interaction is from a neutrino.
+      *                * @param obj the interactin to apply the variable on.
+      *                     * @return the interaction classification (nu or not.) 
+      *                          */
+     template<class T>      
+         double is_nu(const T & obj)
+         {
+             double cat(-5);
+             return cat;
+         }
+     REGISTER_VAR_SCOPE(RegistrationScope::Both, is_nu, is_nu);
+    
+    /**
+     *      * @brief Dummy GUNDAM variable for cut type.
+     *           * @details Cut type specifies a signal or sideband cut.
+     *           signal selection=1, sideband1=2,sideband2=3...
+     *                * @param obj the interaction to apply the variable on.
+     *                     * @return the cut type for GUNDAM. 
+     *                          */
+    template<class T>
+        double cut_type(const T & obj,std::vector<double> params={1})
+        {
+            double cat(params[0]);
+            return cat;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::Both, cut_type, cut_type);
+    
+    template<typename T>
+        double energy_init(const T & obj) { return obj.energy_init; }
+    REGISTER_VAR_SCOPE(RegistrationScope::True, energy_init, energy_init);
 }
 
 #endif

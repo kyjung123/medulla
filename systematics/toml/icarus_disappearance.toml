@@ -1,10 +1,10 @@
 [input]
-path = 'icarus_disappearance_08032025.root'
+path = '/pnfs/icarus/scratch/users/kyjung/medulla/output/justin.root'
 weights = '/pnfs/icarus/persistent/users/mueller/production/simulation/cvext/input*.flat.root'
 use_additional_hash = true
 
 [output]
-path = 'icarus_disappearance_08032025_sys.root'
+path = '/pnfs/icarus/scratch/users/kyjung/medulla/output/justin_sys.root'
 histogram_destination = 'variations/'
 
 [[sysvar]]
@@ -19,7 +19,7 @@ result_destination = 'detsys_results/'
 variable = 'reco_visible_energy'
 variable_length = true
 bins = [0.3, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0]
-nuniverses = 10
+nuniverses = 1000
 
 [[tree]]
 origin = 'events/nominal/signal'

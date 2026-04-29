@@ -15,6 +15,7 @@
 #include <algorithm>
 
 #include "particle_variables.h"
+#include "selectors.h"
 
 /**
  * @namespace pcuts
@@ -162,5 +163,27 @@ namespace pcuts
         return pvars::semantic_type(p) == static_cast<int>(params[0]);
     }
     REGISTER_CUT_SCOPE(RegistrationScope::BothParticle, is_semantic_type, is_semantic_type);
+
+    template<class T>
+    bool is_pid_threshold(const T & p, std::vector<double> params={0.0, 0.0})
+    {
+        return (pvars::pid(p) == static_cast<size_t>(params[0])) &&  (pvars::ke(p) >= params[1]);
+    }
+    REGISTER_CUT_SCOPE(RegistrationScope::BothParticle, is_pid_threshold, is_pid_threshold);
+
+//
+//    template<class T>
+//    bool is_leading(const T & obj)
+//    {
+//        const size_t pi = selectors::leading_pion(obj);
+//        double leading_ke(0);
+//        size_t index(kNoMatch);
+//        if (pi == 0)
+//            return true;
+//        else return false;
+//    }
+//    REGISTER_CUT_SCOPE(RegistrationScope::RecoParticle, is_leading, is_leading);
+
+
 }
 #endif // PARTICLE_CUTS_H

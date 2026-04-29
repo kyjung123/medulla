@@ -60,6 +60,7 @@ sys::WeightReader::WeightReader(const std::string & input)
 
     if(isflat)
     {
+        std::cout<<"falt caf:"<<std::endl;
         // Event-level indexing
         chain.SetBranchAddress("rec.mc.nu..length", &nnu);
 
@@ -135,7 +136,9 @@ float sys::WeightReader::get_weight(size_t idn, size_t idu) const
         return wgts[univ_offset + idu];
     }
     else
+    {
         return (*mc)[idn].wgt[idx].univ[idu];
+    }
 }
 
 // Accessor method for the neutrino energy.

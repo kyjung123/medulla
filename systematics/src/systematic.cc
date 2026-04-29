@@ -6,6 +6,7 @@
  * systematics that can be applied to the analysis.
  * @author mueller@fnal.gov
  */
+#include <iostream>
 #include "systematic.h"
 #include "configuration.h"
 
@@ -58,6 +59,7 @@ TTree * sys::Systematic::get_tree()
 // Get a reference to the weights vector.
 std::vector<double> * & sys::Systematic::get_weights()
 {
+//    std::cout<<weights<<std::endl;
     return weights;
 }
 

@@ -13,9 +13,17 @@
 #include <numeric>
 #include <cmath>
 #include <algorithm>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <queue>
+#include <optional>
+#include <limits>
+
 
 #include "utilities.h"
 #include "framework.h"
+#include "selectors.h"
 
 /**
  * @namespace cuts
@@ -245,6 +253,30 @@ namespace cuts
         return true;
     }
     REGISTER_CUT_SCOPE(RegistrationScope::Both, nonmuon_containment_cut, nonmuon_containment_cut);
+    
+    template<class T>
+    bool muon_containment_cut(const T & obj,std::vector<double> params={25.0,})
+    {
+        for(const auto & p : obj.particles)
+        {
+            if(pvars::pid(p) == pvars::kMuon && pvars::primary_classification(p)  && pcuts::containment_cut(p) && pvars::ke(p) >= params[0])
+                return true;
+        }
+        return false;
+    }
+    REGISTER_CUT_SCOPE(RegistrationScope::Both, muon_containment_cut, muon_containment_cut);
+
+    template<class T>
+    bool pion_containment_cut(const T & obj,std::vector<double> params={25.0,})
+    {
+        for(const auto & p : obj.particles)
+        {
+            if(pvars::pid(p) == pvars::kPion && pvars::primary_classification(p) && pcuts::containment_cut(p) && pvars::ke(p) >= params[0])
+                return true;
+        }
+        return false;
+    }
+    REGISTER_CUT_SCOPE(RegistrationScope::Both, pion_containment_cut, pion_containment_cut);
 
     /**
      * @brief Apply a cut on the "time containment" of the interaction.
@@ -548,5 +580,272 @@ namespace cuts
         return count == 1;
     }
     REGISTER_CUT_SCOPE(RegistrationScope::Both, single_michel, single_michel);
+
+
+
+
+
+
+    template<class T>
+        bool pion_michel_tag_cut(const T& obj, std::vector<double> params={25.0,20.0})
+        {
+            bool findpion=false;
+            bool michel_tagged = false;
+            size_t pionindex= -99;//gaurantee it is reco pion candidate
+            utilities::three_vector pion_end = {0,0,0};
+            for(size_t i(0); i < obj.particles.size(); ++i)
+            {
+                const auto & p = obj.particles[i];
+                if(pvars::pid(p) == pvars::kPion && pvars::primary_classification(p) && pvars::ke(p) >= params[0]) //same condition of single_pion
+                {
+                    pionindex=p.id;
+                    auto & pion(obj.particles[i]);
+                    pion_end = {pvars::end_x(pion), pvars::end_y(pion), pvars::end_z(pion)};
+                    findpion=true;
+                }
+            }
+            if (findpion)
+            {
+                for(size_t i(0); i < obj.particles.size(); ++i)
+                {
+                    const auto & p = obj.particles[i];
+                    if (p.id == pionindex) continue;
+                    utilities::three_vector particle_vtx = {pvars::start_x(p), pvars::start_y(p), pvars::start_z(p)};
+                    double Atslc = utilities::magnitude(utilities::subtract(pion_end, particle_vtx));
+                    if (p.shape==2 && Atslc<params[1])  
+                    {
+                        michel_tagged = true;
+                    }
+
+                }
+            }
+            else
+            {
+                return michel_tagged;
+            }
+            return michel_tagged;
+        }
+    REGISTER_CUT_SCOPE(RegistrationScope::Both, pion_michel_tag_cut, pion_michel_tag_cut);
+
+
+
+    
+
+    template <class T>
+        std::vector<int64_t> get_pion_children_pdgs(const T& obj, std::vector<double> params={25.0,})
+        {
+            std::vector<int64_t> v;
+            if (params.empty()) return v;
+
+            size_t pi_idx = kNoMatch;
+
+            for (size_t i = 0; i < obj.particles.size(); ++i) {
+                const auto& p = obj.particles[i];
+                if (pvars::pid(p) == pvars::kPion && pvars::primary_classification(p) && pvars::ke(p) >= params[0]) {
+                    pi_idx = i;                            // <-- keep the INDEX
+                }
+            }
+            if (pi_idx == kNoMatch) return v;
+
+            const auto& pion = obj.particles[pi_idx];
+
+            std::unordered_map<int64_t, size_t> id2i;
+            id2i.reserve(obj.particles.size());
+            for (size_t i = 0; i < obj.particles.size(); ++i)
+                id2i.emplace((int64_t)obj.particles[i].id, i);
+
+            for (auto cid_raw : pion.children_id) {
+                auto it = id2i.find((int64_t)cid_raw);
+                if (it == id2i.end()) continue;
+                v.push_back((int64_t)obj.particles[it->second].pdg_code);
+            }
+            return v;
+        }
+    template <class T>
+        static inline std::unordered_map<int64_t, std::vector<size_t>>
+        build_parent_children_map(const T& obj)
+        {
+            std::unordered_map<int64_t, std::vector<size_t>> pc;
+            pc.reserve(obj.particles.size());
+            for (size_t i = 0; i < obj.particles.size(); ++i)
+            {
+                if (obj.particles[i].parent_id == obj.particles[i].id) continue; // <-- skip self-parented entries
+                pc[obj.particles[i].parent_id].push_back(i);
+            }
+            return pc;
+        }
+
+    template <class T>
+        struct DescendantFlags {
+            bool hasMuon        = false;
+            bool hasMichelStrict= false; // (shape==2 && |pdg|==11)
+            bool hasChargedPi   = false; // |pdg|==211
+            bool hasPi0         = false; // 111
+            bool hasNuclear     = false; // p/n or PDG >= 1e9
+        };
+
+    template <class T>
+        static inline DescendantFlags<T>
+        scan_direct_children(const T& obj, size_t pion_idx)
+        {
+            DescendantFlags<T> f;  // same fields: hasMuon, hasMichelStrict, hasChargedPi, hasPi0, hasNuclear
+            if (pion_idx == kNoMatch || pion_idx >= obj.particles.size()) return f;
+
+            const auto pc = build_parent_children_map(obj);
+            const int64_t root = obj.particles[pion_idx].id;
+
+            auto it = pc.find(root);
+            if (it == pc.end()) return f; // no direct children
+
+            for (size_t idx : it->second) {
+                const auto& ch = obj.particles[idx];
+                if (ch.id == root) continue; // <-- ignore self as a "child"
+                const int pdg = ch.pdg_code;
+                const int ap  = std::abs(pdg);
+
+                if (ap == 13)                     f.hasMuon = true;
+                if (ch.shape == 2 && ap == 11)    f.hasMichelStrict = true; // Michel-like electron as a *direct* daughter only
+                if (ap == 211)                    f.hasChargedPi = true;
+                if (pdg == 111)                   f.hasPi0 = true;
+                if (ap == 2212 || ap == 2112 || ap >= 1000000000) f.hasNuclear = true; // p/n or ion
+            }
+            return f;
+        }
+
+
+    template <class T>
+        bool pion_michel_decay(const T& obj, std::vector<double> params={25.0,})
+        {
+            if (params.empty()) return false;
+
+            size_t pi_idx = kNoMatch;
+            for (size_t i = 0; i < obj.particles.size(); ++i) {
+                const auto& p = obj.particles[i];
+                if (pvars::pid(p) == pvars::kPion && pvars::primary_classification(p) && pvars::ke(p) >= params[0]) {
+                    pi_idx = i;                               // <-- keep INDEX
+                }
+            }
+            if (pi_idx == kNoMatch) return false;
+            const auto ch = get_pion_children_pdgs(obj);
+            auto cntN = [&](){
+                int c = 0;
+                for (auto x: ch) if (x==2212 || x==2112 || std::abs(x)>=1000000000) ++c;
+                return c;
+            };
+            auto onlyGammas = [&](){
+                if (ch.empty()) return false;
+                for (auto x: ch) if (x != 22) return false;
+                return true;
+            };
+
+            const int  Nnuc_dir = cntN();
+            const bool anyN_dir = (Nnuc_dir > 0);
+
+            // *** Direct-only scan ***
+            const auto df = scan_direct_children(obj, pi_idx);
+
+            // -------- DECAY (direct-only) ----------
+            // Require a direct muon to call DECAY.
+            // (Optional) Allow a direct Michel-shaped e± ONLY if there are no direct pions/pi0/nuclear products.
+            if (df.hasMuon)
+                return true;
+
+            if (df.hasMichelStrict && !df.hasChargedPi && !df.hasPi0 && !anyN_dir)
+                return true;
+
+            // -------- CAPTURE (direct-only) --------
+            // π- capture often shows photons only, or nucleons with no pions.
+            if (onlyGammas())
+                return false;
+
+            if (anyN_dir && !df.hasChargedPi && !df.hasPi0)
+                return false;
+
+            // -------- INELASTIC / ELASTIC ----------
+            // π0 among direct daughters → inelastic
+            if (df.hasPi0)
+                return false;
+
+            // Charged π with nucleons → inelastic
+            if (df.hasChargedPi && anyN_dir)
+                return false;
+
+            // Exactly one direct charged π and nothing else → elastic-like
+            {
+                int nCpi = 0, nOther = 0;
+                for (auto x: ch) {
+                    if (std::abs(x) == 211) ++nCpi;
+                    else if (x != 0) ++nOther; // ignore 0 if it can appear
+                }
+                if (nCpi == 1 && nOther == 0)
+                    return false; // or INELASTIC if you don't keep ELASTIC separate
+            }
+
+            // Any charged π at all (and no stronger signature above) → inelastic bucket
+            if (df.hasChargedPi)
+                return false;
+
+            // -------- Fallback ----------
+            return false;
+        }
+    REGISTER_CUT_SCOPE(RegistrationScope::True, pion_michel_decay, pion_michel_decay);
+
+
+    template<class T>
+    bool multiple_pion_michel_tag_cut(const T& obj, std::vector<double> params={25.0,25.0})
+    {
+        // params[0] = pion KE threshold
+        // params[1] = distance threshold for Michel proximity
+    
+        std::vector<size_t> pion_ids;
+        std::vector<utilities::three_vector> pion_ends;
+    
+        // 1) collect ALL reco pion candidates (same condition as your single_pion)
+        for (size_t i = 0; i < obj.particles.size(); ++i)
+        {
+            const auto& p = obj.particles[i];
+    
+            if (pvars::pid(p) == pvars::kPion && pvars::primary_classification(p) && pvars::ke(p) >= params[0])
+            {
+                pion_ids.push_back(p.id);
+                pion_ends.push_back({pvars::end_x(p), pvars::end_y(p), pvars::end_z(p)});
+            }
+        }
+    
+        const int numpion = static_cast<int>(pion_ids.size());
+        if (numpion <= 1) return false; // require multiple pions
+    
+        // 2) count Michel tags (how many particles satisfy your Michel condition
+        //    AND are close to ANY pion end)
+        int nmichel = 0;
+    
+        for (size_t i = 0; i < obj.particles.size(); ++i)
+        {
+            const auto& p = obj.particles[i];
+    
+            // skip the pion candidates themselves
+            if (std::find(pion_ids.begin(), pion_ids.end(), p.id) != pion_ids.end())
+                continue;
+    
+            // your Michel-like condition
+            if (p.shape != 2) continue;
+    
+            utilities::three_vector particle_vtx = {pvars::start_x(p), pvars::start_y(p), pvars::start_z(p)};
+    
+            bool close_to_any_pion = false;
+            for (const auto& pe : pion_ends)
+            {
+                const double d = utilities::magnitude(utilities::subtract(pe, particle_vtx));
+                if (d < params[1]) { close_to_any_pion = true; break; }
+            }
+    
+            if (close_to_any_pion) nmichel++;
+        }
+    
+        // require multiple Michel tags too
+        return (nmichel > 1);
+    }
+    REGISTER_CUT_SCOPE(RegistrationScope::Both, multiple_pion_michel_tag_cut, multiple_pion_michel_tag_cut);
+
 }
 #endif
