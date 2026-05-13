@@ -22,7 +22,8 @@ from math import nan
 
 
 
-file_name = '/exp/icarus/data/users/kyjung/NUMI_cc1pion/icarus_charged_pion_proton_michel_sys.root'
+file_name = '/exp/icarus/data/users/kyjung/NuMI_1pi1p//icarus_charged_pion_proton_michel_sys.root'
+#file_name = '/exp/icarus/data/users/kyjung/NuMi_1pi1p/icarus_charged_pion_proton_michel.root.root'
 #file_name = '/exp/icarus/data/users/kyjung/NUMI_cc1pion/icarus_charged_pion_proton_michel_half_sys.root'
 
 horn_current = 'fhc'
@@ -33,6 +34,8 @@ file_flux = uproot.open('/exp/icarus/data/users/kyjung/NUMI_cc1pion/2025-04-08_o
 flux_g4numi = file_flux[f'g4numi_reweight_v03_01-->v03_02;1/{horn_current};1']
 flux_beam_focus = file_flux[f'beam_focusing_uncertainties;1/{horn_current};1']
 flux_ppfx = file_flux[f'ppfx_flux_weights;1']
+ppfx_hweights_numu    = file_flux[f'ppfx_flux_weights/hweights_{horn_current}_numu;1']
+ppfx_hweights_numubar = file_flux[f'ppfx_flux_weights/hweights_{horn_current}_numubar;1']
 flux_pca = file_flux['pca;1/principal_components;1']
 
 #sample= "selected"
@@ -45,7 +48,8 @@ flux_pca = file_flux['pca;1/principal_components;1']
 
 
 sample= "selected_one_proton_michel"
-#sample= "signal_one_proton"
+#sample= "selected_renzo_low_threshold"
+#sample= "selected_multiple"
 #sample= "signal_N_proton"
 #sample= "signal"
 
@@ -136,9 +140,10 @@ hnom_mu_weights = []
 run = []
 events =[]
 subrun = []
+ppfx_cv_weight = []
 
-#sigma = np.array([3,2,1,0,-1,-2,-3])
-sigma = np.array([-3,-2,-1,0,1,2,3])
+#sigma = np.array([-3,-2,-1,0,1,2,3])
+sigma = np.array([3,2,1,0,-1,-2,-3])
 abs_sigma = np.array([3,2,1,0,1,2,3])
 
 for e,event in tqdm(nu_df.iterrows()):
@@ -210,8 +215,10 @@ for e,event in tqdm(nu_df.iterrows()):
         hnom_kpm_weights.append(float("nan"))
         hnom_k0l_weights.append(float("nan"))
     if int(pdg) ==12:
-        cv_hist = flux_ppfx[f'hweights_{horn_current}_nue;1']
-        cv_weight = cv_hist.values()[np.searchsorted(cv_hist.axes[0].edges(), nu_e) - 1]
+#        cv_hist = flux_ppfx[f'hweights_{horn_current}_nue;1']
+#        cv_weight = cv_hist.values()[np.searchsorted(cv_hist.axes[0].edges(), nu_e) - 1]
+        cv_hist = 1
+        cv_weight = 1
         hysyst_beam_horn_2kA.append(list(map(lambda x: (x + 1) * cv_weight, abs_sigma[0:4]*flux_beam_focus[f'hsyst_beam_Horn_p2kA_{horn_current}_nue;1'].values()[np.searchsorted(flux_beam_focus[f'hsyst_beam_Horn_p2kA_{horn_current}_nue;1'].axes[0].edges(),nu_e)-1])))
         hysyst_beam_horn_2kA[-1].extend(list(map(lambda x: (x + 1) * cv_weight, abs_sigma[4:]*flux_beam_focus[f'hsyst_beam_Horn_m2kA_{horn_current}_nue;1'].values()[np.searchsorted(flux_beam_focus[f'hsyst_beam_Horn_m2kA_{horn_current}_nue;1'].axes[0].edges(),nu_e)-1])))
         hysyst_beam_horn_2kA_sigma.append(sigma)
@@ -276,8 +283,10 @@ for e,event in tqdm(nu_df.iterrows()):
         hpc_14_sigma.append(sigma)
 
     elif int(pdg) == -12:
-        cv_hist = flux_ppfx[f'hweights_{horn_current}_nuebar;1']
-        cv_weight = cv_hist.values()[np.searchsorted(cv_hist.axes[0].edges(), nu_e) - 1]
+#        cv_hist = flux_ppfx[f'hweights_{horn_current}_nue;1']
+#        cv_weight = cv_hist.values()[np.searchsorted(cv_hist.axes[0].edges(), nu_e) - 1]
+        cv_hist = 1
+        cv_weight = 1
         hysyst_beam_horn_2kA.append(list(map(lambda x: (x + 1) * cv_weight, abs_sigma[0:4]*flux_beam_focus[f'hsyst_beam_Horn_p2kA_{horn_current}_nuebar;1'].values()[np.searchsorted(flux_beam_focus[f'hsyst_beam_Horn_p2kA_{horn_current}_nuebar;1'].axes[0].edges(),nu_e)-1])))
         hysyst_beam_horn_2kA[-1].extend(list(map(lambda x: (x + 1) * cv_weight, abs_sigma[4:]*flux_beam_focus[f'hsyst_beam_Horn_m2kA_{horn_current}_nuebar;1'].values()[np.searchsorted(flux_beam_focus[f'hsyst_beam_Horn_m2kA_{horn_current}_nuebar;1'].axes[0].edges(),nu_e)-1])))
         hysyst_beam_horn_2kA_sigma.append(sigma)
@@ -342,8 +351,10 @@ for e,event in tqdm(nu_df.iterrows()):
         hpc_14_sigma.append(sigma)
 
     elif int(pdg) ==14:
-        cv_hist = flux_ppfx[f'hweights_{horn_current}_numu;1']
-        cv_weight = cv_hist.values()[np.searchsorted(cv_hist.axes[0].edges(), nu_e) - 1]
+#        cv_hist = flux_ppfx[f'hweights_{horn_current}_nue;1']
+#        cv_weight = cv_hist.values()[np.searchsorted(cv_hist.axes[0].edges(), nu_e) - 1]
+        cv_hist = 1
+        cv_weight = 1
         hysyst_beam_horn_2kA.append(list(map(lambda x: (x + 1) * cv_weight, abs_sigma[0:4]*flux_beam_focus[f'hsyst_beam_Horn_p2kA_{horn_current}_numu;1'].values()[np.searchsorted(flux_beam_focus[f'hsyst_beam_Horn_p2kA_{horn_current}_numu;1'].axes[0].edges(),nu_e)-1])))
         hysyst_beam_horn_2kA[-1].extend(list(map(lambda x: (x + 1) * cv_weight, abs_sigma[4:]*flux_beam_focus[f'hsyst_beam_Horn_m2kA_{horn_current}_numu;1'].values()[np.searchsorted(flux_beam_focus[f'hsyst_beam_Horn_m2kA_{horn_current}_numu;1'].axes[0].edges(),nu_e)-1])))
         hysyst_beam_horn_2kA_sigma.append(sigma)
@@ -408,8 +419,10 @@ for e,event in tqdm(nu_df.iterrows()):
         hpc_14_sigma.append(sigma)
 
     elif int(pdg) == -14:
-        cv_hist = flux_ppfx[f'hweights_{horn_current}_numubar;1']
-        cv_weight = cv_hist.values()[np.searchsorted(cv_hist.axes[0].edges(), nu_e) - 1]
+#        cv_hist = flux_ppfx[f'hweights_{horn_current}_nue;1']
+#        cv_weight = cv_hist.values()[np.searchsorted(cv_hist.axes[0].edges(), nu_e) - 1]
+        cv_hist = 1
+        cv_weight = 1
         hysyst_beam_horn_2kA.append(list(map(lambda x: (x + 1) * cv_weight, abs_sigma[0:4]*flux_beam_focus[f'hsyst_beam_Horn_p2kA_{horn_current}_numubar;1'].values()[np.searchsorted(flux_beam_focus[f'hsyst_beam_Horn_p2kA_{horn_current}_numubar;1'].axes[0].edges(),nu_e)-1])))
         hysyst_beam_horn_2kA[-1].extend(list(map(lambda x: (x + 1) * cv_weight, abs_sigma[4:]*flux_beam_focus[f'hsyst_beam_Horn_m2kA_{horn_current}_numubar;1'].values()[np.searchsorted(flux_beam_focus[f'hsyst_beam_Horn_m2kA_{horn_current}_numubar;1'].axes[0].edges(),nu_e)-1])))
         hysyst_beam_horn_2kA_sigma.append(sigma)
@@ -473,6 +486,15 @@ for e,event in tqdm(nu_df.iterrows()):
         hpc_14.append(list(map(lambda x: (x + 1) * cv_weight, sigma*flux_pca[f'hpc_14_{horn_current}_numubar;1'].values()[np.searchsorted(flux_pca[f'hpc_14_{horn_current}_numubar;1'].axes[0].edges(),nu_e)-1])))
         hpc_14_sigma.append(sigma)
 
+    # PPFX cv weight (numu/numubar only; everything else gets nan)
+    if int(pdg) == 14:
+        ppfx_cv_weight.append(ppfx_hweights_numu.values()[np.searchsorted(ppfx_hweights_numu.axes[0].edges(), nu_e) - 1])
+        #print(ppfx_hweights_numu.values()[np.searchsorted(ppfx_hweights_numu.axes[0].edges(), nu_e) - 1])
+    elif int(pdg) == -14:
+        ppfx_cv_weight.append(ppfx_hweights_numubar.values()[np.searchsorted(ppfx_hweights_numubar.axes[0].edges(), nu_e) - 1])
+    else:
+        ppfx_cv_weight.append(1.0)
+
 def ensure_dir(rootdir, path):
     cur = rootdir
     for part in path.strip("/").split("/"):
@@ -498,6 +520,7 @@ spec = {
     "Run": ("i", run),
     "Subrun": ("i", subrun),
     "Evt": ("i", events),
+    "ppfx_cv_weight": ("f", ppfx_cv_weight),
     "hysyst_beam_horn_2kA": ("f", hysyst_beam_horn_2kA),
     "hysyst_beam_horn1_x_3mm": ("f", hysyst_beam_horn1_x_3mm),
     "hysyst_beam_horn1_y_3mm": ("f", hysyst_beam_horn1_y_3mm),
@@ -645,3 +668,4 @@ for i in range(N):
 
 tdir.WriteTObject(t, t.GetName(), "Overwrite")
 f.Close()
+

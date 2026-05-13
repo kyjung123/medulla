@@ -189,7 +189,7 @@ def create_systematics_cfg(
     # - tree = list of syst_trees values
     syst_cfg = base_cfg.copy()
     syst_cfg['input']['path'] = 'output.root'
-    syst_cfg['input']['weights'] = 'data/*flat*.root'
+    syst_cfg['input']['weights'] = 'data/*.root'
     syst_cfg['output']['path'] = 'output_sys.root'
     syst_cfg['tree'] = list(syst_trees.values())
     return syst_cfg
@@ -370,9 +370,9 @@ def launch_jobsub(
         'jobsub_submit',
         '-G', exp,
         '-N', str(njobs),
-        '--memory=1800MB',
-        f'--disk={"10GB" if exp == "sbnd" else "25GB"}',
-        '--expected-lifetime=1h',
+        '--memory=2000MB',
+        f'--disk={"10GB" if exp == "sbnd" else "29GB"}',
+        '--expected-lifetime=2h',
         '--resource-provides=usage_model=DEDICATED,OPPORTUNISTIC,OFFSITE',
         "--append_condor_requirements='(TARGET.HAS_Singularity==true)'",
         '--singularity-image=/cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest',

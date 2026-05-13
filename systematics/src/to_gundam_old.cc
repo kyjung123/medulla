@@ -87,7 +87,6 @@ static bool is_syst_tree_name(const std::string& tname){
          (tname.find("_NuMIfluxsimTree") != std::string::npos) ||
          (tname.find("_fluxsimTree")     != std::string::npos) ||
          (tname.find("_multisimTree")    != std::string::npos);
-//         (tname.find("_fluxsimTree")     != std::string::npos) ;
 }
 
 // ------------------------------------------------------------
@@ -126,7 +125,6 @@ static const std::vector<std::string> kFluxSuffixes = {
 
 static const std::vector<std::string> kMultisimSuffixes = {
   "_multisimTree"
-//  "_asdfasdf"
 };
 
 // ------------------------------------------------------------
@@ -150,13 +148,12 @@ struct MergeWriter {
 
   double _category = -5;
 
-  bool use_pick_existing_hadron_branch = true;
+  bool use_pick_existing_hadron_branch = false;
 
   std::vector<std::string> br_names;
   std::vector<double>      br_vals;
 
   double reco_had_cos_src=-9999, true_had_cos_src=-9999, reco_had_ke_src=-9999, true_had_ke_src=-9999;
-  float ppfx_cv_weight=1.0;
 
   double reco_leading_hadron_cos_wrt_beam=-9999;
   double true_leading_hadron_cos_wrt_beam=-9999;
@@ -248,7 +245,6 @@ struct MergeWriter {
     out_tree->Branch("is_nu", &is_nu, "is_nu/I");
     out_tree->Branch("is_data", &is_data, "is_data/I");
     out_tree->Branch("category", &category, "category/I");
-    out_tree->Branch("ppfx_cv_weight", &ppfx_cv_weight, "ppfx_cv_weight/F");
 
     if(use_pick_existing_hadron_branch){
       out_tree->Branch("reco_leading_hadron_cos_wrt_beam", &reco_leading_hadron_cos_wrt_beam);
@@ -284,7 +280,7 @@ struct MergeWriter {
       p.out  = t.has_field("name_short") ? t.get_string_field("name_short") : p.full;
 
       p.arr = new TClonesArray("TGraph", 1);
-      out_tree->Branch(p.out.c_str(), &p.arr, 8000, 0);
+      out_tree->Branch(p.out.c_str(), &p.arr, 32000, -1);
     }
 
     block.booked = true;
@@ -311,7 +307,6 @@ struct MergeWriter {
     true_had_cos_src=-9999;
     reco_had_ke_src=-9999;
     true_had_ke_src=-9999;
-    ppfx_cv_weight=1.0;
 
     if(use_pick_existing_hadron_branch){
       const char* reco_cos_br = pick_existing(in_tree,
@@ -328,13 +323,6 @@ struct MergeWriter {
       if(reco_ke_br)  in_tree->SetBranchAddress(reco_ke_br,  &reco_had_ke_src);
       if(true_ke_br)  in_tree->SetBranchAddress(true_ke_br,  &true_had_ke_src);
     }
-  }
-
-  void bind_ppfx_input(TTree* numi_tree){
-    ppfx_cv_weight = 1.0;
-    if(!numi_tree) return;
-    if(numi_tree->GetBranch("ppfx_cv_weight"))
-      numi_tree->SetBranchAddress("ppfx_cv_weight", &ppfx_cv_weight);
   }
 
   void bind_syst_input(TTree* syst_tree, const std::string& syst_type){
@@ -449,13 +437,8 @@ struct MergeWriter {
         (std::find(morph_names.begin(), morph_names.end(), p.full) != morph_names.end());
 
       if(!p.present_in_this_tree){
-        if(syst_type=="multisim"){
-          nsigmas = {0.0};
-          weights = {1.0};
-        } else {
-          nsigmas = {-1.0, 0.0, 1.0};
-          weights = { 1.0, 1.0, 1.0};
-        }
+        nsigmas = {-1.0, 0.0, 1.0};
+        weights = { 1.0, 1.0, 1.0};
       }
       else if(is_morph){
         Double_t w1 = 1.0;
@@ -486,16 +469,6 @@ struct MergeWriter {
         if(syst_type=="multisigma"){
           nsigmas.push_back(0.0);
           weights.push_back(table_is_nu ? 1.0 : -5.0);
-        }
-
-        // For multisim: weights vector is the universe weights (no sigma axis).
-        // Store as TGraph with x=universe_index, y=weight so GUNDAM can use
-        // ByUniverseReweight. Override the fallback nsigmas built above.
-        if(syst_type=="multisim" && p.present_in_this_tree){
-          nsigmas.clear();
-          // weights already filled from wD/wF above
-          for(std::size_t iu=0; iu<weights.size(); ++iu)
-            nsigmas.push_back((Double_t)iu);
         }
 
         if(weights.size() != nsigmas.size()){
@@ -547,8 +520,6 @@ static void merge_prefix_under_directory(
   }
 
   TTree* out_tree = new TTree(out_tree_name.c_str(), out_tree_name.c_str());
-  out_tree->SetAutoFlush(500);       // 500 entries마다 basket flush -> 메모리 해제
-  out_tree->SetAutoSave(50000000);   // 50MB마다 디스크에 save
 
   MergeWriter w;
 
@@ -567,7 +538,6 @@ static void merge_prefix_under_directory(
     w.book_syst_once(config, out_tree, "variation");
     w.book_syst_once(config, out_tree, "NuMIfluxsim");
   }
-  w.book_syst_once(config, out_tree, "multisim");
 
   bool booked = false;
 
@@ -595,8 +565,7 @@ static void merge_prefix_under_directory(
 
     TTree* ms_tree   = want_syst ? find_syst_tree(indir, tname, kMultisigmaSuffixes) : nullptr;
     TTree* var_tree  = want_syst ? find_syst_tree(indir, tname, kVariationSuffixes)  : nullptr;
-    TTree* numi_tree = find_syst_tree(indir, tname, kFluxSuffixes);
-    TTree* msim_tree = find_syst_tree(indir, tname, kMultisimSuffixes);
+    TTree* numi_tree = want_syst ? find_syst_tree(indir, tname, kFluxSuffixes)       : nullptr;
 
     std::cout << "MERGE " << in_dir_path << "/" << tname
               << " -> " << out_dir_path << "/" << out_tree_name
@@ -604,7 +573,6 @@ static void merge_prefix_under_directory(
               << "  ms=" << ms_tree
               << " var=" << var_tree
               << " numi=" << numi_tree
-              << " msim=" << msim_tree
               << "  use_pick_existing_hadron_branch=" << w.use_pick_existing_hadron_branch
               << std::endl;
 
@@ -619,22 +587,12 @@ static void merge_prefix_under_directory(
       w.bind_syst_input(var_tree,  "variation");
       w.bind_syst_input(numi_tree, "NuMIfluxsim");
     }
-    w.bind_ppfx_input(numi_tree);
-    w.bind_syst_input(msim_tree, "multisim");
-
-    // msim_tree: vector<double>(1000) branch -> ROOT read cache가 수십GB를 잡아먹음
-    // cache 완전히 끄기
-    if(msim_tree){
-      msim_tree->SetCacheSize(0);
-      msim_tree->SetMaxVirtualSize(0);
-    }
 
     Long64_t n_nom = in_tree->GetEntries();
     Long64_t n = n_nom;
     if(ms_tree)   n = std::min(n, ms_tree->GetEntries());
     if(var_tree)  n = std::min(n, var_tree->GetEntries());
     if(numi_tree) n = std::min(n, numi_tree->GetEntries());
-    if(msim_tree) n = std::min(n, msim_tree->GetEntries());
 
     if(want_syst){
       if(ms_tree && ms_tree->GetEntries() != n_nom)
@@ -647,24 +605,18 @@ static void merge_prefix_under_directory(
                   << " nominal=" << n_nom
                   << " variation=" << var_tree->GetEntries()
                   << " -> using min=" << n << "\n";
+      if(numi_tree && numi_tree->GetEntries() != n_nom)
+        std::cout << "WARN: entries mismatch: " << in_dir_path << "/" << tname
+                  << " nominal=" << n_nom
+                  << " numi=" << numi_tree->GetEntries()
+                  << " -> using min=" << n << "\n";
     }
-    if(numi_tree && numi_tree->GetEntries() != n_nom)
-      std::cout << "WARN: entries mismatch: " << in_dir_path << "/" << tname
-                << " nominal=" << n_nom
-                << " numi=" << numi_tree->GetEntries()
-                << " -> using min=" << n << "\n";
-    if(msim_tree && msim_tree->GetEntries() != n_nom)
-      std::cout << "WARN: entries mismatch: " << in_dir_path << "/" << tname
-                << " nominal=" << n_nom
-                << " multisim=" << msim_tree->GetEntries()
-                << " -> using min=" << n << "\n";
 
     for(Long64_t i=0;i<n;++i){
       in_tree->GetEntry(i);
       if(ms_tree)   ms_tree->GetEntry(i);
       if(var_tree)  var_tree->GetEntry(i);
       if(numi_tree) numi_tree->GetEntry(i);
-      if(msim_tree) msim_tree->GetEntry(i);
 
       w.cut_type = forced_cut;
 
@@ -688,19 +640,8 @@ static void merge_prefix_under_directory(
         w.fill_one_syst_event("variation",  table_is_nu);
         w.fill_one_syst_event("NuMIfluxsim", table_is_nu);
       }
-      w.fill_one_syst_event("multisim", table_is_nu);
-
-      if(std::isnan(w.ppfx_cv_weight) || w.ppfx_cv_weight <= 0)
-          w.ppfx_cv_weight = 1.0;
-
 
       out_tree->Fill();
-
-      // 5000 entries마다 강제 flush로 메모리 상한 방지
-      if(i > 0 && i % 5000 == 0){
-        out_tree->FlushBaskets();
-        gDirectory->SaveSelf();
-      }
     }
   }
 
@@ -708,79 +649,79 @@ static void merge_prefix_under_directory(
   out_tree->Write("", TObject::kOverwrite);
 }
 
-//static void merge_multisim_trees_under_directory(
-//    TFile* input,
-//    TFile* output,
-//    const std::string& in_dir_path,
-//    const std::string& out_dir_path,
-//    const std::string& out_tree_name,
-//    const std::string& prefix
-//){
-//  auto* indir = get_dir_path(input, in_dir_path);
-//  if(!indir){
-//    std::cout << "WARN: missing input directory " << in_dir_path << std::endl;
-//    return;
-//  }
-//
-//  TDirectory* outdir = ensure_dir_path(output, out_dir_path);
-//  outdir->cd();
-//  outdir->Delete((out_tree_name + ";*").c_str());
-//
-//  TChain chain("dummy");
-//  bool added = false;
-//
-//  TIter nextkey(indir->GetListOfKeys());
-//  TKey* key;
-//  while((key=(TKey*)nextkey())){
-//    TObject* obj = key->ReadObj();
-//    if(!obj || !obj->InheritsFrom(TTree::Class())) continue;
-//
-//    std::string tname = obj->GetName();
-//
-//    if(!starts_with(tname, prefix)) continue;
-//    if(is_syst_tree_name(tname)) continue;
-//    if(!is_allowed_nominal_tree(tname, prefix)) {
-//      std::cout << "SKIP multisim source tree (not allowed): " << tname << "\n";
-//      continue;
-//    }
-//
-//    TTree* multisim_tree = find_syst_tree(indir, tname, kMultisimSuffixes);
-//    if(!multisim_tree) continue;
-//
-//    std::string fullpath = input->GetName();
-//    fullpath += "/";
-//    fullpath += in_dir_path;
-//    fullpath += "/";
-//    fullpath += multisim_tree->GetName();
-//
-//    chain.Add(fullpath.c_str());
-//    added = true;
-//
-//    std::cout << "ADD multisim tree: " << in_dir_path << "/" << multisim_tree->GetName()
-//              << " -> " << out_dir_path << "/" << out_tree_name << "\n";
-//  }
-//
-//  if(!added){
-//    std::cout << "WARN: no multisim trees found for " << in_dir_path
-//              << " prefix=" << prefix << std::endl;
-//    return;
-//  }
-//
-//  outdir->cd();
-//  TTree* merged = chain.CloneTree(-1, "fast");
-//  if(!merged){
-//    std::cout << "WARN: failed to merge multisim trees into " << out_tree_name << std::endl;
-//    return;
-//  }
-//
-//  merged->SetName(out_tree_name.c_str());
-//  merged->SetTitle(out_tree_name.c_str());
-//  merged->Write("", TObject::kOverwrite);
-//
-//  std::cout << "WROTE merged multisim tree: "
-//            << out_dir_path << "/" << out_tree_name
-//            << " entries=" << merged->GetEntries() << std::endl;
-//}
+static void merge_multisim_trees_under_directory(
+    TFile* input,
+    TFile* output,
+    const std::string& in_dir_path,
+    const std::string& out_dir_path,
+    const std::string& out_tree_name,
+    const std::string& prefix
+){
+  auto* indir = get_dir_path(input, in_dir_path);
+  if(!indir){
+    std::cout << "WARN: missing input directory " << in_dir_path << std::endl;
+    return;
+  }
+
+  TDirectory* outdir = ensure_dir_path(output, out_dir_path);
+  outdir->cd();
+  outdir->Delete((out_tree_name + ";*").c_str());
+
+  TChain chain("dummy");
+  bool added = false;
+
+  TIter nextkey(indir->GetListOfKeys());
+  TKey* key;
+  while((key=(TKey*)nextkey())){
+    TObject* obj = key->ReadObj();
+    if(!obj || !obj->InheritsFrom(TTree::Class())) continue;
+
+    std::string tname = obj->GetName();
+
+    if(!starts_with(tname, prefix)) continue;
+    if(is_syst_tree_name(tname)) continue;
+    if(!is_allowed_nominal_tree(tname, prefix)) {
+      std::cout << "SKIP multisim source tree (not allowed): " << tname << "\n";
+      continue;
+    }
+
+    TTree* multisim_tree = find_syst_tree(indir, tname, kMultisimSuffixes);
+    if(!multisim_tree) continue;
+
+    std::string fullpath = input->GetName();
+    fullpath += "/";
+    fullpath += in_dir_path;
+    fullpath += "/";
+    fullpath += multisim_tree->GetName();
+
+    chain.Add(fullpath.c_str());
+    added = true;
+
+    std::cout << "ADD multisim tree: " << in_dir_path << "/" << multisim_tree->GetName()
+              << " -> " << out_dir_path << "/" << out_tree_name << "\n";
+  }
+
+  if(!added){
+    std::cout << "WARN: no multisim trees found for " << in_dir_path
+              << " prefix=" << prefix << std::endl;
+    return;
+  }
+
+  outdir->cd();
+  TTree* merged = chain.CloneTree(-1, "fast");
+  if(!merged){
+    std::cout << "WARN: failed to merge multisim trees into " << out_tree_name << std::endl;
+    return;
+  }
+
+  merged->SetName(out_tree_name.c_str());
+  merged->SetTitle(out_tree_name.c_str());
+  merged->Write("", TObject::kOverwrite);
+
+  std::cout << "WROTE merged multisim tree: "
+            << out_dir_path << "/" << out_tree_name
+            << " entries=" << merged->GetEntries() << std::endl;
+}
 
 int main(int argc, char* argv[])
 {
@@ -819,18 +760,18 @@ int main(int argc, char* argv[])
                                    "signal_merged",
                                    "signal");
 
-//      merge_multisim_trees_under_directory(input, output,
-//              "events/nominal",
-//              "events/nominal",
-//              "selected_merged_multisimTree",
-//              "selected");
-//
-//      merge_multisim_trees_under_directory(input, output,
-//              "events/nominal",
-//              "events/nominal",
-//              "signal_merged_multisimTree",
-//              "signal");
-//
+      merge_multisim_trees_under_directory(input, output,
+              "events/nominal",
+              "events/nominal",
+              "selected_merged_multisimTree",
+              "selected");
+
+      merge_multisim_trees_under_directory(input, output,
+              "events/nominal",
+              "events/nominal",
+              "signal_merged_multisimTree",
+              "signal");
+
       did_nominal = true;
     }
 
@@ -848,6 +789,3 @@ int main(int argc, char* argv[])
   input->Close();
   return 0;
 }
-
-
-

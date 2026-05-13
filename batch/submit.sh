@@ -125,7 +125,7 @@ ls -lrth
 printf -v RAWNAME "output_jobid%04d.root" "$JOBID"
 ifdh cp --cp_maxretries=0 --web_timeout=100 output.root $PROJECT/output/$RAWNAME
 
-# Run medulla (systematics)
+## Run medulla (systematics)
 ./systematics/run_systematics systematics.toml
 ls -lrth
 

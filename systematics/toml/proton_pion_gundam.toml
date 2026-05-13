@@ -1,14 +1,11 @@
 [input]
-path = '/exp/icarus/data/users/kyjung/NUMI_cc1pion/icarus_charged_pion_proton_michel_sys.root'
-weights = '/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_CV_flat_cafs_2/*.root'
-#path = '/exp/icarus/data/users/kyjung/NUMI_cc1pion/icarus_charged_pion_proton_michel_half_sys.root'
-#weights = '/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_CV_flat_cafs_2/NuMI_CV_flat_cafs_2_0[0-2].root'
+path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_sys.root"
+weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/*.root.flat_merged_geant4.root"
 
 use_additional_hash = true
 
 [output]
-path = '/exp/icarus/data/users/kyjung/NUMI_cc1pion/icarus_charged_pion_proton_michel_sys_gundam.root'
-#path = '/exp/icarus/data/users/kyjung/NUMI_cc1pion/icarus_charged_pion_proton_michel_half_sys_gundam.root'
+path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_sys_gundam.root"
 histogram_destination = 'variations/'
 
 [[sysvar]]
@@ -32,7 +29,7 @@ origin = 'events/nominal/selected_one_proton_michel'
 destination = 'events/nominal/'
 name = 'selected_one_proton_michel'
 action = 'add_weights'
-table_types = ['multisigma','NuMIfluxsim']
+table_types = ['multisigma','NuMIfluxsim','multisim','variation']
 gundam_store_syst = true
 is_nu = true
 is_data = false
@@ -57,22 +54,13 @@ is_data = true
 
 
 
-#[[tree]]
-#origin = 'events/nominal/signal'
-#destination = 'events/nominal/'
-#name = 'signal'
-#action = 'add_weights'
-#table_types = ['multisigma','NuMIfluxsim']
-#gundam_store_syst = true
-#is_nu = true
-#is_data = false
 
 [[tree]]
 origin = 'events/nominal/signal_N_proton'
 destination = 'events/nominal/'
 name = 'signal_N_proton'
 action = 'add_weights'
-table_types = ['multisigma','NuMIfluxsim']
+table_types = ['multisigma','NuMIfluxsim','multisim','variation']
 gundam_store_syst = true
 is_nu = true
 is_data = false
@@ -87,77 +75,96 @@ is_data = false
 #scale = [-3, -2, -1, 1, 1, 2, 3]
 #ordinate = 'nominal'
 #points = ['var00', 'var00', 'var00', 'nominal', 'var00', 'var00', 'var00']
-#
-#[[sys]]
-#name = 'var01'
-#name_short = 'Induction_Gain'
-#type = 'variation'
-#index = -1
-#nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-#scale = [-3, -2, -1, 1, 1, 2, 3]
-#ordinate = 'nominal'
-#points = ['var01m', 'var01m', 'var01m', 'nominal', 'var01p', 'var01p', 'var01p']
-#
-#[[sys]]
-#name = 'var02'
-#name_short = 'Coherent_Noise'
-#type = 'variation'
-#index = -1
-#nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-#scale = [-3, -2, -1, 1, 1, 2, 3]
-#ordinate = 'nominal'
-#points = ['var02m', 'var02m', 'var02m', 'nominal', 'var02p', 'var02p', 'var02p']
-#
-#[[sys]]
-#name = 'var03'
-#name_short = 'Intrinsic_Noise'
-#type = 'variation'
-#index = -1
-#nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-#scale = [3, 2, 1, 1, 1, 2, 3]
-#ordinate = 'nominal'
-#points = ['var03m', 'var03m', 'var03m', 'nominal', 'var03p', 'var03p', 'var03p']
-#
-#[[sys]]
-#name = 'var04'
-#name_short = 'Electron_Lifetime'
-#type = 'variation'
-#index = -1
-#nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-#scale = [-3, -2, -1, 1, 1, 2, 3]
-#ordinate = 'nominal'
-#points = ['var04m', 'var04m', 'var04m', 'nominal', 'var04p', 'var04p', 'var04p']
-#
-#[[sys]]
-#name = 'var05'
-#name_short = 'PMT_QE'
-#type = 'variation'
-#index = -1
-#nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-#scale = [-3, -2, -1, 1, 1, 2, 3]
-#ordinate = 'nominal'
-#points = ['var05', 'var05', 'var05', 'nominal', 'var05', 'var05', 'var05']
-#
-#[[sys]]
-#name = 'var06'
-#name_short = 'Wire_Gap'
-#type = 'variation'
-#index = -1
-#nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-#scale = [-3, -2, -1, 1, 1, 2, 3]
-#ordinate = 'nominal'
-#points = ['var06', 'var06', 'var06', 'nominal', 'var06', 'var06', 'var06']
-#
-#[[sys]]
-#name = 'var07'
-#name_short = 'YZ_Nonuniformity'
-#type = 'variation'
-#index = -1
-#nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-#scale = [-3, -2, -1, 1, 1, 2, 3]
-#ordinate = 'nominal'
-#points = ['var07', 'var07', 'var07', 'nominal', 'var07', 'var07', 'var07']
 
+[[sys]]
+name = 'var01'
+name_short = 'Induction_Gain'
+type = 'variation'
+index = -1
+nsigma = [-3, -2, -1, 0, 1 ,2, 3]
+scale = [-3, -2, -1, 1, 1, 2, 3]
+ordinate = 'nominal'
+points = ['var01m', 'var01m', 'var01m', 'nominal', 'var01p', 'var01p', 'var01p']
+
+[[sys]]
+name = 'var02'
+name_short = 'Coherent_Noise'
+type = 'variation'
+index = -1
+nsigma = [-3, -2, -1, 0, 1 ,2, 3]
+scale = [-3, -2, -1, 1, 1, 2, 3]
+ordinate = 'nominal'
+points = ['var02m', 'var02m', 'var02m', 'nominal', 'var02p', 'var02p', 'var02p']
+
+[[sys]]
+name = 'var03'
+name_short = 'Intrinsic_Noise'
+type = 'variation'
+index = -1
+nsigma = [-3, -2, -1, 0, 1 ,2, 3]
+scale = [3, 2, 1, 1, 1, 2, 3]
+ordinate = 'nominal'
+points = ['var03m', 'var03m', 'var03m', 'nominal', 'var03p', 'var03p', 'var03p']
+
+[[sys]]
+name = 'var04'
+name_short = 'Electron_Lifetime'
+type = 'variation'
+index = -1
+nsigma = [-3, -2, -1, 0, 1 ,2, 3]
+scale = [-3, -2, -1, 1, 1, 2, 3]
+ordinate = 'nominal'
+points = ['var04m', 'var04m', 'var04m', 'nominal', 'var04p', 'var04p', 'var04p']
+
+[[sys]]
+name = 'var05'
+name_short = 'PMT_QE'
+type = 'variation'
+index = -1
+nsigma = [-3, -2, -1, 0, 1 ,2, 3]
+scale = [-3, -2, -1, 1, 1, 2, 3]
+ordinate = 'nominal'
+points = ['var05', 'var05', 'var05', 'nominal', 'var05', 'var05', 'var05']
+
+[[sys]]
+name = 'var06'
+name_short = 'Wire_Gap'
+type = 'variation'
+index = -1
+nsigma = [-3, -2, -1, 0, 1 ,2, 3]
+scale = [-3, -2, -1, 1, 1, 2, 3]
+ordinate = 'nominal'
+points = ['var06', 'var06', 'var06', 'nominal', 'var06', 'var06', 'var06']
+
+[[sys]]
+name = 'var07'
+name_short = 'YZ_Nonuniformity'
+type = 'variation'
+index = -1
+nsigma = [-3, -2, -1, 0, 1 ,2, 3]
+scale = [-3, -2, -1, 1, 1, 2, 3]
+ordinate = 'nominal'
+points = ['var07', 'var07', 'var07', 'nominal', 'var07', 'var07', 'var07']
+
+[[sys]]
+name = 'var08'
+name_short = 'Recombination'
+type = 'variation'
+index = -1
+nsigma = [-3, -2, -1, 0, 1 ,2, 3]
+scale = [-3, -2, -1, 1, 1, 2, 3]
+ordinate = 'nominal'
+points = ['var08', 'var08', 'var08', 'nominal', 'var08', 'var08', 'var08']
+
+[[sys]]
+name = 'var09'
+name_short = 'Cathode_Bending'
+type = 'variation'
+index = -1
+nsigma = [-3, -2, -1, 0, 1 ,2, 3]
+scale = [-3, -2, -1, 1, 1, 2, 3]
+ordinate = 'nominal'
+points = ['var09', 'var09', 'var09', 'nominal', 'var09', 'var09', 'var09']
 
 
 [[sys]]
@@ -905,191 +912,228 @@ nsigma = [-1,1,-2,2,-3,3]
 #index = 127
 
 [[sys]]
+name = "reinteractions_kminus_Geant4"
+name_short = 'G4_kminus'
+type = "multisim"
+index = 128
+
+[[sys]]
+name = "reinteractions_kplus_Geant4"
+name_short = 'G4_kplus'
+type = "multisim"
+index = 129
+
+[[sys]]
+name = "reinteractions_neutron_Geant4"
+name_short = 'G4_neutron'
+type = "multisim"
+index = 130
+
+[[sys]]
+name = "reinteractions_piminus_Geant4"
+name_short = 'G4_piminus'
+type = "multisim"
+index = 131
+
+[[sys]]
+name = "reinteractions_piplus_Geant4"
+name_short = 'G4_piplus'
+type = "multisim"
+index = 132
+
+[[sys]]
+name = "reinteractions_proton_Geant4"
+name_short = 'G4_proton'
+type = "multisim"
+index = 133
+
+
+[[sys]]
 name = 'hysyst_beam_horn_2kA'
 name_short = 'horn_2kA'
 type = 'NuMIfluxsim'
-index = 128
+index = 134
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_horn1_x_3mm'
 name_short = 'horn1_x_3mm'
 type = 'NuMIfluxsim'
-index = 129
+index = 135
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_horn1_y_3mm'
 name_short = 'horn1_y_3mm'
 type = 'NuMIfluxsim'
-index = 130
+index = 136
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_spot_1_3mm'
 name_short = 'spot_1_3mm'
 type = 'NuMIfluxsim'
-index = 131
+index = 137
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_spot_1_7mm'
 name_short = 'spot_1_7mm'
 type = 'NuMIfluxsim'
-index = 132
+index = 138
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_horn2_x_3mm'
 name_short = 'horn2_x_3mm'
 type = 'NuMIfluxsim'
-index = 133
+index = 139
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_horn2_y_3mm'
 name_short = 'horn2_y_3mm'
 type = 'NuMIfluxsim'
-index = 134
+index = 140
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_horns_0mm_water'
 name_short = 'horns_0mm_water'
 type = 'NuMIfluxsim'
-index = 135
+index = 141
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_horns_2mm_water'
 name_short = 'horns_2mm_water'
 type = 'NuMIfluxsim'
-index = 136
+index = 142
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_Beam_shift_x_1mm'
 name_short = 'Beam_shift_x_1mm'
 type = 'NuMIfluxsim'
-index = 137
+index = 143
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_Beam_shift_y_1mm'
 name_short = 'Beam_shift_y_1mm'
 type = 'NuMIfluxsim'
-index = 138
+index = 144
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_Target_z_7mm'
 name_short = 'Target_z_7mm'
 type = 'NuMIfluxsim'
-index = 139
+index = 145
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_0'
 name_short = 'hpc_0'
 type = 'NuMIfluxsim'
-index = 140
+index = 146
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_1'
 name_short = 'hpc_1'
 type = 'NuMIfluxsim'
-index = 141
+index = 147
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_2'
 name_short = 'hpc_2'
 type = 'NuMIfluxsim'
-index = 142
+index = 148
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_3'
 name_short = 'hpc_4'
 type = 'NuMIfluxsim'
-index = 143
+index = 149
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_4'
 name_short = 'hpc_4'
 type = 'NuMIfluxsim'
-index = 144
+index = 150
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_5'
 name_short = 'hpc_5'
 type = 'NuMIfluxsim'
-index = 145
+index = 151
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_6'
 name_short = 'hpc_6'
 type = 'NuMIfluxsim'
-index = 146
+index = 152
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_7'
 name_short = 'hpc_7'
 type = 'NuMIfluxsim'
-index = 147
+index = 153
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_8'
 name_short = 'hpc_8'
 type = 'NuMIfluxsim'
-index = 148
+index = 154
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_9'
 name_short = 'hpc_9'
 type = 'NuMIfluxsim'
-index = 149
+index = 155
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_10'
 name_short = 'hpc_10'
 type = 'NuMIfluxsim'
-index = 150
+index = 156
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_11'
 name_short = 'hpc_11'
 type = 'NuMIfluxsim'
-index = 151
+index = 157
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_12'
 name_short = 'hpc_12'
 type = 'NuMIfluxsim'
-index = 152
+index = 158
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_13'
 name_short = 'hpc_13'
 type = 'NuMIfluxsim'
-index = 153
+index = 159
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_14'
 name_short = 'hpc_14'
 type = 'NuMIfluxsim'
-index = 154
+index = 160
 nsigma = [-3,-2,-1,0,1,2,3]
 

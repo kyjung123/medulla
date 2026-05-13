@@ -311,19 +311,33 @@ namespace mctruth
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, no_electron_pandora, no_electron_pandora);
 
     template<typename T>
-        int pion_num_pandora(const T & obj)
+        int pion_plus_num_pandora(const T & obj)
         {
             int count = 0;
             for (const auto & p : obj.prim)
             {
-                if ( (p.pdg==211 || p.pdg==-211) && (p.genE - 0.13957) > 0.05 )
+                if ( (p.pdg==211) && (p.genE - 0.13957) > 0.05 )
                 {
                     count++;
                 }
             }
             return count;
         }
-    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, pion_num_pandora, pion_num_pandora);
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, pion_plus_num_pandora, pion_plus_num_pandora);
+    template<typename T>
+        int pion_minus_num_pandora(const T & obj)
+        {
+            int count = 0;
+            for (const auto & p : obj.prim)
+            {
+                if ( (p.pdg==-211) && (p.genE - 0.13957) > 0.05 )
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, pion_minus_num_pandora, pion_minus_num_pandora);
     template<typename T>
         int proton_num_pandora(const T & obj)
         {
