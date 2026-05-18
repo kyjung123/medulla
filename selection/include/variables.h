@@ -41,6 +41,7 @@
 #include <iostream>
 #include <cstdlib>   // for std::abs
 #include <random>
+#include <set>
 
 
 
@@ -799,7 +800,7 @@ namespace vars
      * @return the multiplicity of primary pions in the interaction.
      */
     template<class T>
-    double pion_multiplicity(const T & obj, std::vector<double> params={25.0,})
+    double pion_multiplicity(const T & obj, std::vector<double> params={50.0,})
     {
         size_t count(0);
         for(const auto & p : obj.particles)
@@ -2750,6 +2751,80 @@ namespace vars
 
 
 
+    template<class T>
+        double count_proton(const T & obj)
+        {
+            std::set<int64_t> seen_tracks;
+            int n_protons = 0;
+            for(const auto & part : obj.particles)
+            {
+//                std::cout<< "particle ID : " << part.id<< ", track ID : " << part.track_id<< ", pdg : " << part.pdg_code<< ", parent id : " << part.parent_id<< std::endl;
+                // proton only
+                if(part.pdg_code != 2212)
+                    continue;
+                // invalid track id protection
+                if(part.track_id < 0)
+                    continue;
+                // avoid duplicated propagated particles
+                if(seen_tracks.count(part.track_id))
+                    continue;
+                seen_tracks.insert(part.track_id);
+                n_protons++;
+            }
+//            std::cout<<"proton Number:"<<n_protons<<std::endl;
+            return n_protons;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::True, count_proton,count_proton);
+
+    template<class T>
+        double count_pip(const T & obj)
+        {
+            std::set<int64_t> seen_tracks;
+            int n_protons = 0;
+            for(const auto & part : obj.particles)
+            {
+            //    std::cout<< "particle ID : " << part.id<< ", track ID : " << part.track_id<< ", pdg : " << part.pdg_code<< ", parent id : " << part.parent_id<< std::endl;
+                // proton only
+                if(part.pdg_code != 211)
+                    continue;
+                // invalid track id protection
+                if(part.track_id < 0)
+                    continue;
+                // avoid duplicated propagated particles
+                if(seen_tracks.count(part.track_id))
+                    continue;
+                seen_tracks.insert(part.track_id);
+                n_protons++;
+            }
+//            std::cout<<"pip Number:"<<n_protons<<std::endl;
+            return n_protons;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::True, count_pip,count_pip);
+
+    template<class T>
+        double count_pim(const T & obj)
+        {
+            std::set<int64_t> seen_tracks;
+            int n_protons = 0;
+            for(const auto & part : obj.particles)
+            {
+            //    std::cout<< "particle ID : " << part.id<< ", track ID : " << part.track_id<< ", pdg : " << part.pdg_code<< ", parent id : " << part.parent_id<< std::endl;
+                // proton only
+                if(part.pdg_code != -211)
+                    continue;
+                // invalid track id protection
+                if(part.track_id < 0)
+                    continue;
+                // avoid duplicated propagated particles
+                if(seen_tracks.count(part.track_id))
+                    continue;
+                seen_tracks.insert(part.track_id);
+                n_protons++;
+            }
+//            std::cout<<"pim Number:"<<n_protons<<std::endl;
+            return n_protons;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::True, count_pim,count_pim);
 }
 
 

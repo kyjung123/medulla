@@ -248,6 +248,9 @@ branch = [
     { name = "proton_multiplicity",   type = "both", parameters = ["@pion_threshold",]},
     { name = "nneutron_G4",         type = "mctruth" },
     { name = "resnum",         type = "mctruth" },
+    { name = "count_proton",         type = "true" },
+    { name = "count_pip",         type = "true" },
+    { name = "count_pim",         type = "true" },
 
     # Kinematic imbalance & angles
     { name = "opening_angle", type = "both" ,parameters = [1.0]},
@@ -500,6 +503,9 @@ branch = [
     { name = "proton_multiplicity",   type = "both", parameters = [50.0,]},
     { name = "pion_plus_num_pandora",                type = "mctruth" },
     { name = "pion_minus_num_pandora",                type = "mctruth" },
+    { name = "count_proton",         type = "true" },
+    { name = "count_pip",         type = "true" },
+    { name = "count_pim",         type = "true" },
 
     # Kinematic imbalance & angles
     { name = "opening_angle", type = "both" ,parameters = [1.0]},
@@ -636,6 +642,9 @@ branch = [
     { name = "muon_pT_wrt_beam", type = "both" },
     { name = "pion_plus_num_pandora",                type = "mctruth" },
     { name = "pion_minus_num_pandora",                type = "mctruth" },
+    { name = "count_proton",         type = "true" },
+    { name = "count_pip",         type = "true" },
+    { name = "count_pim",         type = "true" },
 
     #For gundam
     {name = "is_nu",            type = "both"},
@@ -891,6 +900,9 @@ branch = [
     { name = "visible_energy",         type = "both"    },
     { name = "visible_energy_calosub", type = "true"    },
     {name = "energy_init",      type = "true"},
+    { name = "count_proton",         type = "true" },
+    { name = "count_pip",         type = "true" },
+    { name = "count_pim",         type = "true" },
 
     # Interaction-level selection variables
     { name = "photon_multiplicity",   type = "both", parameters = [25.0,]},
@@ -1001,6 +1013,9 @@ branch = [
     { name = "visible_energy",         type = "both"    },
     { name = "visible_energy_calosub", type = "true"    },
     {name = "energy_init",      type = "true"},
+    { name = "count_proton",         type = "true" },
+    { name = "count_pip",         type = "true" },
+    { name = "count_pim",         type = "true" },
 
     # Interaction-level selection variables
     { name = "photon_multiplicity",   type = "both", parameters = [25.0,]},

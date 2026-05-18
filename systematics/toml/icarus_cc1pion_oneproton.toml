@@ -20,9 +20,9 @@ origin = 'events/'
 tree = 'selected_one_proton_michel'
 result_destination = 'detsys_results/'
 variable = 'reco_leading_muon_ke'
-variable_length = true
-bins = [0.0,50.0, 100.0, 150.0,  200.0,300, 500, 800, 1000, 2000,2500,3000.0,3500,4000,5000,6000]  # full list of edges!
+bins = [0.0, 100.0, 200.0, 400.0, 600.0, 800.0, 1000.0, 1500.0, 2000.0, 3000.0, 4000.0, 5000.0]
 nuniverses = 1000
+variable_length = true
 
 ##variable_length = false
 ##bins = [25, 0, 2000]
