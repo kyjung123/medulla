@@ -1,6 +1,4 @@
 [general]
-#output = "/exp/icarus/data/users/kyjung/NUMI_cc1pion/icarus_charged_pion_proton_michel_half"
-#output = "/exp/icarus/data/users/kyjung/NUMI_cc1pion/icarus_charged_pion_proton_michel"
 output = "trial"
 primfn = "default_primary_classification"
 
@@ -865,8 +863,6 @@ mode = "true"
 cut = [
     { name = "neutrino",              type = "true" },
     { name = "fiducial_cut",          type = "true" },
-    { name = "no_photons",            type = "true",  parameters = [25.0] },
-    { name = "no_electrons",          type = "true",  parameters = [25.0] },
     { name = "single_muon",           type = "true",  parameters = ["@muon_threshold"] },
     { name = "single_pion",           type = "true", parameters = ["@pion_threshold"] },
     { name = "trigger_emulation_cut", type = "event", decrements_exposure = false },
@@ -977,8 +973,6 @@ mode = "true"
 cut = [
     { name = "neutrino",              type = "true" },
     { name = "fiducial_cut",          type = "true" },
-    { name = "no_photons",            type = "true",  parameters = [25.0] },
-    { name = "no_electrons",          type = "true",  parameters = [25.0] },
     { name = "single_muon",           type = "true",  parameters = ["@muon_threshold"] },
     { name = "single_pion",           type = "true", parameters = ["@pion_threshold"] },
     { name = "!no_protons",               type = "true",  parameters = ["@proton_threshold"] },

@@ -1,0 +1,102 @@
+[general]
+output = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/wo_cut"
+primfn = "default_primary_classification"
+pidfn = "default_pid"
+
+[[category]] # 0 : Fiducial, single muon, single pion
+cuts = [
+    { name = "neutrino"        },
+    { name = "fiducial_cut"    },
+    { name = "no_photons",       parameters = [25.0] },
+    { name = "no_electrons",     parameters = [25.0] },
+    { name = "single_muon",      parameters = [143.425] },
+    { name = "single_pion",    parameters = [25.0] },
+]
+
+[[category]] # 1 : Single muon, multiple pion
+cuts = [
+    { name = "neutrino" },
+    { name = "fiducial_cut"    },
+    { name = "no_photons",       parameters = [25.0] },
+    { name = "no_electrons",     parameters = [25.0] },
+    { name = "single_muon",      parameters = [143.425] },
+    { name = "!no_charged_pions", parameters = [25.0] },
+    { name = "!single_pion",    parameters = [25.0] },
+]
+
+[[category]] # 2 : Single muon, zero pion
+cuts = [
+    { name = "neutrino" },
+    { name = "fiducial_cut"    },
+    { name = "no_photons",       parameters = [25.0] },
+    { name = "no_electrons",     parameters = [25.0] },
+    { name = "single_muon",      parameters = [143.425] },
+    { name = "no_charged_pions", parameters = [25.0] },
+]
+
+[[category]] # 3 : Neutrino, charged current
+cuts = [
+    { name = "neutrino" },
+    { name = "fiducial_cut"    },
+    { name = "iscc"     },
+]
+
+[[category]] # 4 : Neutrino, neutral current
+cuts = [
+    { name = "neutrino" },
+    { name = "fiducial_cut"    },
+    { name = "!iscc"    },
+]
+
+[[category]] # 5 : Out of FV
+cuts = [
+    { name = "!fiducial_cut" },
+    { name = "neutrino" },
+]
+
+[[category]] # 6 : Cosmic
+cuts = [
+    { name = "!neutrino" },
+]
+
+[[sample]]
+name = "nominal"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_CV_flat_cafs_2/NuMI_CV_flat_cafs_2_0*.root"
+ismc = true
+disable = false
+
+
+
+
+
+[[tree]]
+name = "signal"
+sim_only = true
+add_exposure = true
+mode = "true"
+cut = [
+    { name = "neutrino",              type = "true" },
+]
+branch = [
+    # Interaction-level truth branches
+    { name = "neutrino_id",            type = "true"    },
+    { name = "cc",                     type = "mctruth" },
+    { name = "neutrino_energy",         type = "mctruth" },
+    { name = "interaction_mode",       type = "mctruth" },
+    { name = "interaction_type",       type = "mctruth" },
+    { name = "category",               type = "true"    },
+
+    # Interaction-level selection variables
+    { name = "photon_multiplicity",   type = "reco", parameters = [25.0,]},
+    { name = "electron_multiplicity", type = "reco", parameters = [25.0,]},
+    { name = "muon_multiplicity",     type = "reco", parameters = [143.425,]},
+    { name = "pion_multiplicity",     type = "reco", parameters = [25,]},
+    { name = "proton_multiplicity",   type = "reco", parameters = [50.0,]},
+    { name = "hadronic_invariant_mass", type = "true" },
+    { name = "four_mom_transfer_squared",     type = "both"},
+
+]
+
+
+
+
