@@ -21,7 +21,7 @@ proton_threshold = 50.0
 flash_low_t = -0.0
 flash_high_t = 9.6
 
-[[category]] # 0 : Fiducial, single muon, single pion
+[[category]] # 0 : Fiducial, single muon, single pion, N proton(N>=1)
 cuts = [
     { name = "neutrino"        },
     { name = "fiducial_cut"    },
@@ -29,9 +29,20 @@ cuts = [
     { name = "no_electrons",     parameters = [25.0] },
     { name = "single_muon",      parameters = ["@muon_threshold"] },
     { name = "single_pion",    parameters = ["@pion_threshold"] },
+    { name = "!no_protons",    parameters = ["@proton_threshold"] },
+]
+[[category]] # 1 : Fiducial, single muon, single pion, zero proton
+cuts = [
+    { name = "neutrino"        },
+    { name = "fiducial_cut"    },
+    { name = "no_photons",       parameters = [25.0] },
+    { name = "no_electrons",     parameters = [25.0] },
+    { name = "single_muon",      parameters = ["@muon_threshold"] },
+    { name = "single_pion",    parameters = ["@pion_threshold"] },
+    { name = "no_protons",    parameters = ["@proton_threshold"] },
 ]
 
-[[category]] # 1 : Single muon, multiple pion
+[[category]] # 2 : Single muon, multiple pions (N>1)
 cuts = [
     { name = "neutrino" },
     { name = "fiducial_cut"    },
@@ -42,7 +53,7 @@ cuts = [
     { name = "!single_pion",    parameters = ["@pion_threshold"] },
 ]
 
-[[category]] # 2 : Single muon, zero pion
+[[category]] # 3 : Single muon, zero pion
 cuts = [
     { name = "neutrino" },
     { name = "fiducial_cut"    },
@@ -52,40 +63,29 @@ cuts = [
     { name = "no_charged_pions", parameters = ["@pion_threshold"] },
 ]
 
-[[category]] # 3 : Neutrino, charged current
+[[category]] # 4 : Neutrino, charged current
 cuts = [
     { name = "neutrino" },
     { name = "fiducial_cut"    },
     { name = "iscc"     },
 ]
 
-[[category]] # 4 : Neutrino, neutral current
+[[category]] # 5 : Neutrino, neutral current
 cuts = [
     { name = "neutrino" },
     { name = "fiducial_cut"    },
     { name = "!iscc"    },
 ]
 
-[[category]] # 5 : Out of FV
+[[category]] # 6 : Out of FV
 cuts = [
     { name = "!fiducial_cut" },
     { name = "neutrino" },
 ]
 
-[[category]] # 6 : Cosmic
+[[category]] # 7 : Cosmic
 cuts = [
     { name = "!neutrino" },
-]
-
-[[category]] # 7 : Fiducial, single muon, single pion; signle proton
-cuts = [
-    { name = "neutrino"        },
-    { name = "fiducial_cut"    },
-    { name = "no_photons",       parameters = [25.0] },
-    { name = "no_electrons",     parameters = [25.0] },
-    { name = "single_muon",      parameters = ["@muon_threshold"] },
-    { name = "single_pion",    parameters = ["@pion_threshold"] },
-    { name = "single_proton",    parameters = ["@proton_threshold"] },
 ]
 
 
