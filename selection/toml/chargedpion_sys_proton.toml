@@ -196,7 +196,7 @@ disable = false
 name = "selected_one_proton_michel"
 sim_only = false
 add_exposure = true
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },
@@ -343,7 +343,7 @@ branch = [
 name = "selected_one_proton"
 sim_only = false
 add_exposure = true
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },
@@ -609,7 +609,7 @@ branch = [
 name = "selected_renzo_low_threshold"
 sim_only = false
 add_exposure = true
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },
@@ -723,7 +723,7 @@ branch = [
 name = "selected_multiple"
 sim_only = false
 add_exposure = false
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },

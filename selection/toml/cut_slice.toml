@@ -112,7 +112,7 @@ disable = false
 name = "FV_cut"
 sim_only = false
 add_exposure = true
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },
@@ -138,7 +138,7 @@ branch = [
 name = "FV_flash_cut"
 sim_only = false
 add_exposure = true
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },
@@ -165,7 +165,7 @@ branch = [
 name = "FV_flash_photon_cut"
 sim_only = false
 add_exposure = true
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },
@@ -193,7 +193,7 @@ branch = [
 name = "FV_flash_photon_e_cut"
 sim_only = false
 add_exposure = true
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },
@@ -222,7 +222,7 @@ branch = [
 name = "FV_flash_photon_e_mu_cut"
 sim_only = false
 add_exposure = true
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },
@@ -252,7 +252,7 @@ branch = [
 name = "FV_flash_photon_e_mu_p_cut"
 sim_only = false
 add_exposure = true
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },
@@ -283,7 +283,7 @@ branch = [
 name = "FV_flash_photon_e_mu_p_pi_cut"
 sim_only = false
 add_exposure = true
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },

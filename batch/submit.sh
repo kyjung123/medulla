@@ -126,9 +126,9 @@ printf -v RAWNAME "output_jobid%04d.root" "$JOBID"
 ifdh cp --cp_maxretries=0 --web_timeout=100 output.root $PROJECT/output/$RAWNAME
 
 ## Run medulla (systematics)
-./systematics/run_systematics systematics.toml
-ls -lrth
+#./systematics/run_systematics systematics.toml
+#ls -lrth
 
 # Copy output file to the output directory
-printf -v SYSTNAME "output_systematics_jobid%04d.root" "$JOBID"
-ifdh cp --cp_maxretries=0 --web_timeout=100 output_sys.root $PROJECT/output/$SYSTNAME
+#printf -v SYSTNAME "output_systematics_jobid%04d.root" "$JOBID"
+#ifdh cp --cp_maxretries=0 --web_timeout=100 output_sys.root $PROJECT/output/$SYSTNAME
