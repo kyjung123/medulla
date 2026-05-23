@@ -7,8 +7,6 @@ pidfn = "default_pid"
 cuts = [
     { name = "neutrino"        },
     { name = "fiducial_cut"    },
-    { name = "no_photons",       parameters = [25.0] },
-    { name = "no_electrons",     parameters = [25.0] },
     { name = "single_muon",      parameters = [143.425] },
     { name = "single_pion",    parameters = [25.0] },
 ]
@@ -17,8 +15,6 @@ cuts = [
 cuts = [
     { name = "neutrino" },
     { name = "fiducial_cut"    },
-    { name = "no_photons",       parameters = [25.0] },
-    { name = "no_electrons",     parameters = [25.0] },
     { name = "single_muon",      parameters = [143.425] },
     { name = "!no_charged_pions", parameters = [25.0] },
     { name = "!single_pion",    parameters = [25.0] },
@@ -28,8 +24,6 @@ cuts = [
 cuts = [
     { name = "neutrino" },
     { name = "fiducial_cut"    },
-    { name = "no_photons",       parameters = [25.0] },
-    { name = "no_electrons",     parameters = [25.0] },
     { name = "single_muon",      parameters = [143.425] },
     { name = "no_charged_pions", parameters = [25.0] },
 ]

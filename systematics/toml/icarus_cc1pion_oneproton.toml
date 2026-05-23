@@ -1,13 +1,12 @@
 [input]
 path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel.root"
-weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/*.root.flat_merged_geant4.root"
-#weights = '/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_CV_flat_cafs_2/*.root'
-#weights = '/pnfs/icarus/persistent/users/mueller/production/simulation/cvext/input*.flat.root'
+#weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/*.root.flat_merged_geant4.root"
+weights = "/pnfs/icarus/scratch/users/kyjung/ZExpPCA/*.root.flat_merged_geant4.root"
+#weights = "/exp/icarus/data/users/kyjung/ZExpPCA/*.root.flat_merged_geant4.root"
 use_additional_hash = true
 
 [output]
 path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_sys.root"
-#path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_sys_test.root"
 histogram_destination = 'variations/'
 
 [[sysvar]]
@@ -1000,3 +999,31 @@ index = 132
 name = "reinteractions_proton_Geant4"
 type = "multisim"
 index = 133
+
+[[sys]]
+name = "ZExpPCAWeighter_myreweighter_b1"
+name_short = 'ZExpPCAB1CCQE'
+type = "multisigma"
+nsigma = [-3,-2,-1,0,1,2,3]
+index = 134
+
+[[sys]]
+name = "ZExpPCAWeighter_myreweighter_b2"
+name_short = 'ZExpPCAB2CCQE'
+type = "multisigma"
+nsigma = [-3,-2,-1,0,1,2,3]
+index = 135
+
+[[sys]]
+name = "ZExpPCAWeighter_myreweighter_b3"
+name_short = 'ZExpPCAB3CCQE'
+type = "multisigma"
+nsigma = [-3,-2,-1,0,1,2,3]
+index = 136
+
+[[sys]]
+name = "ZExpPCAWeighter_myreweighter_b4"
+name_short = 'ZExpPCAB4CCQE'
+type = "multisigma"
+nsigma = [-3,-2,-1,0,1,2,3]
+index = 137

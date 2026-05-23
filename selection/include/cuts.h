@@ -587,7 +587,7 @@ namespace cuts
 
 
     template<class T>
-        bool pion_michel_tag_cut(const T& obj, std::vector<double> params={25.0,20.0})
+        bool pion_michel_tag_cut(const T& obj, std::vector<double> params={50.0,20.0})
         {
             bool findpion=false;
             bool michel_tagged = false;
@@ -626,6 +626,41 @@ namespace cuts
             return michel_tagged;
         }
     REGISTER_CUT_SCOPE(RegistrationScope::Both, pion_michel_tag_cut, pion_michel_tag_cut);
+    template<class T>
+
+bool pion_michel_tag_cut(const T& obj, std::vector<double> params={20.0})
+{
+    size_t pion_index = selectors::leading_pion(obj);
+    if (pion_index == kNoMatch) return false;
+    const auto& pion = obj.particles[pion_index];
+    // KE threshold: default 50 MeV
+    utilities::three_vector pion_end = {
+        pvars::end_x(pion),
+        pvars::end_y(pion),
+        pvars::end_z(pion)
+    };
+    int64_t pion_id = pion.id;
+    bool michel_tagged = false;
+    for(size_t i = 0; i < obj.particles.size(); ++i)
+    {
+        const auto& p = obj.particles[i];
+        if (p.id == pion_id) continue;
+        utilities::three_vector particle_vtx = {
+            pvars::start_x(p),
+            pvars::start_y(p),
+            pvars::start_z(p)
+        };
+        double Atslc =utilities::magnitude(utilities::subtract(pion_end, particle_vtx));
+        // Michel candidate within 20 cm
+        if (p.shape == 2 && Atslc < params[1])
+        {
+            michel_tagged = true;
+            break;
+        }
+    }
+    return michel_tagged;
+}
+REGISTER_CUT_SCOPE(RegistrationScope::Both, pion_michel_tag_cut, pion_michel_tag_cut);
 
 
 
