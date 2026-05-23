@@ -113,6 +113,7 @@ branch = [
     # Interaction-level truth/reco branches
     { name = "neutrino_id",             type = "true"    },
     { name = "flash_time",         type = "reco"},
+    { name = "flash_time_test",         type = "true"},
     { name = "baseline",                type = "mctruth" },
     { name = "cc",                      type = "mctruth" },
     { name = "pdg",                     type = "mctruth" },

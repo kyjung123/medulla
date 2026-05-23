@@ -299,6 +299,14 @@ namespace vars
     }
     REGISTER_VAR_SCOPE(RegistrationScope::Reco, flash_time, flash_time);
 
+    template<class T>
+    double flash_time_test(const T & obj)
+    {
+        if(obj.flash_times.size() > 0)
+            return obj.flash_times[0];
+        return PLACEHOLDERVALUE;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::True, flash_time_test, flash_time_test);
     /**
      * @brief Variable for the flash score of the interaction.
      * @details The flash score is the likelihood score of the flash observed
