@@ -1485,7 +1485,7 @@ namespace vars
     REGISTER_VAR_SCOPE(RegistrationScope::True, true_pion_michel_tag, true_pion_michel_tag);
 
     template <class T>
-    double pion_michel_tag(const T& obj, std::vector<double> params={10.0})
+    double pion_michel_tag(const T& obj, std::vector<double> params={20.0})
     {
         size_t mu = selectors::leading_pion(obj);//gaurantee it is reco pion candidate
         size_t index(kNoMatch);

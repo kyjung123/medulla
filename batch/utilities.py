@@ -87,7 +87,15 @@ def get_samples(
     # Process the samples and batch them if requested.
     batches = []
     for sample in enabled_samples:
-        paths = glob(sample['path'])
+#        paths = glob(sample['path'])
+        sample_paths = sample['path']
+        if isinstance(sample_paths, str):
+            paths = glob(sample_paths)
+        else:
+            paths = []
+            for path in sample_paths:
+                paths.extend(glob(path))
+        paths = sorted(paths)
         if len(paths) == 0:
             raise FileNotFoundError(f"No files found for sample {sample.get('name', '<unknown>')} with path {sample['path']}")
         if batch_size is None or batch_size <= 0:

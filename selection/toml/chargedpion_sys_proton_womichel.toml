@@ -82,7 +82,8 @@ cuts = [
 
 [[sample]]
 name = "nominal"
-path = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/*.root"
+#path = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/ZExpPCA/*.root"
+path = "/pnfs/icarus/persistent/users/spine/NuMI/ZExpPCA//*.root"
 ismc = true
 disable = false
 
@@ -450,4 +451,29 @@ branch = [
     { name = "containment",   type = "both_particle", selector = "leading_muon" },
     { name = "containment",   type = "both_particle", selector = "leading_pion" },
     { name = "containment",   type = "both_particle", selector = "leading_proton" },
+]
+
+[[tree]]
+name = "signal_N_proton_reco_mode"
+sim_only = true
+add_exposure = true
+mode = "reco"
+cut = [
+    { name = "neutrino",     type = "true" },
+    { name = "fiducial_cut", type = "true" },
+    { name = "single_muon",  type = "true", parameters = ["@muon_threshold"] },
+    { name = "single_pion",  type = "true", parameters = ["@pion_threshold"] },
+    { name = "!no_protons",  type = "true", parameters = ["@proton_threshold"] },
+]
+
+branch = [
+    { name = "category", type = "true" },
+    { name = "fiducial_cut", type = "both" },
+    { name = "flash_time", type = "reco" },
+    { name = "photon_multiplicity", type = "both", parameters = ["@photon_threshold"] },
+    { name = "electron_multiplicity", type = "both", parameters = ["@electron_threshold"] },
+    { name = "muon_multiplicity", type = "both", parameters = ["@muon_threshold"] },
+    { name = "pion_multiplicity", type = "both", parameters = ["@pion_threshold"] },
+    { name = "proton_multiplicity", type = "both", parameters = ["@proton_threshold"] },
+    { name = "pion_michel_tag", type = "both", parameters = [20.0] },
 ]

@@ -1,8 +1,9 @@
 [input]
 path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel.root"
-#weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/*.root.flat_merged_geant4.root"
-weights = "/pnfs/icarus/scratch/users/kyjung/ZExpPCA/*.root.flat_merged_geant4.root"
+weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/ZExpPCA/*.root.flat_merged_geant4.root"
 #weights = "/exp/icarus/data/users/kyjung/ZExpPCA/*.root.flat_merged_geant4.root"
+#weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/*.root.flat_merged_geant4.root"
+#weights = "/pnfs/icarus/scratch/users/kyjung/ZExpPCA/*.root.flat_merged_geant4.root"
 use_additional_hash = true
 
 [output]

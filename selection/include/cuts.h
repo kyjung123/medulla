@@ -651,7 +651,7 @@ namespace cuts
                 };
                 double Atslc =utilities::magnitude(utilities::subtract(pion_end, particle_vtx));
                 // Michel candidate within 20 cm
-                if (p.shape == 2 && Atslc < params[1])
+                if (p.shape == 2 && Atslc < params[0])
                 {
                     michel_tagged = true;
                     break;

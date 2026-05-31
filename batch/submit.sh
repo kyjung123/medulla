@@ -91,7 +91,8 @@ ifdh cp --cp_maxretries=0 --web_timeout=100 $PROJECT/systematics.toml systematic
 mkdir data
 
 # Extract all paths
-full_paths=$(grep '"/pnfs' job_config.toml | grep -o '"[^"]*"' | sed 's/"//g')
+#full_paths=$(grep '"/pnfs' job_config.toml | grep -o '"[^"]*"' | sed 's/"//g')
+full_paths=$(grep -E '"/(pnfs|exp)' job_config.toml | grep -o '"[^"]*"' | sed 's/"//g')
 echo "Found $(echo "$full_paths" | wc -l) input files to copy."
 
 # Copy input files
