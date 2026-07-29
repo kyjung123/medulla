@@ -89,7 +89,6 @@ cuts = [
 
 [[sample]]
 name = "nominal"
-#path = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/ZExpPCA/*.root"
 path = "/pnfs/icarus/persistent/users/spine/NuMI/ZExpPCA/*.root"
 #path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_CV_flat_cafs_2/NuMI_CV_flat_cafs_2_01.root"
 ismc = true
@@ -97,89 +96,84 @@ disable = false
 
 [[sample]]
 name = "onbeam"
-path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_data_flat_cafs_2/*.root"
-#path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_data_flat_cafs_2/NuMI_data_flat_cafs_2_00.root"
+#path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_data_flat_cafs_2/*.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_data_flat_cafs_2/NuMI_data_flat_cafs_2_00.root"
 ismc = false
-disable = false
+disable =false
 
-[[sample]]
-name = "var00"
-path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Null_var/*.root"
-ismc = true
-disable = true
 
 [[sample]]
 name = "var01p"
 path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/High_Gain/*.root"
 ismc = true
-disable = false
+disable =false
 
 [[sample]]
 name = "var01m"
 path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Low_Gain/*.root"
 ismc = true
-disable = false
+disable =false
 
 [[sample]]
 name = "var02p"
 path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/High_Coh/*.root"
 ismc = true
-disable = false
+disable =false
 
 [[sample]]
 name = "var02m"
 path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Low_Coh/*.root"
 ismc = true
-disable = false
+disable =false
 
 [[sample]]
 name = "var03p"
 path = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/Int_high/*.root"
 ismc = true
-disable = false
+disable =false
 
 [[sample]]
 name = "var03m"
 path = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/Int_low/*.root"
 ismc = true
-disable = false
+disable =false
 
 [[sample]]
 name = "var04p"
 path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/High_Lifetime/*.root"
 ismc = true
-disable = false
+disable =false
 
 [[sample]]
 name = "var04m"
 path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Low_Lifetime/*.root"
 ismc = true
-disable = false
+disable =false
 
 
 [[sample]]
 name = "var05"
 path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Scint_Var/*.root"
 ismc = true
-disable = false
+disable =false
 
 [[sample]]
 name = "var06"
 path = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/WireGap/*.root"
 ismc = true
-disable = false
+disable =false
 
 [[sample]]
 name = "var07"
 path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/YZ_unif/*.root"
 ismc = true
-disable = false
+disable =false
 
 [[sample]]
 name = "var08"
 path = "/pnfs/icarus/persistent/users/dcarber/spine/NuMI_Nu_det_sys_flat_cafs/Recomb/*.root"
 ismc = true
-disable = false
+disable =false
 
 [[sample]]
 name = "var09"
@@ -189,7 +183,7 @@ disable = false
 
 [[tree]]
 name = "selected_one_proton_michel"
-minus_G4 = false
+sim_only = false
 add_exposure = true
 add_systematics = false
 mode = "reco"
