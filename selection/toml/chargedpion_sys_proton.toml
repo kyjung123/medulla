@@ -90,7 +90,7 @@ cuts = [
 [[sample]]
 name = "nominal"
 #path = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/ZExpPCA/*.root"
-path = "/pnfs/icarus/persistent/users/spine/NuMI/ZExpPCA//*.root"
+path = "/pnfs/icarus/persistent/users/spine/NuMI/ZExpPCA/*.root"
 #path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_CV_flat_cafs_2/NuMI_CV_flat_cafs_2_01.root"
 ismc = true
 disable = false
@@ -189,7 +189,7 @@ disable = false
 
 [[tree]]
 name = "selected_one_proton_michel"
-sim_only = false
+minus_G4 = false
 add_exposure = true
 add_systematics = false
 mode = "reco"
@@ -242,6 +242,9 @@ branch = [
     { name = "pion_multiplicity",     type = "both", parameters = ["@pion_threshold",]},
     { name = "proton_multiplicity",   type = "both", parameters = ["@proton_threshold",]},
     { name = "nneutron_G4",         type = "mctruth" },
+    { name = "npiplus_G4",         type = "mctruth" },
+    { name = "npiminus_G4",         type = "mctruth" },
+    { name = "nproton_G4",         type = "mctruth" },
     { name = "resnum",         type = "mctruth" },
     { name = "count_proton",         type = "true" },
     { name = "count_pip",         type = "true" },
@@ -397,6 +400,10 @@ branch = [
     { name = "leadingproton_match_id_max", type = "both" },
     { name = "leadingproton_match_overlap_max", type = "both" },
     { name = "containment",   type = "both_particle"},
+    { name = "nneutron_G4",         type = "mctruth" },
+    { name = "npiplus_G4",         type = "mctruth" },
+    { name = "npiminus_G4",         type = "mctruth" },
+    { name = "nproton_G4",         type = "mctruth" },
 ]
 
 [[tree]]
@@ -428,6 +435,9 @@ branch = [
     { name = "interaction_type",        type = "mctruth" },
     { name = "interaction_mode",       type = "mctruth" },
     { name = "nneutron_G4",         type = "mctruth" },
+    { name = "npiplus_G4",         type = "mctruth" },
+    { name = "npiminus_G4",         type = "mctruth" },
+    { name = "nproton_G4",         type = "mctruth" },
     { name = "resnum",         type = "mctruth" },
     { name = "category",                type = "true"    },
     { name = "visible_energy",          type = "both"    },
@@ -543,6 +553,9 @@ branch = [
     { name = "neutrino_energy",         type = "mctruth" },
     { name = "q_squared",         type = "mctruth" },
     { name = "nneutron_G4",         type = "mctruth" },
+    { name = "npiplus_G4",         type = "mctruth" },
+    { name = "npiminus_G4",         type = "mctruth" },
+    { name = "nproton_G4",         type = "mctruth" },
     { name = "resnum",         type = "mctruth" },
     { name = "visible_energy",          type = "both"    },
     { name = "visible_energy_calosub",  type = "both"    },
@@ -699,6 +712,10 @@ branch = [
     { name = "leadingproton_match_id_max", type = "both" },
     { name = "leadingproton_match_overlap_max", type = "both" },
     { name = "containment",   type = "both_particle"},
+    { name = "nneutron_G4",         type = "mctruth" },
+    { name = "npiplus_G4",         type = "mctruth" },
+    { name = "npiminus_G4",         type = "mctruth" },
+    { name = "nproton_G4",         type = "mctruth" },
 ]
 
 
@@ -811,6 +828,10 @@ branch = [
     { name = "containment",   type = "both_particle", selector = "leading_muon" },
     { name = "containment",   type = "both_particle", selector = "leading_pion" },
     { name = "containment",   type = "both_particle", selector = "leading_proton" },
+    { name = "nneutron_G4",         type = "mctruth" },
+    { name = "npiplus_G4",         type = "mctruth" },
+    { name = "npiminus_G4",         type = "mctruth" },
+    { name = "nproton_G4",         type = "mctruth" },
 ]
 
 
@@ -839,6 +860,10 @@ branch = [
     { name = "pion_multiplicity", type = "both", parameters = ["@pion_threshold"] },
     { name = "proton_multiplicity", type = "both", parameters = ["@proton_threshold"] },
     { name = "pion_michel_tag", type = "both", parameters = [20.0] },
+    { name = "nneutron_G4",         type = "mctruth" },
+    { name = "npiplus_G4",         type = "mctruth" },
+    { name = "npiminus_G4",         type = "mctruth" },
+    { name = "nproton_G4",         type = "mctruth" },
 ]
 
 

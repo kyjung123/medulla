@@ -378,7 +378,7 @@ def launch_jobsub(
         'jobsub_submit',
         '-G', exp,
         '-N', str(njobs),
-        '--memory=2000MB',
+        '--memory=2500MB',
         f'--disk={"10GB" if exp == "sbnd" else "29GB"}',
         '--expected-lifetime=2h',
         '--resource-provides=usage_model=DEDICATED,OPPORTUNISTIC,OFFSITE',

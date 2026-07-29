@@ -155,27 +155,58 @@ namespace mctruth
     template<typename T>
         double nneutron_G4(const T & obj)
         {
-//            std::cout<<"resnum:"<<obj.resnum<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
-//            std::cout<<"parent pdg:"<<obj.parent_pdg<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
-//            std::cout<<"target pdg:"<<obj.targetPDG<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
             size_t count(0);
             for(const auto & p : obj.prim)
             {
-//            std::cout<<"Prim particle pad:"<<p.pdg<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
-//            std::cout<<"parent id:"<<p.parent<<std::endl;
             unsigned parentid=p.parent;
 
                 if (p.pdg==2112) ++count;
             }
-//            for(const auto & p : obj)
-//            {
-//                std::cout<<"parent pdg:"<<p.pdg<<std::endl;
-//            }
-
-//            std::cout<<"count:"<<count<<std::endl;
             return count;
         }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, nneutron_G4, nneutron_G4);
+
+    template<typename T>
+        double nproton_G4(const T & obj)
+        {
+            size_t count(0);
+            for(const auto & p : obj.prim)
+            {
+            unsigned parentid=p.parent;
+
+                if (p.pdg==2212) ++count;
+            }
+            return count;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, nproton_G4, nproton_G4);
+
+    template<typename T>
+        double npiplus_G4(const T & obj)
+        {
+            size_t count(0);
+            for(const auto & p : obj.prim)
+            {
+            unsigned parentid=p.parent;
+
+                if (p.pdg==211) ++count;
+            }
+            return count;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, npiplus_G4, npiplus_G4);
+
+    template<typename T>
+        double npiminus_G4(const T & obj)
+        {
+            size_t count(0);
+            for(const auto & p : obj.prim)
+            {
+            unsigned parentid=p.parent;
+
+                if (p.pdg==-211) ++count;
+            }
+            return count;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, npiminus_G4, npiminus_G4);
 
     template<typename T>
         double prim_pion_process(const T & obj)
