@@ -484,8 +484,12 @@ struct MergeWriter {
         }
 
         if(syst_type=="multisigma"){
-          nsigmas.push_back(0.0);
-          weights.push_back(table_is_nu ? 1.0 : -5.0);
+            bool has_nominal = std::any_of(nsigmas.begin(),nsigmas.end(),[](double x){ return std::abs(x) < 1e-12; });
+
+            if(!has_nominal){
+                nsigmas.push_back(0.0);
+                weights.push_back(table_is_nu ? 1.0 : -5.0);
+            }
         }
 
         // For multisim: weights vector is the universe weights (no sigma axis).
