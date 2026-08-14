@@ -1,5 +1,5 @@
 /**
- * @file mctruth.h
+ * @file mctruth_variables.h
  * @brief Definitions of analysis variables which can extract information from
  * the SRTrueInteraction object.
  * @details This file contains definitions of analysis variables which can be
@@ -9,13 +9,17 @@
  * object to an SRTrueInteraction object is handled upstream in the SpineVar
  * functions.
  * @author mueller@fnal.gov
+ * @author rvizarr@fnal.gov
+ * @author kyjung
  */
-#ifndef MCTRUTH_H
-#define MCTRUTH_H
+#ifndef MCTRUTH_VARIABLES_H
+#define MCTRUTH_VARIABLES_H
 #include "sbnanaobj/StandardRecord/Proxy/SRProxy.h"
 #include "sbnanaobj/StandardRecord/SRTrueInteraction.h"
+#include "sbnanaobj/StandardRecord/SRVector3D.h"
 
 #include "framework.h"
+#include "utilities.h"
 
 /**
  * @namespace mctruth
@@ -35,19 +39,39 @@ namespace mctruth
      * @return the true neutrino energy.
      */
     template<typename T>
-        double neutrino_energy(const T & obj)
-        { 
-        if (!obj.E>0.0 || !std::isfinite(obj.E))
-            return -999.0;
-        else
-            return obj.E;
-        }
+        double neutrino_energy(const T & obj) { return obj.E; }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, neutrino_energy, neutrino_energy);
 
+   /**
+     * @brief Variable for the true interaction energy transfer.
+     * @details This variable is intended to provide the true energy
+     * transfer from the neutrino to the hadronic system. This is
+     * defined in the lab frame.
+     * @tparam T the type of the object to apply the variable on.
+     * @param obj the SRTrueInteraction to apply the variable on.
+     * @return the true energy transfer into the hadronic system
+     * in the lab frame.
+     */
+    template<typename T>
+        double energy_transfer(const T & obj) { return obj.q0_lab; }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, energy_transfer, energy_transfer);
+
+    /**
+     * @brief Variable for the true four-momentum transfer squared Q², with
+     * validity guards.
+     * @details This variable is intended to provide the true Q² of the
+     * interaction, guarding against non-physical (non-positive) or
+     * non-finite values by returning a sentinel value of -999.0 in those
+     * cases. This differs from @ref neutrino_Q2, which returns the raw
+     * generator-record value with no validity check.
+     * @tparam T the type of the object to apply the variable on.
+     * @param obj the SRTrueInteraction to apply the variable on.
+     * @return Q² in GeV², or -999.0 if Q² is non-positive or non-finite.
+     */
     template<typename T>
         double q_squared(const T & obj)
-        { 
-        if (!obj.Q2>0.0 || !std::isfinite(obj.Q2))
+        {
+        if (!(obj.Q2 > 0.0) || !std::isfinite(obj.Q2))
             return -999.0;
         else
             return obj.Q2;
@@ -128,6 +152,235 @@ namespace mctruth
         double interaction_type(const T & obj) { return obj.genie_inttype; }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, interaction_type, interaction_type);
 
+    /**
+     * @brief Variable for the true off-axis angle of the neutrino.
+     * @details This variable is intended to provide the true off-axis angle of
+     * the parent neutrino that produced the interaction. The off-axis angle is
+     * calculated as the angle between the neutrino momentum vector and the
+     * beam axis (defined as the z-axis in both SBND and ICARUS).
+     * @tparam T the type of the object to apply the variable on.
+     * @param obj the SRTrueInteraction to apply the variable on.
+     * @return the true off-axis angle of the neutrino in degrees.
+     */
+    template<typename T>
+    double off_axis_angle(const T & obj)
+    {
+        const auto & neutrino_momentum = obj.momentum;
+        double mag = std::sqrt(
+            neutrino_momentum.x * neutrino_momentum.x +
+            neutrino_momentum.y * neutrino_momentum.y +
+            neutrino_momentum.z * neutrino_momentum.z
+        );
+        return 180./3.141592653589793 * std::acos(
+            neutrino_momentum.z / mag
+        );
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, off_axis_angle, off_axis_angle);
+
+    /**
+     * @brief True four-momentum transfer squared Q² in GeV².
+     * @details Returns the raw generator-record value with no validity
+     * check. See @ref q_squared for a version that guards against
+     * non-physical or non-finite values.
+     * @tparam T the type of the object to apply the variable on.
+     * @param obj the SRTrueInteraction to apply the variable on.
+     * @return Q² from the generator record.
+     */
+    template<typename T>
+    double neutrino_Q2(const T & obj) { return obj.Q2; }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, neutrino_Q2, neutrino_Q2);
+
+    /**
+     * @brief True hadronic invariant mass W in GeV.
+     * @tparam T the type of the object to apply the variable on.
+     * @param obj the SRTrueInteraction to apply the variable on.
+     * @return W from the generator record.
+     */
+    template<typename T>
+    double neutrino_W(const T & obj) { return obj.w; }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, neutrino_W, neutrino_W);
+
+    /**
+     * @brief Count of true primary photons above an energy threshold.
+     * @details Loops over `obj.prim` and counts PDG-22 particles whose kinetic
+     * energy (= total energy, since photons are massless) exceeds `params[0]`
+     * in MeV. Generator energies are stored in GeV.
+     * @tparam T the type of the object to apply the variable on.
+     * @param obj the SRTrueInteraction to apply the variable on.
+     * @param params threshold in MeV; defaults to 0 MeV.
+     * @return number of primary photons above threshold.
+     */
+    template<typename T>
+    double nphotons_srtruth(const T & obj, std::vector<double> params={0.0,})
+    {
+        int n(0);
+        for(const auto & p : obj.prim)
+        {
+            if(p.pdg == 22)
+            {
+                double ke = 1000. * p.genE; // MeV (massless)
+                if(ke >= params[0]) ++n;
+            }
+        }
+        return n;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, nphotons_srtruth, nphotons_srtruth);
+
+    /**
+     * @brief Count of true primary electrons above a kinetic energy threshold.
+     * @details Loops over `obj.prim` and counts PDG-11 particles whose kinetic
+     * energy exceeds `params[0]` in MeV.
+     * @tparam T the type of the object to apply the variable on.
+     * @param obj the SRTrueInteraction to apply the variable on.
+     * @param params threshold in MeV; defaults to 0 MeV.
+     * @return number of primary electrons above threshold.
+     */
+    template<typename T>
+    double nelectrons_srtruth(const T & obj, std::vector<double> params={0.0,})
+    {
+        int n(0);
+        for(const auto & p : obj.prim)
+        {
+            if(p.pdg == 11)
+            {
+                double ke = 1000. * (p.genE - ELECTRON_MASS/1000.); // MeV
+                if(ke >= params[0]) ++n;
+            }
+        }
+        return n;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, nelectrons_srtruth, nelectrons_srtruth);
+
+    /**
+     * @brief Count of true primary muons above a kinetic energy threshold.
+     * @details Loops over `obj.prim` and counts PDG-13 particles (muons only,
+     * not antimuons) whose kinetic energy exceeds `params[0]` in MeV.
+     * @tparam T the type of the object to apply the variable on.
+     * @param obj the SRTrueInteraction to apply the variable on.
+     * @param params threshold in MeV; defaults to 0 MeV.
+     * @return number of primary muons above threshold.
+     */
+    template<typename T>
+    double nmuons_srtruth(const T & obj, std::vector<double> params={0.0,})
+    {
+        int n(0);
+        for(const auto & p : obj.prim)
+        {
+            if(p.pdg == 13)
+            {
+                double ke = 1000. * (p.genE - MUON_MASS/1000.); // MeV
+                if(ke >= params[0]) ++n;
+            }
+        }
+        return n;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, nmuons_srtruth, nmuons_srtruth);
+
+    /**
+     * @brief Count of true primary neutral pions above a kinetic energy threshold.
+     * @details Loops over `obj.prim` and counts PDG-111 particles whose kinetic
+     * energy exceeds `params[0]` in MeV.
+     * @tparam T the type of the object to apply the variable on.
+     * @param obj the SRTrueInteraction to apply the variable on.
+     * @param params threshold in MeV; defaults to 0 MeV.
+     * @return number of primary neutral pions above threshold.
+     */
+    template<typename T>
+    double npi0s_srtruth(const T & obj, std::vector<double> params={0.0,})
+    {
+        int n(0);
+        for(const auto & p : obj.prim)
+        {
+            if(p.pdg == 111)
+            {
+                double ke = 1000. * (p.genE - PI0_MASS/1000.); // MeV
+                if(ke >= params[0]) ++n;
+            }
+        }
+        return n;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, npi0s_srtruth, npi0s_srtruth);
+
+    /**
+     * @brief Count of true primary charged pions above a kinetic energy threshold.
+     * @details Loops over `obj.prim` and counts |PDG|=211 particles (π⁺ and π⁻)
+     * whose kinetic energy exceeds `params[0]` in MeV.
+     * @tparam T the type of the object to apply the variable on.
+     * @param obj the SRTrueInteraction to apply the variable on.
+     * @param params threshold in MeV; defaults to 0 MeV.
+     * @return number of primary charged pions above threshold.
+     */
+    template<typename T>
+    double npions_srtruth(const T & obj, std::vector<double> params={0.0,})
+    {
+        int n(0);
+        for(const auto & p : obj.prim)
+        {
+            if(std::abs(p.pdg) == 211)
+            {
+                double ke = 1000. * (p.genE - PION_MASS/1000.); // MeV
+                if(ke >= params[0]) ++n;
+            }
+        }
+        return n;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, npions_srtruth, npions_srtruth);
+
+    /**
+     * @brief Count of true primary eta mesons above a kinetic energy threshold.
+     * @details Loops over `obj.prim` and counts |PDG|=221 particles whose kinetic
+     * energy exceeds `params[0]` in MeV. Eta mass: 547.862 MeV.
+     * @tparam T the type of the object to apply the variable on.
+     * @param obj the SRTrueInteraction to apply the variable on.
+     * @param params threshold in MeV; defaults to 0 MeV.
+     * @return number of primary eta mesons above threshold.
+     */
+    template<typename T>
+    double netas_srtruth(const T & obj, std::vector<double> params={0.0,})
+    {
+        int n(0);
+        for(const auto & p : obj.prim)
+        {
+            if(std::abs(p.pdg) == 221)
+            {
+                double ke = 1000. * (p.genE - 547.862/1000.); // MeV
+                if(ke >= params[0]) ++n;
+            }
+        }
+        return n;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, netas_srtruth, netas_srtruth);
+
+    /**
+     * @brief Count of true primary protons above a kinetic energy threshold.
+     * @details Loops over `obj.prim` and counts PDG-2212 particles whose kinetic
+     * energy exceeds `params[0]` in MeV.
+     * @tparam T the type of the object to apply the variable on.
+     * @param obj the SRTrueInteraction to apply the variable on.
+     * @param params threshold in MeV; defaults to 0 MeV.
+     * @return number of primary protons above threshold.
+     */
+    template<typename T>
+    double nprotons_srtruth(const T & obj, std::vector<double> params={0.0,})
+    {
+        int n(0);
+        for(const auto & p : obj.prim)
+        {
+            if(p.pdg == 2212)
+            {
+                double ke = 1000. * (p.genE - PROTON_MASS/1000.); // MeV
+                if(ke >= params[0]) ++n;
+            }
+        }
+        return n;
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, nprotons_srtruth, nprotons_srtruth);
+
+    // -------------------------------------------------------------------
+    // Variables merged in from the legacy mctruth.h (kyjung's ccpionproton
+    // branch). Kept as-is aside from the q_squared fix above.
+    // -------------------------------------------------------------------
+
     template<typename T>
         int nneutron_bf_FSI(const T & obj) { return obj.nneutron; }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, nneutron_bf_FSI, nneutron_bf_FSI);
@@ -147,10 +400,6 @@ namespace mctruth
     template<typename T>
         int nproton_bf_FSI(const T & obj) { return obj.nproton; }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, nproton_bf_FSI, nproton_bf_FSI);
-
-
-
-
 
     template<typename T>
         double nneutron_G4(const T & obj)
@@ -216,9 +465,6 @@ namespace mctruth
             {
                 if ( (p.pdg==211 || p.pdg==-211) && (p.genE-0.139)>0.05 )
                 {
-//                    std::cout << "pion:" << std::endl;
-//                    std::cout<<"genE:"<<p.genE<<std::endl;
-//                    std::cout<<"end_process:"<<p.end_process<<std::endl;
                     process=p.end_process;
                 }
             }
@@ -235,15 +481,13 @@ namespace mctruth
                 unsigned parentid = p.parent;
                 if (p.pdg==2212 && (p.genE-0.93827)>0.05)
                 {
-//                    std::cout << "proton:" << std::endl;
-//                    std::cout << "genE:" << p.genE << std::endl;
-//                    std::cout << "end_process:" << p.end_process << std::endl;
                     process = p.end_process;
                 }
             }
             return process;
         }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, prim_proton_process, prim_proton_process);
+
     template<typename T>
         double prim_muon_process(const T & obj)
         {
@@ -253,16 +497,12 @@ namespace mctruth
                 unsigned parentid = p.parent;
                 if ( (p.pdg==13 || p.pdg==-13) && (p.genE-0.10566)>0.143 )
                 {
-//                    std::cout << "muon:" << std::endl;
-//                    std::cout << "genE:" << p.genE << std::endl;
-//                    std::cout << "end_process:" << p.end_process << std::endl;
                     process = p.end_process;
                 }
             }
             return process;
         }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, prim_muon_process, prim_muon_process);
-
 
     template<typename T>
         bool is_neutrino_pandora(const T & obj)
@@ -415,22 +655,12 @@ namespace mctruth
         }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, pion_process_not_9_or_10, pion_process_not_9_or_10);
 
-
     template<typename T>
         double resnum(const T & obj)
         {
-//            std::cout<<"resnum:"<<obj.resnum<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
-//            std::cout<<"parent pdg:"<<obj.parent_pdg<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
-//            std::cout<<"target pdg:"<<obj.targetPDG<<std::endl;//<<", its parent PDG::"<<p.parent_pdg<<std::endl;
-//            for(const auto & p : obj)
-//            {
-//                std::cout<<"parent pdg:"<<p.pdg<<std::endl;
-//            }
-//            std::cout<<"count:"<<count<<std::endl;
             return obj.resnum;
         }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, resnum, resnum);
-
 
     template<typename T>
         double muon_length(const T & obj)
@@ -479,7 +709,6 @@ namespace mctruth
             return process;
         }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, muon_end_y, muon_end_y);
-
 
     template<typename T>
         double muon_end_z(const T & obj)

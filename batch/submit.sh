@@ -1,38 +1,59 @@
 #!/bin/bash
 
 #######################################################################
-# Usage: submit.sh [--project=PROJECT]
-# 
+# Usage: submit.sh [--project=PROJECT] [--tag=TAG]
+#
 # Arguments:
 #   --project=PROJECT   : Specify the project directory
+#   --tag=TAG           : Git ref to checkout on grid nodes (default: develop)
 #######################################################################
+
+# Print usage information
+usage() {
+  echo "Usage: submit.sh [--project=PROJECT] [--tag=TAG]"
+  echo ""
+  echo "Arguments:"
+  echo "  --project=PROJECT   : Specify the project directory"
+  echo "  --tag=TAG           : Git ref to checkout on grid nodes (default: develop)"
+}
 
 # Initialize variables
 PROJECT=""
+TAG="ccpionproton"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --project=*)
-            PROJECT="${1#*=}"
-            shift
-            ;;
-        --project)
-            PROJECT="$2"
-            shift 2
-            ;;
-        -h|--help)
-            usage
-            ;;
-        --) # end of options
-            shift
-            break
-            ;;
-        *)
-            echo "Unknown option: $1" >&2
-            usage
-            ;;
-    esac
+  case "$1" in
+    --project=*)
+      PROJECT="${1#*=}"
+      shift
+      ;;
+    --project)
+      PROJECT="$2"
+      shift 2
+      ;;
+    --tag=*)
+      TAG="${1#*=}"
+      shift
+      ;;
+    --tag)
+      TAG="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --) # end of options
+      shift
+      break
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      usage
+      exit 1
+      ;;
+  esac
 done
 
 #######################################################################
@@ -51,6 +72,10 @@ fi
 # Initial Setup
 #######################################################################
 
+# IFDH options
+export IFDH_CP_MAXRETRIES=0
+export IFDH_WEB_TIMEOUT=100
+
 # Setup CVMFS area
 source /cvmfs/icarus.opensciencegrid.org/products/icarus/setup_icarus.sh
 
@@ -63,8 +88,7 @@ ups active
 # Build medulla
 git clone https://github.com/kyjung123/medulla.git
 cd medulla
-git checkout ccpionproton
-
+git checkout ${TAG}
 mkdir build && cd build
 export CC=$(which gcc)
 export CXX=$(which g++)
@@ -76,30 +100,34 @@ make -j4
 #######################################################################
 
 # Copy the project database
-ifdh cp --cp_maxretries=0 --web_timeout=100 $PROJECT/project.db project.db
+ifdh cp $PROJECT/project.db project.db
 
 # Extract this job's configuration file. First, we get the job ID for this
 # process by checking against the list of not-yet-completed jobs in the project
 # database.
 JOBID=$(sqlite3 -noheader project.db "SELECT jobid FROM jobs WHERE status != 'completed' ORDER BY jobid LIMIT 1 OFFSET ${PROCESS};")
+if [[ -z "$JOBID" ]]; then
+    echo "Error: could not determine JOBID for PROCESS=${PROCESS}. The project database may be empty or corrupt." >&2
+    exit 1
+fi
 sqlite3 -noheader -cmd ".mode list" project.db "SELECT cfg FROM configuration WHERE jobid=${JOBID};" > job_config.toml
 
 # Copy the systematics TOML file
-ifdh cp --cp_maxretries=0 --web_timeout=100 $PROJECT/systematics.toml systematics.toml
+ifdh cp $PROJECT/systematics.toml systematics.toml
 
 # Copy the input data file(s)
 mkdir data
 
 # Extract all paths
-#full_paths=$(grep '"/pnfs' job_config.toml | grep -o '"[^"]*"' | sed 's/"//g')
-full_paths=$(grep -E '"/(pnfs|exp)' job_config.toml | grep -o '"[^"]*"' | sed 's/"//g')
+#full_paths=$(grep -E '"/(pnfs|exp)' job_config.toml | grep -o '"[^"]*"' | sed 's/"//g')
+full_paths=$(grep '"/pnfs' job_config.toml | grep -o '"[^"]*"' | sed 's/"//g')
 echo "Found $(echo "$full_paths" | wc -l) input files to copy."
 
 # Copy input files
 mkdir -p data
 for p in $full_paths; do
     echo "Copying input file: $p"
-    ifdh cp --cp_maxretries=0 --web_timeout=100 "$p" data/
+    ifdh cp "$p" data/
 done
 ls -lrth data/
 
@@ -124,7 +152,7 @@ ls -lrth
 
 # Copy output file to the output directory
 printf -v RAWNAME "output_jobid%04d.root" "$JOBID"
-ifdh cp --cp_maxretries=0 --web_timeout=100 output.root $PROJECT/output/$RAWNAME
+ifdh cp output.root $PROJECT/output/$RAWNAME
 
 ## Run medulla (systematics)
 #./systematics/run_systematics systematics.toml
@@ -132,4 +160,4 @@ ifdh cp --cp_maxretries=0 --web_timeout=100 output.root $PROJECT/output/$RAWNAME
 
 # Copy output file to the output directory
 #printf -v SYSTNAME "output_systematics_jobid%04d.root" "$JOBID"
-#ifdh cp --cp_maxretries=0 --web_timeout=100 output_sys.root $PROJECT/output/$SYSTNAME
+#ifdh cp output_sys.root $PROJECT/output/$SYSTNAME
