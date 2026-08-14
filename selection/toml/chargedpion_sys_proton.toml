@@ -89,10 +89,17 @@ cuts = [
 
 [[sample]]
 name = "nominal"
-path = "/pnfs/icarus/persistent/users/spine/NuMI/ZExpPCA/*.root"
-#path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_CV_flat_cafs_2/NuMI_CV_flat_cafs_2_01.root"
+#path = "/pnfs/icarus/persistent/users/spine/NuMI/ZExpPCA/*.root"
+path = "/pnfs/icarus/scratch/users/kyjung/nuSyst_ZEXPPCA/*.root"
 ismc = true
 disable = false
+
+[[sample]]
+name = "rock"
+path = "/pnfs/icarus/persistent/users/spine/NuMI/FHCv09_89_01_02p02_Rock_muons/*.root"
+ismc = true
+disable = false
+
 
 [[sample]]
 name = "onbeam"
@@ -100,6 +107,13 @@ name = "onbeam"
 path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_data_flat_cafs_2/NuMI_data_flat_cafs_2_00.root"
 ismc = false
 disable =false
+
+
+[[sample]]
+name = "offbeam"
+path = "/pnfs/icarus/persistent/users/spine/NuMI/offbeam/*.root"
+ismc = false
+disable = false
 
 
 [[sample]]

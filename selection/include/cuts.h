@@ -167,6 +167,18 @@ namespace cuts
      * @param obj the interaction to select on.
      * @return true if the vertex is in the fiducial volume.
      */
+    //ICARUS volume;: 
+    //Positive-x TPC:
+//  61.94 + 25 < x < 358.49 - 25
+//  86.94 < x < 333.49 cm
+//
+//y:
+//  -181.86 + 25 < y < 134.96 - 25
+//  -156.86 < y < 109.96 cm
+//
+//z:
+//  -894.95 + 30 < z < 894.95 - 50
+//  -864.95 < z < 844.95 cm
     template<class T>
     bool fiducial_cut(const T & obj)
     {

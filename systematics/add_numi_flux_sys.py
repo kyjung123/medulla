@@ -22,7 +22,7 @@ from math import nan
 
 
 
-file_name = '/exp/icarus/data/users/kyjung/NuMI_1pi1p//icarus_charged_pion_proton_michel_sys.root'
+file_name = '/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_sys.root'
 #file_name = '/exp/icarus/data/users/kyjung/NuMi_1pi1p/icarus_charged_pion_proton_michel.root.root'
 #file_name = '/exp/icarus/data/users/kyjung/NUMI_cc1pion/icarus_charged_pion_proton_michel_half_sys.root'
 

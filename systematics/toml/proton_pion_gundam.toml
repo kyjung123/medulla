@@ -6,7 +6,7 @@ weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/ZExpPCA/*.root
 use_additional_hash = true
 
 [output]
-path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_sys_gundam.root"
+path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_sys_gundam_test.root"
 histogram_destination = 'variations/'
 
 [[sysvar]]

@@ -169,9 +169,6 @@ struct MergeWriter {
     std::string full;
     std::string out;
     TClonesArray* arr=nullptr;
-    bool export_flat_sigma=false;
-    double flat_m1 = 1.0;
-    double flat_p1 = 1.0;
 
     std::vector<Double_t>* wD = nullptr;
     std::vector<Float_t>*  wF = nullptr;
@@ -192,25 +189,6 @@ struct MergeWriter {
   };
 
   std::map<std::string, SystTypeBlock> syst_blocks;
-
-  std::unordered_set<std::string> flat_sigma_names = {
-    "ZExpA1CCQE",
-    "ZExpA2CCQE",
-    "ZExpA3CCQE",
-    "ZExpA4CCQE",
-    "VecFFCCQEshape",
-    "RPA_CCQE",
-    "CoulombCCQE",
-    "NormCCMEC",
-    "NormNCMEC",
-    "DecayAngMEC",
-    "MaNCEL",
-    "EtaNCEL",
-    "MaCCRES",
-    "MvCCRES",
-    "MaNCRES",
-    "MvNCRES"
-  };
 
   std::vector<std::string> morph_names = {
     "GENIEReWeight_SBN_v1_multisigma_VecFFCCQEshape",
@@ -307,12 +285,6 @@ struct MergeWriter {
 
       p.arr = new TClonesArray("TGraph", 1);
       out_tree->Branch(p.out.c_str(), &p.arr, 8000, 0);
-
-      if(block.type == "multisigma" && flat_sigma_names.count(p.out) > 0){
-        p.export_flat_sigma = true;
-        out_tree->Branch((p.out + "_m1").c_str(), &p.flat_m1);
-        out_tree->Branch((p.out + "_p1").c_str(), &p.flat_p1);
-      }
     }
 
     block.booked = true;
@@ -468,9 +440,6 @@ struct MergeWriter {
       std::vector<Double_t> nsigmas;
       std::vector<Double_t> weights;
 
-      p.flat_m1 = 1.0;
-      p.flat_p1 = 1.0;
-
       if(p.arr == nullptr){
         std::cout << "WARN: p.arr is null for " << p.full << "\n";
         continue;
@@ -515,7 +484,7 @@ struct MergeWriter {
         }
 
         if(syst_type=="multisigma"){
-            bool has_nominal = std::any_of(nsigmas.begin(),nsigmas.end(),[](double x){ return std::abs(x) < 1e-12; }); //Check there is 0 sigma or not
+            bool has_nominal = std::any_of(nsigmas.begin(),nsigmas.end(),[](double x){ return std::abs(x) < 1e-12; });
 
             if(!has_nominal){
                 nsigmas.push_back(0.0);
@@ -545,13 +514,6 @@ struct MergeWriter {
 
       TGraph g((int)nsigmas.size(), nsigmas.data(), weights.data());
       g.Sort();
-
-      if(p.export_flat_sigma){
-        p.flat_m1 = g.Eval(-1.0);
-        p.flat_p1 = g.Eval( 1.0);
-        if(!std::isfinite(p.flat_m1)) p.flat_m1 = 1.0;
-        if(!std::isfinite(p.flat_p1)) p.flat_p1 = 1.0;
-      }
 
       p.arr->Clear("C");
       new((*p.arr)[0]) TGraph(g.GetN(), g.GetX(), g.GetY());
@@ -894,5 +856,6 @@ int main(int argc, char* argv[])
   input->Close();
   return 0;
 }
+
 
 
