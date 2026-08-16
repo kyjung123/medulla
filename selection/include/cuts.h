@@ -1380,25 +1380,6 @@ namespace cuts
     }
     REGISTER_CUT_SCOPE(RegistrationScope::Reco, vertex_distance_cut, vertex_distance_cut);
 
-    /**
-     * @brief Cut to select interactions with a specific neutrino PDG code.
-     * @details This function applies a cut to select interactions with a
-     * specific neutrino PDG code.
-     * @tparam T the type of interaction (true).
-     * @param obj the interaction to select on.
-     * @return true if the interaction has a neutrino matching the given PDG code.
-    */
-    template<class T>
-    bool neutrino_pdg(const T & obj, std::vector<double> params={12.0})
-    {
-        for (const auto & pdg : params)
-        {
-            if (obj.pdg_code == pdg)
-                return true;
-        }
-        return false;
-    }
-    REGISTER_CUT_SCOPE(RegistrationScope::True, neutrino_pdg, neutrino_pdg);
 
 }
 #endif
