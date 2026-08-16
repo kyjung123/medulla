@@ -22,65 +22,99 @@ proton_threshold = 50.0
 flash_low_t = -0.0
 flash_high_t = 9.6
 
-[[category]] # 0 : Fiducial, single muon, single pion, N proton(N>=1)
+
+[[category]] # 0 : nu_mu CC, 1 mu-, 1 pi+, Np (N >= 1) -- signal
 cuts = [
-    { name = "neutrino"        },
-    { name = "fiducial_cut"    },
-    { name = "single_muon",      parameters = ["@muon_threshold"] },
-    { name = "single_pion",    parameters = ["@pion_threshold"] },
-    { name = "!no_protons",    parameters = ["@proton_threshold"] },
-]
-[[category]] # 1 : Fiducial, single muon, single pion, zero proton
-cuts = [
-    { name = "neutrino"        },
-    { name = "fiducial_cut"    },
-    { name = "single_muon",      parameters = ["@muon_threshold"] },
-    { name = "single_pion",    parameters = ["@pion_threshold"] },
-    { name = "no_protons",    parameters = ["@proton_threshold"] },
+    { name = "neutrino",             type = "true" },
+    { name = "fiducial_cut",         type = "true" },
+    { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
+    { name = "iscc",                 type = "mctruth" },
+    { name = "single_muon_minus",    type = "mctruth", parameters = ["@muon_threshold"] },
+    { name = "single_positive_pion", type = "mctruth", parameters = ["@pion_threshold"] },
+    { name = "has_proton",           type = "mctruth", parameters = ["@proton_threshold"] },
 ]
 
-[[category]] # 2 : Single muon, multiple pions (N>1)
+[[category]] # 1 : nu_mu CC, 1 mu-, 1 pi+, zero protons
 cuts = [
-    { name = "neutrino" },
-    { name = "fiducial_cut"    },
-    { name = "single_muon",      parameters = ["@muon_threshold"] },
-    { name = "!no_charged_pions", parameters = ["@pion_threshold"] },
-    { name = "!single_pion",    parameters = ["@pion_threshold"] },
+    { name = "neutrino",             type = "true" },
+    { name = "fiducial_cut",         type = "true" },
+    { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
+    { name = "iscc",                 type = "mctruth" },
+    { name = "single_muon_minus",    type = "mctruth", parameters = ["@muon_threshold"] },
+    { name = "single_positive_pion", type = "mctruth", parameters = ["@pion_threshold"] },
+    { name = "!has_proton",          type = "mctruth", parameters = ["@proton_threshold"] },
 ]
 
-[[category]] # 3 : Single muon, zero pion
+[[category]] # 2 : nu_mu CC, 1 mu-, 1 pi-, any Np -- wrong-sign pion
 cuts = [
-    { name = "neutrino" },
-    { name = "fiducial_cut"    },
-    { name = "single_muon",      parameters = ["@muon_threshold"] },
-    { name = "no_charged_pions", parameters = ["@pion_threshold"] },
+    { name = "neutrino",             type = "true" },
+    { name = "fiducial_cut",         type = "true" },
+    { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
+    { name = "iscc",                 type = "mctruth" },
+    { name = "single_muon_minus",    type = "mctruth", parameters = ["@muon_threshold"] },
+    { name = "single_negative_pion", type = "mctruth", parameters = ["@pion_threshold"] },
 ]
 
-[[category]] # 4 : Neutrino, charged current
+[[category]] # 3 : nu_mu CC, 1 mu-, multiple charged pions, any Np
 cuts = [
-    { name = "neutrino" },
-    { name = "fiducial_cut"    },
-    { name = "iscc"     },
+    { name = "neutrino",               type = "true" },
+    { name = "fiducial_cut",           type = "true" },
+    { name = "is_neutrino_pdg",        type = "mctruth", parameters = [14] },
+    { name = "iscc",                   type = "mctruth" },
+    { name = "single_muon_minus",      type = "mctruth", parameters = ["@muon_threshold"] },
+    { name = "multiple_charged_pions", type = "mctruth", parameters = ["@pion_threshold"] },
 ]
 
-[[category]] # 5 : Neutrino, neutral current
+[[category]] # 4 : nu_mu CC, 1 mu-, zero charged pions, any Np
 cuts = [
-    { name = "neutrino" },
-    { name = "fiducial_cut"    },
-    { name = "!iscc"    },
+    { name = "neutrino",          type = "true" },
+    { name = "fiducial_cut",      type = "true" },
+    { name = "is_neutrino_pdg",   type = "mctruth", parameters = [14] },
+    { name = "iscc",              type = "mctruth" },
+    { name = "single_muon_minus", type = "mctruth", parameters = ["@muon_threshold"] },
+    { name = "no_charged_pions",  type = "mctruth", parameters = ["@pion_threshold"] },
 ]
 
-[[category]] # 6 : Out of FV
+[[category]] # 5 : Other in-FV nu_mu CC
 cuts = [
-    { name = "!fiducial_cut" },
-    { name = "neutrino" },
+    { name = "neutrino",        type = "true" },
+    { name = "fiducial_cut",    type = "true" },
+    { name = "is_neutrino_pdg", type = "mctruth", parameters = [14] },
+    { name = "iscc",            type = "mctruth" },
 ]
 
-[[category]] # 7 : Cosmic
+[[category]] # 6 : In-FV anti-nu_mu CC -- wrong-sign beam
 cuts = [
-    { name = "!neutrino" },
+    { name = "neutrino",        type = "true" },
+    { name = "fiducial_cut",    type = "true" },
+    { name = "is_neutrino_pdg", type = "mctruth", parameters = [-14] },
+    { name = "iscc",            type = "mctruth" },
 ]
 
+[[category]] # 7 : Other-flavor in-FV CC
+cuts = [
+    { name = "neutrino",     type = "true" },
+    { name = "fiducial_cut", type = "true" },
+    { name = "iscc",         type = "mctruth" },
+]
+
+[[category]] # 8 : In-FV NC, all neutrino flavors and signs
+cuts = [
+    { name = "neutrino",     type = "true" },
+    { name = "fiducial_cut", type = "true" },
+    { name = "!iscc",        type = "mctruth" },
+]
+
+[[category]] # 9 : Out-of-FV neutrino
+cuts = [
+    { name = "neutrino",      type = "true" },
+    { name = "!fiducial_cut", type = "true" },
+]
+
+[[category]] # 10 : Cosmic
+cuts = [
+    { name = "!neutrino", type = "true" },
+]
 
 #CV  High_Coh  Int_high  Int_low  WireGap
 #[kyjung@icarusgpvm05 Nu_det_sys]$ pwd
@@ -735,12 +769,13 @@ sim_only = true
 add_exposure = true
 mode = "true"
 cut = [
-    { name = "neutrino",              type = "true" },
-    { name = "fiducial_cut",          type = "true" },
-    { name = "single_muon",           type = "true",  parameters = ["@muon_threshold"] },
-    { name = "single_pion",           type = "true", parameters = ["@pion_threshold"] },
-    { name = "!no_protons",               type = "true",  parameters = ["@proton_threshold"] },
-#    { name = "trigger_emulation_cut", type = "event", decrements_exposure = false },
+{ name = "neutrino",             type = "true" },
+{ name = "fiducial_cut",         type = "true" },
+{ name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
+{ name = "iscc",                 type = "mctruth" },
+{ name = "single_muon_minus",    type = "mctruth", parameters = ["@muon_threshold"] },
+{ name = "single_positive_pion", type = "mctruth", parameters = ["@pion_threshold"] },
+{ name = "has_proton",           type = "mctruth", parameters = ["@proton_threshold"] },
 ]
 branch = [
     # Interaction-level truth branches
@@ -844,35 +879,6 @@ branch = [
 
 
 
-
-[[tree]]
-name = "signal_N_proton_reco_mode"
-sim_only = true
-add_exposure = true
-mode = "reco"
-cut = [
-    { name = "neutrino",     type = "true" },
-    { name = "fiducial_cut", type = "true" },
-    { name = "single_muon",  type = "true", parameters = ["@muon_threshold"] },
-    { name = "single_pion",  type = "true", parameters = ["@pion_threshold"] },
-    { name = "!no_protons",  type = "true", parameters = ["@proton_threshold"] },
-]
-
-branch = [
-    { name = "category", type = "true" },
-    { name = "fiducial_cut", type = "both" },
-    { name = "flash_time", type = "reco" },
-    { name = "photon_multiplicity", type = "both", parameters = ["@photon_threshold"] },
-    { name = "electron_multiplicity", type = "both", parameters = ["@electron_threshold"] },
-    { name = "muon_multiplicity", type = "both", parameters = ["@muon_threshold"] },
-    { name = "pion_multiplicity", type = "both", parameters = ["@pion_threshold"] },
-    { name = "proton_multiplicity", type = "both", parameters = ["@proton_threshold"] },
-    { name = "pion_michel_tag", type = "both", parameters = [20.0] },
-    { name = "nneutron_G4",         type = "mctruth" },
-    { name = "npiplus_G4",         type = "mctruth" },
-    { name = "npiminus_G4",         type = "mctruth" },
-    { name = "nproton_G4",         type = "mctruth" },
-]
 
 
 

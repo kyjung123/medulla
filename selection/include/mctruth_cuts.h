@@ -11,6 +11,8 @@
  */
 #ifndef MCTRUTH_CUTS_H
 #define MCTRUTH_CUTS_H
+#include <algorithm>
+
 #include "sbnanaobj/StandardRecord/Proxy/SRProxy.h"
 #include "sbnanaobj/StandardRecord/SRTrueInteraction.h"
 
@@ -39,6 +41,26 @@ namespace mctruth
     REGISTER_CUT_SCOPE(RegistrationScope::MCTruth, iscc, iscc);
 
     /**
+     * @brief Cut on the signed PDG code of the incoming neutrino.
+     * @details Uses SRTrueInteraction::pdg, so neutrinos and antineutrinos
+     * can be selected independently (for example, 14 for nu_mu and -14 for
+     * anti-nu_mu).
+     * @tparam T the type of the object to apply the cut on.
+     * @param obj the SRTrueInteraction to apply the cut on.
+     * @param params accepted signed neutrino PDG codes. An empty list applies
+     * no flavor cut.
+     * @return true if obj.pdg is in the accepted list.
+     */
+    template<typename T>
+    bool is_neutrino_pdg(const T & obj, std::vector<double> params={})
+    {
+        if(params.empty())
+            return true;
+        return std::find(params.begin(), params.end(), obj.pdg) != params.end();
+    }
+    REGISTER_CUT_SCOPE(RegistrationScope::MCTruth, is_neutrino_pdg, is_neutrino_pdg);
+
+    /**
      * @brief Cut for exactly one true final state muon above threshold.
      * @details Applied at the GENIE generator level using obj.prim. The
      * kinetic energy is computed from the GENIE genE field.
@@ -65,6 +87,35 @@ namespace mctruth
     REGISTER_CUT_SCOPE(RegistrationScope::MCTruth, single_muon, single_muon);
 
     /**
+     * @brief Cut for exactly one mu- and no mu+ above threshold.
+     * @details The signed final-state PDG code is used to distinguish the
+     * charged-current lepton associated with nu_mu from its antiparticle.
+     * @param params muon kinetic-energy threshold in MeV.
+     */
+    template<typename T>
+    bool single_muon_minus(const T & obj, std::vector<double> params={143.425,})
+    {
+        int num_minus(0);
+        int num_plus(0);
+        for(const auto & p : obj.prim)
+        {
+            if(abs(p.pdg) != 13)
+                continue;
+
+            double ke = 1000. * (p.genE - (MUON_MASS/1000.));
+            if(ke < params[0])
+                continue;
+
+            if(p.pdg == 13)
+                num_minus++;
+            else if(p.pdg == -13)
+                num_plus++;
+        }
+        return num_minus == 1 && num_plus == 0;
+    }
+    REGISTER_CUT_SCOPE(RegistrationScope::MCTruth, single_muon_minus, single_muon_minus);
+
+    /**
      * @brief Cut for zero true final state charged pions above threshold.
      * @details Applied at the GENIE generator level using obj.prim. The
      * kinetic energy is computed from the GENIE genE field.
@@ -88,6 +139,81 @@ namespace mctruth
         return true;
     }
     REGISTER_CUT_SCOPE(RegistrationScope::MCTruth, no_charged_pions, no_charged_pions);
+
+    /**
+     * @brief Cut for exactly one pi+ and no pi- above threshold.
+     * @param params pion kinetic-energy threshold in MeV.
+     */
+    template<typename T>
+    bool single_positive_pion(const T & obj, std::vector<double> params={25.0,})
+    {
+        int num_plus(0);
+        int num_minus(0);
+        for(const auto & p : obj.prim)
+        {
+            if(abs(p.pdg) != 211)
+                continue;
+
+            double ke = 1000. * (p.genE - (PION_MASS/1000.));
+            if(ke < params[0])
+                continue;
+
+            if(p.pdg == 211)
+                num_plus++;
+            else if(p.pdg == -211)
+                num_minus++;
+        }
+        return num_plus == 1 && num_minus == 0;
+    }
+    REGISTER_CUT_SCOPE(RegistrationScope::MCTruth, single_positive_pion, single_positive_pion);
+
+    /**
+     * @brief Cut for exactly one pi- and no pi+ above threshold.
+     * @param params pion kinetic-energy threshold in MeV.
+     */
+    template<typename T>
+    bool single_negative_pion(const T & obj, std::vector<double> params={25.0,})
+    {
+        int num_plus(0);
+        int num_minus(0);
+        for(const auto & p : obj.prim)
+        {
+            if(abs(p.pdg) != 211)
+                continue;
+
+            double ke = 1000. * (p.genE - (PION_MASS/1000.));
+            if(ke < params[0])
+                continue;
+
+            if(p.pdg == 211)
+                num_plus++;
+            else if(p.pdg == -211)
+                num_minus++;
+        }
+        return num_minus == 1 && num_plus == 0;
+    }
+    REGISTER_CUT_SCOPE(RegistrationScope::MCTruth, single_negative_pion, single_negative_pion);
+
+    /**
+     * @brief Cut for at least two charged pions above threshold.
+     * @param params pion kinetic-energy threshold in MeV.
+     */
+    template<typename T>
+    bool multiple_charged_pions(const T & obj, std::vector<double> params={25.0,})
+    {
+        int count(0);
+        for(const auto & p : obj.prim)
+        {
+            if(abs(p.pdg) != 211)
+                continue;
+
+            double ke = 1000. * (p.genE - (PION_MASS/1000.));
+            if(ke >= params[0] && ++count >= 2)
+                return true;
+        }
+        return false;
+    }
+    REGISTER_CUT_SCOPE(RegistrationScope::MCTruth, multiple_charged_pions, multiple_charged_pions);
 
     /**
      * @brief Cut for zero true final state neutral pions.
@@ -187,6 +313,26 @@ namespace mctruth
     REGISTER_CUT_SCOPE(RegistrationScope::MCTruth, single_proton, single_proton);
 
     /**
+     * @brief Cut for at least one proton above threshold.
+     * @param params proton kinetic-energy threshold in MeV.
+     */
+    template<typename T>
+    bool has_proton(const T & obj, std::vector<double> params={50.0,})
+    {
+        for(const auto & p : obj.prim)
+        {
+            if(p.pdg != 2212)
+                continue;
+
+            double ke = 1000. * (p.genE - (PROTON_MASS/1000.));
+            if(ke >= params[0])
+                return true;
+        }
+        return false;
+    }
+    REGISTER_CUT_SCOPE(RegistrationScope::MCTruth, has_proton, has_proton);
+
+    /**
      * @brief Apply a cut for a maximum energy transfer
      * @details This function applies a cut to select interactions below
      * a maximum energy transfer (aka, omega or q0).This cut is on the
@@ -207,3 +353,4 @@ namespace mctruth
 
 } // namespace mctruth
 #endif
+
