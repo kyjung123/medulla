@@ -76,6 +76,38 @@ fi
 export IFDH_CP_MAXRETRIES=0
 export IFDH_WEB_TIMEOUT=100
 
+COPY_ATTEMPTS=3
+COPY_RETRY_DELAY_SECONDS=10
+
+copy_to_local_with_retry() {
+    local source_path="$1"
+    local destination_path="$2"
+    local description="$3"
+    local attempt
+
+    for ((attempt = 1; attempt <= COPY_ATTEMPTS; attempt++)); do
+        # A failed gfal-copy can leave a zero-byte local destination. Remove
+        # only this job-local file before retrying so that it cannot be
+        # mistaken for a successful copy.
+        rm -f -- "$destination_path"
+
+        echo "Copying ${description} (attempt ${attempt}/${COPY_ATTEMPTS}): ${source_path}"
+        if ifdh cp "$source_path" "$destination_path" && [[ -s "$destination_path" ]]; then
+            return 0
+        fi
+
+        echo "Warning: failed to copy ${description} on attempt ${attempt}." >&2
+        if ((attempt < COPY_ATTEMPTS)); then
+            sleep "$COPY_RETRY_DELAY_SECONDS"
+        fi
+    done
+
+    echo "Error: failed to copy ${description} after ${COPY_ATTEMPTS} attempts." >&2
+    return 1
+}
+
+
+
 # Setup CVMFS area
 source /cvmfs/icarus.opensciencegrid.org/products/icarus/setup_icarus.sh
 
@@ -100,7 +132,11 @@ make -j4
 #######################################################################
 
 # Copy the project database
-ifdh cp $PROJECT/project.db project.db
+#ifdh cp $PROJECT/project.db project.db
+if ! copy_to_local_with_retry "$PROJECT/project.db" "project.db" "project database"; then
+    exit 1
+fi
+
 
 # Extract this job's configuration file. First, we get the job ID for this
 # process by checking against the list of not-yet-completed jobs in the project
@@ -113,7 +149,10 @@ fi
 sqlite3 -noheader -cmd ".mode list" project.db "SELECT cfg FROM configuration WHERE jobid=${JOBID};" > job_config.toml
 
 # Copy the systematics TOML file
-ifdh cp $PROJECT/systematics.toml systematics.toml
+#ifdh cp $PROJECT/systematics.toml systematics.toml
+if ! copy_to_local_with_retry "$PROJECT/systematics.toml" "systematics.toml" "systematics configuration"; then
+    exit 1
+fi
 
 # Copy the input data file(s)
 mkdir data
@@ -148,11 +187,35 @@ ls -lrth data/
 
 # Run medulla (selection)
 ./selection/medulla job_config.toml
+
+MEDULLA_STATUS=$?
+if [[ $MEDULLA_STATUS -ne 0 ]]; then
+    echo "Error: medulla selection failed with exit status ${MEDULLA_STATUS}; output will not be copied." >&2
+    exit "$MEDULLA_STATUS"
+fi
+
+if [[ ! -f output.root ]]; then
+    echo "Error: medulla selection did not create output.root." >&2
+    exit 1
+fi
+
+OUTPUT_SIZE=$(stat -c%s output.root)
+if [[ $OUTPUT_SIZE -lt 1024 ]]; then
+    echo "Error: output.root is only ${OUTPUT_SIZE} bytes; refusing to copy a stub output." >&2
+    exit 1
+fi
+
+
 ls -lrth
 
 # Copy output file to the output directory
 printf -v RAWNAME "output_jobid%04d.root" "$JOBID"
-ifdh cp output.root $PROJECT/output/$RAWNAME
+#ifdh cp output.root $PROJECT/output/$RAWNAME
+if ! ifdh cp output.root "$PROJECT/output/$RAWNAME"; then
+    echo "Error: failed to copy output.root to $PROJECT/output/$RAWNAME." >&2
+    exit 1
+fi
+
 
 ## Run medulla (systematics)
 #./systematics/run_systematics systematics.toml
