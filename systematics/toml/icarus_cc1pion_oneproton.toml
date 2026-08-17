@@ -1,13 +1,15 @@
 [input]
-path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel.root"
-weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/ZExpPCA/*.root.flat_merged_geant4.root"
+path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_recent.root"
+weights = "/pnfs/icarus/scratch/users/kyjung/nuSyst_ZEXPPCA/*.flat.root"
+#path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel.root"
+#weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/ZExpPCA/*.root.flat_merged_geant4.root"
 #weights = "/exp/icarus/data/users/kyjung/ZExpPCA/*.root.flat_merged_geant4.root"
 #weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/*.root.flat_merged_geant4.root"
 #weights = "/pnfs/icarus/scratch/users/kyjung/ZExpPCA/*.root.flat_merged_geant4.root"
 use_additional_hash = true
 
 [output]
-path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_sys.root"
+path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_recent_sys.root"
 histogram_destination = 'variations/'
 
 [[sysvar]]
@@ -44,17 +46,6 @@ name = 'selected_one_proton_michel_exposure'
 action = 'copy'
 
 
-[[tree]]
-origin = 'events/onbeam/selected_one_proton_michel'
-destination = 'events/onbeam/'
-name = 'selected_one_proton_michel'
-action = 'copy'
-
-[[tree]]
-origin = 'events/onbeam/selected_one_proton_michel'
-destination = 'events/onbeam/'
-name = 'selected_one_proton_michel_exposure'
-action = 'copy'
 
 
 [[tree]]
@@ -72,18 +63,6 @@ name = 'selected_renzo_low_threshold_exposure'
 action = 'copy'
 
 
-[[tree]]
-origin = 'events/onbeam/selected_renzo_low_threshold'
-destination = 'events/onbeam/'
-name = 'selected_renzo_low_threshold'
-action = 'copy'
-
-[[tree]]
-origin = 'events/onbeam/selected_renzo_low_threshold'
-destination = 'events/onbeam/'
-name = 'selected_renzo_low_threshold_exposure'
-action = 'copy'
-
 
 [[tree]]
 origin = 'events/nominal/selected_multiple'
@@ -99,6 +78,30 @@ destination = 'events/nominal/'
 name = 'selected_multiple_exposure'
 action = 'copy'
 
+[[tree]]
+origin = 'events/onbeam/selected_one_proton_michel'
+destination = 'events/onbeam/'
+name = 'selected_one_proton_michel'
+action = 'copy'
+
+[[tree]]
+origin = 'events/onbeam/selected_one_proton_michel'
+destination = 'events/onbeam/'
+name = 'selected_one_proton_michel_exposure'
+action = 'copy'
+
+
+[[tree]]
+origin = 'events/onbeam/selected_renzo_low_threshold'
+destination = 'events/onbeam/'
+name = 'selected_renzo_low_threshold'
+action = 'copy'
+
+[[tree]]
+origin = 'events/onbeam/selected_renzo_low_threshold'
+destination = 'events/onbeam/'
+name = 'selected_renzo_low_threshold_exposure'
+action = 'copy'
 
 [[tree]]
 origin = 'events/onbeam/selected_multiple'
@@ -111,6 +114,84 @@ origin = 'events/onbeam/selected_multiple'
 destination = 'events/onbeam/'
 name = 'selected_multiple_exposure'
 action = 'copy'
+
+
+[[tree]]
+origin = 'events/offbeam/selected_one_proton_michel'
+destination = 'events/offbeam/'
+name = 'selected_one_proton_michel'
+action = 'copy'
+
+[[tree]]
+origin = 'events/offbeam/selected_one_proton_michel'
+destination = 'events/offbeam/'
+name = 'selected_one_proton_michel_exposure'
+action = 'copy'
+
+
+[[tree]]
+origin = 'events/offbeam/selected_renzo_low_threshold'
+destination = 'events/offbeam/'
+name = 'selected_renzo_low_threshold'
+action = 'copy'
+
+[[tree]]
+origin = 'events/offbeam/selected_renzo_low_threshold'
+destination = 'events/offbeam/'
+name = 'selected_renzo_low_threshold_exposure'
+action = 'copy'
+
+[[tree]]
+origin = 'events/offbeam/selected_multiple'
+destination = 'events/offbeam/'
+name = 'selected_multiple'
+action = 'copy'
+
+[[tree]]
+origin = 'events/offbeam/selected_multiple'
+destination = 'events/offbeam/'
+name = 'selected_multiple_exposure'
+action = 'copy'
+
+[[tree]]
+origin = 'events/rock/selected_one_proton_michel'
+destination = 'events/rock/'
+name = 'selected_one_proton_michel'
+action = 'copy'
+
+[[tree]]
+origin = 'events/rock/selected_one_proton_michel'
+destination = 'events/rock/'
+name = 'selected_one_proton_michel_exposure'
+action = 'copy'
+
+
+[[tree]]
+origin = 'events/rock/selected_renzo_low_threshold'
+destination = 'events/rock/'
+name = 'selected_renzo_low_threshold'
+action = 'copy'
+
+[[tree]]
+origin = 'events/rock/selected_renzo_low_threshold'
+destination = 'events/rock/'
+name = 'selected_renzo_low_threshold_exposure'
+action = 'copy'
+
+[[tree]]
+origin = 'events/rock/selected_multiple'
+destination = 'events/rock/'
+name = 'selected_multiple'
+action = 'copy'
+
+[[tree]]
+origin = 'events/rock/selected_multiple'
+destination = 'events/rock/'
+name = 'selected_multiple_exposure'
+action = 'copy'
+
+
+
 
 
 

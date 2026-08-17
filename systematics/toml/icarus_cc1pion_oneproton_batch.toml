@@ -1,231 +1,16 @@
 [input]
-path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel.root"
-weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/ZExpPCA/*.root.flat_merged_geant4.root"
-#weights = "/exp/icarus/data/users/kyjung/ZExpPCA/*.root.flat_merged_geant4.root"
-#weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/*.root.flat_merged_geant4.root"
-#weights = "/pnfs/icarus/scratch/users/kyjung/ZExpPCA/*.root.flat_merged_geant4.root"
+path = 'output.root'
+weights = 'data/*.root'
 use_additional_hash = true
 
 [output]
-path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_sys.root"
+path = 'output_sys.root'
 histogram_destination = 'variations/'
 
-[[sysvar]]
-name = 'reco_leading_muon_ke'
-bins = [25, 0, 5000]
+#[[sysvar]]
+#name = 'reco_leading_pion_ke'
+#bins = [25, 0, 2000]
 
-[variations]
-keys = ['nominal', 'var01m','var01p', 'var02m','var02p', 'var03m', 'var03p', 'var04m','var04p', 'var05','var06','var07','var08','var09']
-origin = 'events/'
-tree = 'selected_one_proton_michel'
-result_destination = 'detsys_results/'
-variable = 'reco_leading_muon_ke'
-bins = [0.0, 100.0, 200.0, 400.0, 600.0, 800.0, 1000.0, 1500.0, 2000.0, 3000.0, 4000.0, 5000.0]
-nuniverses = 1000
-variable_length = true
-
-##variable_length = false
-##bins = [25, 0, 2000]
-
-
-
-[[tree]]
-origin = 'events/nominal/selected_one_proton_michel'
-destination = 'events/nominal/'
-name = 'selected_one_proton_michel'
-action = 'add_weights'
-table_types = ['multisigma','multisim','variation']
-#table_types = ['multisigma','multisim']
-
-[[tree]]
-origin = 'events/nominal/selected_one_proton_michel_exposure'
-destination = 'events/nominal/'
-name = 'selected_one_proton_michel_exposure'
-action = 'copy'
-
-
-[[tree]]
-origin = 'events/onbeam/selected_one_proton_michel'
-destination = 'events/onbeam/'
-name = 'selected_one_proton_michel'
-action = 'copy'
-
-[[tree]]
-origin = 'events/onbeam/selected_one_proton_michel'
-destination = 'events/onbeam/'
-name = 'selected_one_proton_michel_exposure'
-action = 'copy'
-
-
-[[tree]]
-origin = 'events/nominal/selected_renzo_low_threshold'
-destination = 'events/nominal/'
-name = 'selected_renzo_low_threshold'
-action = 'add_weights'
-table_types = ['multisigma','multisim','variation']
-#table_types = ['multisigma','multisim']
-
-[[tree]]
-origin = 'events/nominal/selected_renzo_low_threshold_exposure'
-destination = 'events/nominal/'
-name = 'selected_renzo_low_threshold_exposure'
-action = 'copy'
-
-
-[[tree]]
-origin = 'events/onbeam/selected_renzo_low_threshold'
-destination = 'events/onbeam/'
-name = 'selected_renzo_low_threshold'
-action = 'copy'
-
-[[tree]]
-origin = 'events/onbeam/selected_renzo_low_threshold'
-destination = 'events/onbeam/'
-name = 'selected_renzo_low_threshold_exposure'
-action = 'copy'
-
-
-[[tree]]
-origin = 'events/nominal/selected_multiple'
-destination = 'events/nominal/'
-name = 'selected_multiple'
-action = 'add_weights'
-table_types = ['multisigma','multisim','variation']
-#table_types = ['multisigma','multisim']
-
-[[tree]]
-origin = 'events/nominal/selected_multiple_exposure'
-destination = 'events/nominal/'
-name = 'selected_multiple_exposure'
-action = 'copy'
-
-
-[[tree]]
-origin = 'events/onbeam/selected_multiple'
-destination = 'events/onbeam/'
-name = 'selected_multiple'
-action = 'copy'
-
-[[tree]]
-origin = 'events/onbeam/selected_multiple'
-destination = 'events/onbeam/'
-name = 'selected_multiple_exposure'
-action = 'copy'
-
-
-
-
-
-
-
-
-[[tree]]
-origin = 'events/nominal/signal_N_proton'
-destination = 'events/nominal/'
-name = 'signal_N_proton'
-action = 'add_weights'
-table_types = ['multisigma','multisim','variation']
-#table_types = ['multisigma','multisim']
-
-
-[[tree]]
-origin = 'events/nominal/signal_N_proton_exposure'
-destination = 'events/nominal/'
-name = 'signal_N_proton_exposure'
-action = 'copy'
-
-
-
-
-[[sys]]
-name = 'var01'
-name_short = 'Induction_Gain'
-type = 'variation'
-index = -1
-nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-scale = [-3, -2, -1, 1, 1, 2, 3]
-ordinate = 'nominal'
-points = ['var01m', 'var01m', 'var01m', 'nominal', 'var01p', 'var01p', 'var01p']
-
-[[sys]]
-name = 'var02'
-name_short = 'Coherent_Noise'
-type = 'variation'
-index = -1
-nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-scale = [-3, -2, -1, 1, 1, 2, 3]
-ordinate = 'nominal'
-points = ['var02m', 'var02m', 'var02m', 'nominal', 'var02p', 'var02p', 'var02p']
-
-[[sys]]
-name = 'var03'
-name_short = 'Intrinsic_Noise'
-type = 'variation'
-index = -1
-nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-scale = [3, 2, 1, 1, 1, 2, 3]
-ordinate = 'nominal'
-points = ['var03m', 'var03m', 'var03m', 'nominal', 'var03p', 'var03p', 'var03p']
-
-[[sys]]
-name = 'var04'
-name_short = 'Electron_Lifetime'
-type = 'variation'
-index = -1
-nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-scale = [-3, -2, -1, 1, 1, 2, 3]
-ordinate = 'nominal'
-points = ['var04m', 'var04m', 'var04m', 'nominal', 'var04p', 'var04p', 'var04p']
-
-[[sys]]
-name = 'var05'
-name_short = 'PMT_QE'
-type = 'variation'
-index = -1
-nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-scale = [-3, -2, -1, 1, 1, 2, 3]
-ordinate = 'nominal'
-points = ['var05', 'var05', 'var05', 'nominal', 'var05', 'var05', 'var05']
-
-[[sys]]
-name = 'var06'
-name_short = 'Wire_Gap'
-type = 'variation'
-index = -1
-nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-scale = [-3, -2, -1, 1, 1, 2, 3]
-ordinate = 'nominal'
-points = ['var06', 'var06', 'var06', 'nominal', 'var06', 'var06', 'var06']
-
-[[sys]]
-name = 'var07'
-name_short = 'YZ_Nonuniformity'
-type = 'variation'
-index = -1
-nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-scale = [-3, -2, -1, 1, 1, 2, 3]
-ordinate = 'nominal'
-points = ['var07', 'var07', 'var07', 'nominal', 'var07', 'var07', 'var07']
-
-[[sys]]
-name = 'var08'
-name_short = 'Recombination'
-type = 'variation'
-index = -1
-nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-scale = [-3, -2, -1, 1, 1, 2, 3]
-ordinate = 'nominal'
-points = ['var08', 'var08', 'var08', 'nominal', 'var08', 'var08', 'var08']
-
-[[sys]]
-name = 'var09'
-name_short = 'Cathode_Bending'
-type = 'variation'
-index = -1
-nsigma = [-3, -2, -1, 0, 1 ,2, 3]
-scale = [-3, -2, -1, 1, 1, 2, 3]
-ordinate = 'nominal'
-points = ['var09', 'var09', 'var09', 'nominal', 'var09', 'var09', 'var09']
 
 [[sys]]
 name = 'GENIEReWeight_SBN_v1_multisigma_ZExpA1CCQE'
@@ -975,4 +760,37 @@ nsigma = [-1,1,-2,2,-3,3]
 name = "GENIEReWeight_SBNNuSyst_LQCDZExpFit_correction_ZExpAVariationResponse"
 type = "multisim"
 index = 128
+
+[[sys]]
+name = "GENIEReWeight_SBNNuSyst_MINERvAZExpFit_correction_ZExpAVariationResponse"
+type = "multisim"
+index = 129
+
+[[sys]]
+name = "ZExpPCAWeighter_SBNNuSyst_ZExpPCA_multisigma_b1"
+name_short = 'ZExpPCAB1CCQE'
+type = "multisigma"
+nsigma = [-3,-2,-1,0,1,2,3]
+index = 130
+
+[[sys]]
+name = "ZExpPCAWeighter_SBNNuSyst_ZExpPCA_multisigma_b2"
+name_short = 'ZExpPCAB2CCQE'
+type = "multisigma"
+nsigma = [-3,-2,-1,0,1,2,3]
+index = 131
+
+[[sys]]
+name = "ZExpPCAWeighter_SBNNuSyst_ZExpPCA_multisigma_b3"
+name_short = 'ZExpPCAB3CCQE'
+type = "multisigma"
+nsigma = [-3,-2,-1,0,1,2,3]
+index = 132
+
+[[sys]]
+name = "ZExpPCAWeighter_SBNNuSyst_ZExpPCA_multisigma_b4"
+name_short = 'ZExpPCAB4CCQE'
+type = "multisigma"
+nsigma = [-3,-2,-1,0,1,2,3]
+index = 133
 

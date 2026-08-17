@@ -149,7 +149,6 @@ fi
 sqlite3 -noheader -cmd ".mode list" project.db "SELECT cfg FROM configuration WHERE jobid=${JOBID};" > job_config.toml
 
 # Copy the systematics TOML file
-#ifdh cp $PROJECT/systematics.toml systematics.toml
 if ! copy_to_local_with_retry "$PROJECT/systematics.toml" "systematics.toml" "systematics configuration"; then
     exit 1
 fi
@@ -208,19 +207,37 @@ fi
 
 ls -lrth
 
-# Copy output file to the output directory
-printf -v RAWNAME "output_jobid%04d.root" "$JOBID"
-#ifdh cp output.root $PROJECT/output/$RAWNAME
-if ! ifdh cp output.root "$PROJECT/output/$RAWNAME"; then
-    echo "Error: failed to copy output.root to $PROJECT/output/$RAWNAME." >&2
+
+
+# Run medulla (systematics)
+./systematics/run_systematics systematics.toml
+SYSTEMATICS_STATUS=$?
+if [[ $SYSTEMATICS_STATUS -ne 0 ]]; then
+    echo "Error: systematics failed with exit status ${SYSTEMATICS_STATUS}; outputs will not be copied." >&2
+    exit "$SYSTEMATICS_STATUS"
+fi
+
+if [[ ! -f output_sys.root ]]; then
+    echo "Error: systematics did not create output_sys.root." >&2
     exit 1
 fi
 
+SYSTEMATICS_SIZE=$(stat -c%s output_sys.root)
+if [[ $SYSTEMATICS_SIZE -lt 1024 ]]; then
+    echo "Error: output_sys.root is only ${SYSTEMATICS_SIZE} bytes; refusing to copy a stub output." >&2
+    exit 1
+fi
 
-## Run medulla (systematics)
-#./systematics/run_systematics systematics.toml
-#ls -lrth
+ls -lrth
 
-# Copy output file to the output directory
-#printf -v SYSTNAME "output_systematics_jobid%04d.root" "$JOBID"
-#ifdh cp output_sys.root $PROJECT/output/$SYSTNAME
+# Copy the systematics output first. The raw output is copied last because
+# project status uses output_jobid*.root as the job-completion marker.
+printf -v SYSTNAME "output_systematics_jobid%04d.root" "$JOBID"
+if ! copy_to_remote_with_retry output_sys.root "$PROJECT/output/$SYSTNAME" "systematics output"; then
+    exit 1
+fi
+
+printf -v RAWNAME "output_jobid%04d.root" "$JOBID"
+if ! copy_to_remote_with_retry output.root "$PROJECT/output/$RAWNAME" "selection output"; then
+    exit 1
+fi
