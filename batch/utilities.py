@@ -174,13 +174,14 @@ def create_systematics_cfg(
             # configured with a "copy" action that just copies the
             # selected events to the output without applying any
             # systematics.
-            if not sample['ismc'] or not tree.get('add_systematics', False):
+#            if not sample['ismc'] or not tree.get('add_systematics', False):
+            if (not sample['ismc'] or not sample.get('add_systematics', True) or not tree.get('add_systematics', False)):
                 syst_trees[key] = {
-                    'origin' : key,
-                    'destination' : f'events/{sample["name"]}/',
-                    'name' : tree['name'],
-                    'action' : 'copy',
-                }
+                        'origin' : key,
+                        'destination' : f'events/{sample["name"]}/',
+                        'name' : tree['name'],
+                        'action' : 'copy',
+                        }
             # If the sample is MC and the tree requests systematics, do
             # some additional checking and then configure it with a
             # "add_weights" action.
@@ -213,7 +214,8 @@ def create_systematics_cfg(
     # - tree = list of syst_trees values
     syst_cfg = base_cfg.copy()
     syst_cfg['input']['path'] = 'output.root'
-    syst_cfg['input']['weights'] = 'data/*.root'
+    #syst_cfg['input']['weights'] = 'data/*.root'
+    syst_cfg['input']['weights'] = 'data/*flat*.root'
     syst_cfg['output']['path'] = 'output_sys.root'
     syst_cfg['tree'] = list(syst_trees.values())
     return syst_cfg

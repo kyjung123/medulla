@@ -7,9 +7,9 @@ use_additional_hash = true
 path = 'output_sys.root'
 histogram_destination = 'variations/'
 
-#[[sysvar]]
-#name = 'reco_leading_pion_ke'
-#bins = [25, 0, 2000]
+[[sysvar]]
+name = 'reco_leading_pion_ke'
+bins = [25, 0, 2000]
 
 
 [[sys]]
