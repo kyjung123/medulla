@@ -73,6 +73,8 @@ fi
 #######################################################################
 
 # IFDH options
+# Input copies are retried explicitly below so that we can also reject the
+# zero-byte destination files left behind by failed gfal-copy attempts.
 export IFDH_CP_MAXRETRIES=0
 export IFDH_WEB_TIMEOUT=100
 
@@ -106,7 +108,27 @@ copy_to_local_with_retry() {
     return 1
 }
 
+copy_to_remote_with_retry() {
+    local source_path="$1"
+    local destination_path="$2"
+    local description="$3"
+    local attempt
 
+    for ((attempt = 1; attempt <= COPY_ATTEMPTS; attempt++)); do
+        echo "Copying ${description} (attempt ${attempt}/${COPY_ATTEMPTS}): ${destination_path}"
+        if ifdh cp "$source_path" "$destination_path"; then
+            return 0
+        fi
+
+        echo "Warning: failed to copy ${description} on attempt ${attempt}." >&2
+        if ((attempt < COPY_ATTEMPTS)); then
+            sleep "$COPY_RETRY_DELAY_SECONDS"
+        fi
+    done
+
+    echo "Error: failed to copy ${description} after ${COPY_ATTEMPTS} attempts." >&2
+    return 1
+}
 
 # Setup CVMFS area
 source /cvmfs/icarus.opensciencegrid.org/products/icarus/setup_icarus.sh
@@ -132,11 +154,9 @@ make -j4
 #######################################################################
 
 # Copy the project database
-#ifdh cp $PROJECT/project.db project.db
 if ! copy_to_local_with_retry "$PROJECT/project.db" "project.db" "project database"; then
     exit 1
 fi
-
 
 # Extract this job's configuration file. First, we get the job ID for this
 # process by checking against the list of not-yet-completed jobs in the project
@@ -164,8 +184,10 @@ echo "Found $(echo "$full_paths" | wc -l) input files to copy."
 # Copy input files
 mkdir -p data
 for p in $full_paths; do
-    echo "Copying input file: $p"
-    ifdh cp "$p" data/
+    b=$(basename "$p")
+    if ! copy_to_local_with_retry "$p" "data/$b" "input file"; then
+        exit 1
+    fi
 done
 ls -lrth data/
 
@@ -186,7 +208,6 @@ ls -lrth data/
 
 # Run medulla (selection)
 ./selection/medulla job_config.toml
-
 MEDULLA_STATUS=$?
 if [[ $MEDULLA_STATUS -ne 0 ]]; then
     echo "Error: medulla selection failed with exit status ${MEDULLA_STATUS}; output will not be copied." >&2
@@ -204,10 +225,7 @@ if [[ $OUTPUT_SIZE -lt 1024 ]]; then
     exit 1
 fi
 
-
 ls -lrth
-
-
 
 # Run medulla (systematics)
 ./systematics/run_systematics systematics.toml
