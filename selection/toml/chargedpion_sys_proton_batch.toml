@@ -123,8 +123,7 @@ cuts = [
 
 [[sample]]
 name = "nominal"
-#path = "/pnfs/icarus/persistent/users/spine/NuMI/ZExpPCA/*.root"
-path = "/pnfs/icarus/scratch/users/kyjung/nuSyst_ZEXPPCA/*.root"
+path = "/pnfs/icarus/persistent/users/kyjung/nuSyst/nuSyst_ZEXPPCA/*.root"
 ismc = true
 disable = false
 add_systematics = true
