@@ -8,6 +8,7 @@
  * candidates and the configured systematics.
  * @author mueller@fnal.gov
  */
+#include <algorithm>
 #include <iostream>
 
 #include "trees.h"
@@ -175,6 +176,9 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
      * the output TTree.
      */
     TTree * output_tree = new TTree(table.get_string_field("name").c_str(), table.get_string_field("name").c_str());
+    const bool write_main_tree = config.get_bool_field("output.write_main_tree", true);
+    if(!write_main_tree)
+        output_tree->SetDirectory(nullptr);
     for(auto & br : brs)
         output_tree->Branch(br.first.c_str(), &br.second);
     output_tree->Branch("true_neutrino_id", &nu_id);
@@ -212,8 +216,18 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
      */
 
 
+    const std::vector<std::string> table_types = table.get_string_vector("table_types");
+    const bool variation_only_tree = !table_types.empty() && std::all_of(
+        table_types.begin(), table_types.end(),
+        [](const std::string & type)
+        {
+            return type == "variation";
+        });
+
     std::map<index_t, size_t> candidates;
     bool use_additional_hash = config.get_bool_field("input.use_additional_hash", false);
+    if(!variation_only_tree)
+    {
     /* =========================
        🔎 DEBUG: nu_id == -1 충돌 체크
        ========================= */
@@ -254,6 +268,7 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
             else
                 candidates.insert(std::make_pair<index_t, size_t>(std::make_tuple(run, subrun, event, nu_id, brs["true_neutrino_energy"]), i));
         }
+    }
     }
 //    std::cout << "[DBG] input_tree entries = " << input_tree->GetEntries() << "\n";
 //    std::cout << "[DBG] candidates.size()  = " << candidates.size() << "\n";
@@ -368,7 +383,6 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
      * loop is used to load and configure the systematics of each type in
      * sequential order.
      */
-    std::vector<std::string> table_types = table.get_string_vector("table_types");
     for(const std::string & s : table_types)
     {
         std::string tname = table.get_string_field("name") + '_' + s;
@@ -399,9 +413,69 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
         }
     }
 
-    sys::WeightReader reader(config.get_string_field("input.weights"));
     std::vector<index_t> saved_indices;
     double nominal_count(0);
+
+    // Detector-variation weights depend only on the configured splines and
+    // variables already stored in the selected-event tree. They do not need
+    // event-weight CAFs or neutrino-to-CAF matching. Avoid constructing a
+    // WeightReader in this case; for large productions that would otherwise
+    // scan every CAF once for every detector-weighted output tree.
+    const bool variation_only = variation_only_tree && !systematics.empty() && std::all_of(
+        systematics.begin(), systematics.end(),
+        [](const auto & item)
+        {
+            return item.second->get_type() == Type::kVARIATION;
+        });
+
+    auto fill_variation_weights = [&]()
+    {
+        for(auto & [key, value] : systematics)
+        {
+            value->get_weights()->clear();
+            for(double & z : calc.get_zscores(key))
+                value->get_weights()->push_back(value->clip(calc.get_weight(key, brs[calc.get_variable()], z)));
+            for(SysVariable & sv : sysvariables)
+                calc.add_value(sv.name, brs[sv.name], key, brs[calc.get_variable()]);
+        }
+    };
+
+    if(variation_only)
+    {
+        std::cout << "Detector-variation-only tree: skipping CAF weight scan." << std::endl;
+        for(int i(0); i < input_tree->GetEntries(); ++i)
+        {
+            input_tree->GetEntry(i);
+
+            // Preserve the existing output convention: entries without a
+            // valid truth-neutrino ID are written to the non-matched tree and
+            // do not receive neutrino detector-systematic weights.
+            if(nu_id < 0)
+            {
+                if(nonmatched_tree)
+                    nonmatched_tree->Fill();
+                continue;
+            }
+
+            calc.increment_nominal_count(1.0);
+            nominal_count += 1.0;
+            if(write_main_tree)
+                output_tree->Fill();
+            fill_variation_weights();
+            for(auto & [key, value] : systrees)
+                value->Fill();
+        }
+
+        if(nonmatched_tree)
+        {
+            directory->WriteObject(nonmatched_tree, nonmatched_tree->GetName());
+            delete nonmatched_tree;
+            nonmatched_tree = nullptr;
+        }
+    }
+    else
+    {
+    sys::WeightReader reader(config.get_string_field("input.weights"));
     while(reader.next())
     {
         /**
@@ -435,7 +509,8 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
                 event = reader.get_event();
                 calc.increment_nominal_count(1.0);
                 nominal_count += 1.0;
-                output_tree->Fill();
+                if(write_main_tree)
+                    output_tree->Fill();
 
                 /**
                  * @brief Store the universe weights in the output TTree.
@@ -468,6 +543,9 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
                     }
                     else
                     {
+                        // This branch is reached in mixed configurations that
+                        // contain both CAF-based and detector-variation
+                        // systematics.
                         for(double & z : calc.get_zscores(key))
                             value->get_weights()->push_back(value->clip(calc.get_weight(key, brs[calc.get_variable()], z)));
                         for(SysVariable & sv : sysvariables)
@@ -532,14 +610,20 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
         directory->WriteObject(nonmatched_tree, nonmatched_tree->GetName());
         delete nonmatched_tree;
     }
+    }
 //    std::cout << "[DBG] output_tree entries    = " << output_tree->GetEntries() << "\n";
 //    if(nonmatched_tree)
 //        std::cout << "[DBG] nonmatched_tree entries = " << nonmatched_tree->GetEntries() << "\n";
 
     // Write the output TTree to the output file.
-    directory->WriteObject(output_tree, table.get_string_field("name").c_str());
+    if(write_main_tree)
+        directory->WriteObject(output_tree, table.get_string_field("name").c_str());
     for(auto & [key, value] : systrees)
-        directory->WriteObject(value, (key+"Tree").c_str());
+    {
+        directory->cd();
+        value->Write((key+"Tree").c_str(), TObject::kOverwrite);
+        value->SetDirectory(nullptr);
+    }
     
     // Write the systematic histograms to the output file.
     std::string destination = config.get_string_field("output.histogram_destination", "");

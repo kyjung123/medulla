@@ -139,8 +139,7 @@ add_systematics = true
 
 [[sample]]
 name = "onbeam"
-#path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_data_flat_cafs_2/*.root"
-path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_data_flat_cafs_2/NuMI_data_flat_cafs_2_00.root"
+path = "/pnfs/icarus/persistent/users/dcarber/spine/combined_files/NuMI_data_flat_cafs_2/*.root"
 ismc = false
 disable =false
 add_systematics = false

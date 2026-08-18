@@ -1,12 +1,8 @@
 [input]
-path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_sys.root"
-weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/ZExpPCA/*.root.flat_merged_geant4.root"
-#weights = "/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/*.root.flat_merged_geant4.root"
-
-use_additional_hash = true
+path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_recent_sys_det.root"
 
 [output]
-path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_sys_gundam_test.root"
+path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_recent_sys_det_gundam.root"
 histogram_destination = 'variations/'
 
 [[sysvar]]
@@ -912,257 +908,232 @@ nsigma = [-1,1,-2,2,-3,3]
 #type = 'multisim'
 #index = 127
 
+
+
 [[sys]]
-name = "reinteractions_kminus_Geant4"
-name_short = 'G4_kminus'
+name = "GENIEReWeight_SBNNuSyst_LQCDZExpFit_correction_ZExpAVariationResponse"
 type = "multisim"
 index = 128
 
 [[sys]]
-name = "reinteractions_kplus_Geant4"
-name_short = 'G4_kplus'
+name = "GENIEReWeight_SBNNuSyst_MINERvAZExpFit_correction_ZExpAVariationResponse"
 type = "multisim"
 index = 129
 
 [[sys]]
-name = "reinteractions_neutron_Geant4"
-name_short = 'G4_neutron'
-type = "multisim"
-index = 130
-
-[[sys]]
-name = "reinteractions_piminus_Geant4"
-name_short = 'G4_piminus'
-type = "multisim"
-index = 131
-
-[[sys]]
-name = "reinteractions_piplus_Geant4"
-name_short = 'G4_piplus'
-type = "multisim"
-index = 132
-
-[[sys]]
-name = "reinteractions_proton_Geant4"
-name_short = 'G4_proton'
-type = "multisim"
-index = 133
-
-[[sys]]
-name = "ZExpPCAWeighter_myreweighter_b1"
+name = "ZExpPCAWeighter_SBNNuSyst_ZExpPCA_multisigma_b1"
 name_short = 'ZExpPCAB1CCQE'
 type = "multisigma"
 nsigma = [-3,-2,-1,0,1,2,3]
-index = 134
+index = 130
 
 [[sys]]
-name = "ZExpPCAWeighter_myreweighter_b2"
+name = "ZExpPCAWeighter_SBNNuSyst_ZExpPCA_multisigma_b2"
 name_short = 'ZExpPCAB2CCQE'
 type = "multisigma"
 nsigma = [-3,-2,-1,0,1,2,3]
-index = 135
+index = 131
 
 [[sys]]
-name = "ZExpPCAWeighter_myreweighter_b3"
+name = "ZExpPCAWeighter_SBNNuSyst_ZExpPCA_multisigma_b3"
 name_short = 'ZExpPCAB3CCQE'
 type = "multisigma"
 nsigma = [-3,-2,-1,0,1,2,3]
-index = 136
+index = 132
 
 [[sys]]
-name = "ZExpPCAWeighter_myreweighter_b4"
+name = "ZExpPCAWeighter_SBNNuSyst_ZExpPCA_multisigma_b4"
 name_short = 'ZExpPCAB4CCQE'
 type = "multisigma"
 nsigma = [-3,-2,-1,0,1,2,3]
-index = 137
+index = 133
 
 
 [[sys]]
 name = 'hysyst_beam_horn_2kA'
 name_short = 'horn_2kA'
 type = 'NuMIfluxsim'
-index = 138
+index = 134
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_horn1_x_3mm'
 name_short = 'horn1_x_3mm'
 type = 'NuMIfluxsim'
-index = 139
+index = 135
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_horn1_y_3mm'
 name_short = 'horn1_y_3mm'
 type = 'NuMIfluxsim'
-index = 140
+index = 136
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_spot_1_3mm'
 name_short = 'spot_1_3mm'
 type = 'NuMIfluxsim'
-index = 141
+index = 137
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_spot_1_7mm'
 name_short = 'spot_1_7mm'
 type = 'NuMIfluxsim'
-index = 142
+index = 138
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_horn2_x_3mm'
 name_short = 'horn2_x_3mm'
 type = 'NuMIfluxsim'
-index = 143
+index = 139
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_horn2_y_3mm'
 name_short = 'horn2_y_3mm'
 type = 'NuMIfluxsim'
-index = 144
+index = 140
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_horns_0mm_water'
 name_short = 'horns_0mm_water'
 type = 'NuMIfluxsim'
-index = 145
+index = 141
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_horns_2mm_water'
 name_short = 'horns_2mm_water'
 type = 'NuMIfluxsim'
-index = 146
+index = 142
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_Beam_shift_x_1mm'
 name_short = 'Beam_shift_x_1mm'
 type = 'NuMIfluxsim'
-index = 147
+index = 143
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_Beam_shift_y_1mm'
 name_short = 'Beam_shift_y_1mm'
 type = 'NuMIfluxsim'
-index = 148
+index = 144
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_beam_Target_z_7mm'
 name_short = 'Target_z_7mm'
 type = 'NuMIfluxsim'
-index = 149
+index = 145
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_0'
 name_short = 'hpc_0'
 type = 'NuMIfluxsim'
-index = 150
+index = 146
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_1'
 name_short = 'hpc_1'
 type = 'NuMIfluxsim'
-index = 151
+index = 147
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_2'
 name_short = 'hpc_2'
 type = 'NuMIfluxsim'
-index = 152
+index = 148
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_3'
-name_short = 'hpc_4'
+name_short = 'hpc_3'
 type = 'NuMIfluxsim'
-index = 153
+index = 149
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_4'
 name_short = 'hpc_4'
 type = 'NuMIfluxsim'
-index = 154
+index = 150
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_5'
 name_short = 'hpc_5'
 type = 'NuMIfluxsim'
-index = 155
+index = 151
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_6'
 name_short = 'hpc_6'
 type = 'NuMIfluxsim'
-index = 156
+index = 152
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_7'
 name_short = 'hpc_7'
 type = 'NuMIfluxsim'
-index = 157
+index = 153
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_8'
 name_short = 'hpc_8'
 type = 'NuMIfluxsim'
-index = 158
+index = 154
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_9'
 name_short = 'hpc_9'
 type = 'NuMIfluxsim'
-index = 159
+index = 155
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_10'
 name_short = 'hpc_10'
 type = 'NuMIfluxsim'
-index = 160
+index = 156
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_11'
 name_short = 'hpc_11'
 type = 'NuMIfluxsim'
-index = 161
+index = 157
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_12'
 name_short = 'hpc_12'
 type = 'NuMIfluxsim'
-index = 162
+index = 158
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_13'
 name_short = 'hpc_13'
 type = 'NuMIfluxsim'
-index = 163
+index = 159
 nsigma = [-3,-2,-1,0,1,2,3]
 
 [[sys]]
 name = 'hysyst_hpc_14'
 name_short = 'hpc_14'
 type = 'NuMIfluxsim'
-index = 164
+index = 160
 nsigma = [-3,-2,-1,0,1,2,3]
-

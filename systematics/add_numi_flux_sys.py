@@ -22,7 +22,7 @@ from math import nan
 
 
 
-file_name = '/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_sys.root'
+file_name = '/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_recent_sys_det.root'
 #file_name = '/exp/icarus/data/users/kyjung/NuMi_1pi1p/icarus_charged_pion_proton_michel.root.root'
 #file_name = '/exp/icarus/data/users/kyjung/NUMI_cc1pion/icarus_charged_pion_proton_michel_half_sys.root'
 
@@ -47,11 +47,10 @@ flux_pca = file_flux['pca;1/principal_components;1']
 #sample= "signal_multiple"
 
 
-sample= "selected_one_proton_michel"
+#sample= "selected_one_proton_michel"
 #sample= "selected_renzo_low_threshold"
 #sample= "selected_multiple"
-#sample= "signal_N_proton"
-#sample= "signal"
+sample= "signal_N_proton"
 
 tree_in_path = f"events/nominal/{sample};1"
 tree_out_name = f"{sample}_NuMIfluxsimTree"

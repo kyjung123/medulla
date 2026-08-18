@@ -168,7 +168,7 @@ void sys::detsys::DetsysCalculator::add_variable(SysVariable & variable)
 
 // Default constructor for the DetsysCalculator class.
 sys::detsys::DetsysCalculator::DetsysCalculator()
-    : initialized(false)
+    : initialized(false), nuniverses(0), nominal_count(0)
     {}
 
 // Accessor method for the initialized flag.

@@ -12,8 +12,10 @@
  * systematics.
  * @author mueller@fnal.gov
  */
+#include <filesystem>
 #include <iostream>
 #include <string>
+#include <system_error>
 
 #include "configuration.h"
 #include "trees.h"
@@ -73,13 +75,47 @@ int main(int argc, char * argv[])
 
     /**
      * @brief Open the input and output ROOT files.
-     * @details This block opens the input and output ROOT files. The input
-     * ROOT file is the file that contains the TTrees produced by the CAFAna
-     * analysis framework. The output ROOT file is the file that will contain
-     * the TTrees that are produced by this code.
+     * @details By default the output is recreated. When output.copy_input is
+     * true, the complete input file is first copied to the output path and the
+     * copy is opened in UPDATE mode so newly produced systematics augment all
+     * existing trees and histograms.
      */
-    TFile * input = TFile::Open(config.get_string_field("input.path").c_str(), "READ");
-    TFile * output = TFile::Open(config.get_string_field("output.path").c_str(), "RECREATE");
+    const std::string input_path = config.get_string_field("input.path");
+    const std::string output_path = config.get_string_field("output.path");
+    const bool copy_input = config.get_bool_field("output.copy_input", false);
+
+    if(copy_input)
+    {
+        const std::filesystem::path source = std::filesystem::absolute(input_path).lexically_normal();
+        const std::filesystem::path destination = std::filesystem::absolute(output_path).lexically_normal();
+        if(source == destination)
+        {
+            std::cerr << "Error: output.copy_input requires different input and output paths." << std::endl;
+            return 1;
+        }
+
+        std::error_code error;
+        std::filesystem::copy_file(
+            source,
+            destination,
+            std::filesystem::copy_options::overwrite_existing,
+            error);
+        if(error)
+        {
+            std::cerr << "Error: failed to seed the output file from the input file: "
+                      << error.message() << std::endl;
+            return 1;
+        }
+        std::cout << "Seeded output file with all existing input objects." << std::endl;
+    }
+
+    TFile * input = TFile::Open(input_path.c_str(), "READ");
+    TFile * output = TFile::Open(output_path.c_str(), copy_input ? "UPDATE" : "RECREATE");
+    if(input == nullptr || input->IsZombie() || output == nullptr || output->IsZombie())
+    {
+        std::cerr << "Error: failed to open the input or output ROOT file." << std::endl;
+        return 1;
+    }
 
     /**
      * @brief Load the DetsysCalculator, if configured.

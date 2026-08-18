@@ -172,6 +172,9 @@ struct MergeWriter {
     bool export_flat_sigma=false;
     double flat_m1 = 1.0;
     double flat_p1 = 1.0;
+    bool export_single_weight=false;
+    std::string single_weight_name;
+    double single_weight = 1.0;
 
     std::vector<Double_t>* wD = nullptr;
     std::vector<Float_t>*  wF = nullptr;
@@ -210,6 +213,17 @@ struct MergeWriter {
     "MvCCRES",
     "MaNCRES",
     "MvNCRES"
+  };
+
+  const std::map<std::string, std::string> single_weight_names = {
+    {
+      "GENIEReWeight_SBNNuSyst_LQCDZExpFit_correction_ZExpAVariationResponse",
+      "LQCDZExpFitCorrection_weight"
+    },
+    {
+      "GENIEReWeight_SBNNuSyst_MINERvAZExpFit_correction_ZExpAVariationResponse",
+      "MINERvAZExpFitCorrection_weight"
+    }
   };
 
   std::vector<std::string> morph_names = {
@@ -312,6 +326,13 @@ struct MergeWriter {
         p.export_flat_sigma = true;
         out_tree->Branch((p.out + "_m1").c_str(), &p.flat_m1);
         out_tree->Branch((p.out + "_p1").c_str(), &p.flat_p1);
+      }
+
+      auto single_weight_it = single_weight_names.find(p.full);
+      if(block.type == "multisim" && single_weight_it != single_weight_names.end()){
+        p.export_single_weight = true;
+        p.single_weight_name = single_weight_it->second;
+        out_tree->Branch(p.single_weight_name.c_str(), &p.single_weight);
       }
     }
 
@@ -470,6 +491,7 @@ struct MergeWriter {
 
       p.flat_m1 = 1.0;
       p.flat_p1 = 1.0;
+      p.single_weight = 1.0;
 
       if(p.arr == nullptr){
         std::cout << "WARN: p.arr is null for " << p.full << "\n";
@@ -551,6 +573,11 @@ struct MergeWriter {
         p.flat_p1 = g.Eval( 1.0);
         if(!std::isfinite(p.flat_m1)) p.flat_m1 = 1.0;
         if(!std::isfinite(p.flat_p1)) p.flat_p1 = 1.0;
+      }
+
+      if(p.export_single_weight && p.present_in_this_tree && !weights.empty()){
+        p.single_weight = weights.front();
+        if(!std::isfinite(p.single_weight)) p.single_weight = 1.0;
       }
 
       p.arr->Clear("C");

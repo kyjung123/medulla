@@ -1,11 +1,20 @@
 [input]
-path = 'output_selection_merged.root'
-weights = '/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys/CV/ZExpPCA/*.root.flat_merged_geant4.root'
-use_additional_hash = true
+path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_recent_sys.root"
+#weights = "/pnfs/icarus/scratch/users/kyjung/nuSyst_ZEXPPCA/*.flat.root"
+#use_additional_hash = true
 
 [output]
-path = 'icarus_charged_pion_proton_michel_recent_sys.root'
+path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_recent_sys_det.root"
 histogram_destination = 'variations/'
+
+# Seed the result with every object in merged_sys.root and add detector
+# variation products in UPDATE mode. This preserves generator weights,
+# nonmatched trees, data/rock trees, and detector-variation input samples.
+copy_input = true
+# The seeded file already contains the selected-event and nonmatched trees.
+# Only the new detector variation weight trees need to be written.
+write_main_tree = false
+nonmatched = false
 
 [[sysvar]]
 name = 'reco_leading_muon_ke'
@@ -21,32 +30,14 @@ bins = [0.0, 100.0, 200.0, 400.0, 600.0, 800.0, 1000.0, 1500.0, 2000.0, 3000.0, 
 nuniverses = 1000
 variable_length = true
 
-# Detector weights are evaluated for the nominal MC trees. The corresponding
-# exposure and on-beam trees are copied into the detector-only output.
+# Detector weights are evaluated for the nominal MC trees. All other objects
+# are retained by output.copy_input rather than being rewritten tree by tree.
 [[tree]]
 origin = 'events/nominal/selected_one_proton_michel'
 destination = 'events/nominal/'
 name = 'selected_one_proton_michel'
 action = 'add_weights'
 table_types = ['variation']
-
-[[tree]]
-origin = 'events/nominal/selected_one_proton_michel_exposure'
-destination = 'events/nominal/'
-name = 'selected_one_proton_michel_exposure'
-action = 'copy'
-
-[[tree]]
-origin = 'events/onbeam/selected_one_proton_michel'
-destination = 'events/onbeam/'
-name = 'selected_one_proton_michel'
-action = 'copy'
-
-[[tree]]
-origin = 'events/onbeam/selected_one_proton_michel_exposure'
-destination = 'events/onbeam/'
-name = 'selected_one_proton_michel_exposure'
-action = 'copy'
 
 [[tree]]
 origin = 'events/nominal/selected_renzo_low_threshold'
@@ -56,24 +47,6 @@ action = 'add_weights'
 table_types = ['variation']
 
 [[tree]]
-origin = 'events/nominal/selected_renzo_low_threshold_exposure'
-destination = 'events/nominal/'
-name = 'selected_renzo_low_threshold_exposure'
-action = 'copy'
-
-[[tree]]
-origin = 'events/onbeam/selected_renzo_low_threshold'
-destination = 'events/onbeam/'
-name = 'selected_renzo_low_threshold'
-action = 'copy'
-
-[[tree]]
-origin = 'events/onbeam/selected_renzo_low_threshold_exposure'
-destination = 'events/onbeam/'
-name = 'selected_renzo_low_threshold_exposure'
-action = 'copy'
-
-[[tree]]
 origin = 'events/nominal/selected_multiple'
 destination = 'events/nominal/'
 name = 'selected_multiple'
@@ -81,35 +54,11 @@ action = 'add_weights'
 table_types = ['variation']
 
 [[tree]]
-origin = 'events/nominal/selected_multiple_exposure'
-destination = 'events/nominal/'
-name = 'selected_multiple_exposure'
-action = 'copy'
-
-[[tree]]
-origin = 'events/onbeam/selected_multiple'
-destination = 'events/onbeam/'
-name = 'selected_multiple'
-action = 'copy'
-
-[[tree]]
-origin = 'events/onbeam/selected_multiple_exposure'
-destination = 'events/onbeam/'
-name = 'selected_multiple_exposure'
-action = 'copy'
-
-[[tree]]
 origin = 'events/nominal/signal_N_proton'
 destination = 'events/nominal/'
 name = 'signal_N_proton'
 action = 'add_weights'
 table_types = ['variation']
-
-[[tree]]
-origin = 'events/nominal/signal_N_proton_exposure'
-destination = 'events/nominal/'
-name = 'signal_N_proton_exposure'
-action = 'copy'
 
 [[sys]]
 name = 'var01'
@@ -200,4 +149,3 @@ nsigma = [-3, -2, -1, 0, 1, 2, 3]
 scale = [-3, -2, -1, 1, 1, 2, 3]
 ordinate = 'nominal'
 points = ['var09', 'var09', 'var09', 'nominal', 'var09', 'var09', 'var09']
-
