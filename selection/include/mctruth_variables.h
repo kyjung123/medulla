@@ -14,6 +14,12 @@
  */
 #ifndef MCTRUTH_VARIABLES_H
 #define MCTRUTH_VARIABLES_H
+#include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <utility>
+#include <vector>
+
 #include "sbnanaobj/StandardRecord/Proxy/SRProxy.h"
 #include "sbnanaobj/StandardRecord/SRTrueInteraction.h"
 #include "sbnanaobj/StandardRecord/SRVector3D.h"
@@ -30,6 +36,200 @@
  */
 namespace mctruth
 {
+    /**
+     * @brief Index of the Nth-highest-energy GENIE primary of a given species.
+     * @details `SRTrueInteraction::prim` contains generator-level primary
+     * particles. Since all candidates in one call have the same mass, ordering
+     * by total generator energy is equivalent to ordering by kinetic energy.
+     * Particle and antiparticle PDG codes are treated as the same species.
+     * @param obj the SRTrueInteraction to inspect.
+     * @param abs_pdg absolute PDG code of the requested species.
+     * @param rank zero-based energy rank (0 is leading, 1 is second-leading).
+     * @return index in `obj.prim`, or kNoMatch when no such particle exists.
+     */
+    template<typename T>
+    size_t primary_index_by_energy(const T & obj, int abs_pdg, size_t rank=0)
+    {
+        std::vector<std::pair<double, size_t>> candidates;
+        for(size_t i = 0; i < obj.prim.size(); ++i)
+        {
+            const auto & p = obj.prim[i];
+            if(std::abs(p.pdg) == abs_pdg && std::isfinite(p.genE))
+                candidates.emplace_back(p.genE, i);
+        }
+
+        std::stable_sort(candidates.begin(), candidates.end(),
+            [](const auto & a, const auto & b) { return a.first > b.first; });
+        return rank < candidates.size() ? candidates[rank].second : kNoMatch;
+    }
+
+    /**
+     * @brief Kinetic energy of an energy-ranked GENIE primary in MeV.
+     * @details The particle is selected from `SRTrueInteraction::prim` by
+     * species and generator energy, matching the leading-particle convention
+     * used by the SPINE selectors.
+     */
+    template<typename T>
+    double primary_kinetic_energy(const T & obj, int abs_pdg,
+                                  double mass_mev, size_t rank=0)
+    {
+        const size_t index = primary_index_by_energy(obj, abs_pdg, rank);
+        if(index == kNoMatch)
+            return kNoMatchValue;
+        return 1000.0 * obj.prim[index].genE - mass_mev;
+    }
+
+    template<typename T>
+    double leading_muon_ke(const T & obj)
+    {
+        return primary_kinetic_energy(obj, 13, MUON_MASS);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       leading_muon_ke, leading_muon_ke);
+
+    template<typename T>
+    double leading_pion_ke(const T & obj)
+    {
+        return primary_kinetic_energy(obj, 211, PION_MASS);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       leading_pion_ke, leading_pion_ke);
+
+    template<typename T>
+    double second_leading_pion_ke(const T & obj)
+    {
+        return primary_kinetic_energy(obj, 211, PION_MASS, 1);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       second_leading_pion_ke, second_leading_pion_ke);
+
+    template<typename T>
+    double leading_proton_ke(const T & obj)
+    {
+        return primary_kinetic_energy(obj, 2212, PROTON_MASS);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       leading_proton_ke, leading_proton_ke);
+
+    /**
+     * @brief Cosine of a GENIE primary's direction with respect to the
+     * incoming true-neutrino direction.
+     * @details Uses the particle momentum at its generator point (`genp`) and
+     * `SRTrueInteraction::momentum`, the event-by-event incoming-neutrino
+     * momentum. This matches the definition used by GenericFlux_Tester, where
+     * `cos(particle->fP.Vect().Angle(neutrino->fP.Vect()))` is evaluated.
+     */
+    template<typename T>
+    double primary_cos_wrt_beam(const T & obj, int abs_pdg, size_t rank=0)
+    {
+        const size_t index = primary_index_by_energy(obj, abs_pdg, rank);
+        if(index == kNoMatch)
+            return kNoMatchValue;
+
+        const auto & p = obj.prim[index];
+        const double particle_magnitude = std::sqrt(
+            p.genp.x * p.genp.x + p.genp.y * p.genp.y + p.genp.z * p.genp.z);
+        const double neutrino_magnitude = std::sqrt(
+            obj.momentum.x * obj.momentum.x +
+            obj.momentum.y * obj.momentum.y +
+            obj.momentum.z * obj.momentum.z);
+        if(!(particle_magnitude > 0.0) || !std::isfinite(particle_magnitude) ||
+           !(neutrino_magnitude > 0.0) || !std::isfinite(neutrino_magnitude))
+            return kNoMatchValue;
+
+        const double cosine =
+            (p.genp.x * obj.momentum.x +
+             p.genp.y * obj.momentum.y +
+             p.genp.z * obj.momentum.z) /
+            (particle_magnitude * neutrino_magnitude);
+        return std::clamp(cosine, -1.0, 1.0);
+    }
+
+    template<typename T>
+    double leading_muon_cos_wrt_beam(const T & obj)
+    {
+        return primary_cos_wrt_beam(obj, 13);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       leading_muon_cos_wrt_beam, leading_muon_cos_wrt_beam);
+
+    template<typename T>
+    double leading_pion_cos_wrt_beam(const T & obj)
+    {
+        return primary_cos_wrt_beam(obj, 211);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       leading_pion_cos_wrt_beam, leading_pion_cos_wrt_beam);
+
+    template<typename T>
+    double second_leading_pion_cos_wrt_beam(const T & obj)
+    {
+        return primary_cos_wrt_beam(obj, 211, 1);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       second_leading_pion_cos_wrt_beam,
+                       second_leading_pion_cos_wrt_beam);
+
+    template<typename T>
+    double leading_proton_cos_wrt_beam(const T & obj)
+    {
+        return primary_cos_wrt_beam(obj, 2212);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       leading_proton_cos_wrt_beam, leading_proton_cos_wrt_beam);
+
+    /**
+     * @brief Cosine of the opening angle between leading GENIE primaries.
+     * @details This is the MCTruth analogue of `vars::opening_angle` and
+     * preserves its parameter convention: mode 1 selects the leading muon and
+     * leading charged pion, while mode 2 selects the leading muon and leading
+     * proton. Despite the historical variable name, the returned value is the
+     * cosine (normalized momentum dot product), not the angle in radians.
+     * @param obj the SRTrueInteraction to inspect.
+     * @param params mode selector; defaults to mode 1.
+     * @return opening-angle cosine, or kNoMatchValue for a missing particle or
+     * an unsupported mode.
+     */
+    template<typename T>
+    double opening_angle(const T & obj, std::vector<double> params={1.0,})
+    {
+        const int mode = params.empty() ? 1 : static_cast<int>(params[0]);
+        const size_t muon_index = primary_index_by_energy(obj, 13);
+        size_t other_index = kNoMatch;
+
+        if(mode == 1)
+            other_index = primary_index_by_energy(obj, 211);
+        else if(mode == 2)
+            other_index = primary_index_by_energy(obj, 2212);
+        else
+            return kNoMatchValue;
+
+        if(muon_index == kNoMatch || other_index == kNoMatch)
+            return kNoMatchValue;
+
+        const auto & muon = obj.prim[muon_index];
+        const auto & other = obj.prim[other_index];
+        const double muon_magnitude = std::sqrt(
+            muon.genp.x * muon.genp.x +
+            muon.genp.y * muon.genp.y +
+            muon.genp.z * muon.genp.z);
+        const double other_magnitude = std::sqrt(
+            other.genp.x * other.genp.x +
+            other.genp.y * other.genp.y +
+            other.genp.z * other.genp.z);
+        if(!(muon_magnitude > 0.0) || !std::isfinite(muon_magnitude) ||
+           !(other_magnitude > 0.0) || !std::isfinite(other_magnitude))
+            return kNoMatchValue;
+
+        const double cosine =
+            (muon.genp.x * other.genp.x +
+             muon.genp.y * other.genp.y +
+             muon.genp.z * other.genp.z) /
+            (muon_magnitude * other_magnitude);
+        return std::clamp(cosine, -1.0, 1.0);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, opening_angle, opening_angle);
+
     /**
      * @brief Variable for the true neutrino energy.
      * @details This variable is intended to provide the true energy of the
@@ -199,6 +399,78 @@ namespace mctruth
     template<typename T>
     double neutrino_W(const T & obj) { return obj.w; }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, neutrino_W, neutrino_W);
+
+    /**
+     * @brief Count GENIE primary particles above a kinetic-energy threshold.
+     * @param obj the SRTrueInteraction to inspect.
+     * @param abs_pdg absolute PDG code of the requested species.
+     * @param mass_mev particle rest mass in MeV.
+     * @param threshold_mev minimum kinetic energy in MeV.
+     */
+    template<typename T>
+    double primary_particle_multiplicity(const T & obj, int abs_pdg,
+                                         double mass_mev,
+                                         double threshold_mev)
+    {
+        size_t count = 0;
+        for(const auto & p : obj.prim)
+        {
+            if(std::abs(p.pdg) != abs_pdg)
+                continue;
+
+            const double kinetic_energy_mev = 1000.0 * p.genE - mass_mev;
+            if(kinetic_energy_mev >= threshold_mev)
+                ++count;
+        }
+        return count;
+    }
+
+    template<typename T>
+    double photon_multiplicity(const T & obj,
+                               std::vector<double> params={25.0,})
+    {
+        return primary_particle_multiplicity(obj, 22, 0.0, params[0]);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       photon_multiplicity, photon_multiplicity);
+
+    template<typename T>
+    double electron_multiplicity(const T & obj,
+                                 std::vector<double> params={25.0,})
+    {
+        return primary_particle_multiplicity(
+            obj, 11, ELECTRON_MASS, params[0]);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       electron_multiplicity, electron_multiplicity);
+
+    template<typename T>
+    double muon_multiplicity(const T & obj,
+                             std::vector<double> params={25.0,})
+    {
+        return primary_particle_multiplicity(obj, 13, MUON_MASS, params[0]);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       muon_multiplicity, muon_multiplicity);
+
+    template<typename T>
+    double pion_multiplicity(const T & obj,
+                             std::vector<double> params={50.0,})
+    {
+        return primary_particle_multiplicity(obj, 211, PION_MASS, params[0]);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       pion_multiplicity, pion_multiplicity);
+
+    template<typename T>
+    double proton_multiplicity(const T & obj,
+                               std::vector<double> params={25.0,})
+    {
+        return primary_particle_multiplicity(
+            obj, 2212, PROTON_MASS, params[0]);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth,
+                       proton_multiplicity, proton_multiplicity);
 
     /**
      * @brief Count of true primary photons above an energy threshold.

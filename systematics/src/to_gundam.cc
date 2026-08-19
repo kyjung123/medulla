@@ -873,6 +873,7 @@ int main(int argc, char* argv[])
 
   bool did_nominal=false;
   bool did_onbeam=false;
+  bool did_offbeam=false;
 
   for(cfg::ConfigurationTable& table : tables){
     std::string origin = table.get_string_field("origin");
@@ -914,6 +915,16 @@ int main(int argc, char* argv[])
                                    "selected_merged",
                                    "selected");
       did_onbeam = true;
+    }
+
+
+    if(!did_offbeam && origin.find("events/offbeam/") == 0){
+        merge_prefix_under_directory(input, output, config, table,
+                "events/offbeam",
+                "events/offbeam",
+                "selected_merged",
+                "selected");
+        did_offbeam = true;
     }
   }
 

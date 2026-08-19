@@ -63,6 +63,16 @@ is_nu = true
 is_data = false
 
 
+
+[[tree]]
+origin = 'events/offbeam/selected_one_proton_michel'
+destination = 'events/offbeam/'
+name = 'selected_one_proton_michel'
+action = 'copy'
+gundam_store_syst = false
+is_nu = false
+is_data = true
+
 #[[sys]]
 #name = 'var00'
 #name_short = 'Null'
