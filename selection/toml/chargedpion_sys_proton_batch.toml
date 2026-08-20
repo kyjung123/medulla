@@ -837,6 +837,7 @@ branch = [
 name = "signal_N_proton"
 sim_only = true
 add_exposure = true
+add_systematics = true
 mode = "true"
 cut = [
 { name = "neutrino",             type = "true" },
