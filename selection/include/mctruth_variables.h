@@ -1013,5 +1013,8 @@ namespace mctruth
         }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, pion_pdg, pion_pdg);
 
+    template<typename T>
+        int index(const T & obj) { return obj.index; }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, index, index);
 } // namespace mctruth
 #endif

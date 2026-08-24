@@ -1380,6 +1380,40 @@ namespace cuts
     }
     REGISTER_CUT_SCOPE(RegistrationScope::Reco, vertex_distance_cut, vertex_distance_cut);
 
+    template<class T>
+        bool muon_michel_tag_cut(const T& obj, std::vector<double> params={20.0})
+        {
+            size_t muon_index = selectors::leading_muon(obj);
+            if (muon_index == kNoMatch) return false;
+            const auto& muon = obj.particles[muon_index];
+            // KE threshold: default 50 MeV
+            utilities::three_vector muon_end = {
+                pvars::end_x(muon),
+                pvars::end_y(muon),
+                pvars::end_z(muon)
+            };
+            int64_t muon_id = muon.id;
+            bool michel_tagged = false;
+            for(size_t i = 0; i < obj.particles.size(); ++i)
+            {
+                const auto& p = obj.particles[i];
+                if (p.id == muon_id) continue;
+                utilities::three_vector particle_vtx = {
+                    pvars::start_x(p),
+                    pvars::start_y(p),
+                    pvars::start_z(p)
+                };
+                double Atslc =utilities::magnitude(utilities::subtract(muon_end, particle_vtx));
+                // Michel candidate within 20 cm
+                if (p.shape == 2 && Atslc < params[0])
+                {
+                    michel_tagged = true;
+                    break;
+                }
+            }
+            return michel_tagged;
+        }
+    REGISTER_CUT_SCOPE(RegistrationScope::Both, muon_michel_tag_cut, muon_michel_tag_cut);
 
 }
 #endif
