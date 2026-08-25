@@ -126,14 +126,14 @@ name = "nominal"
 path = "/pnfs/icarus/persistent/users/kyjung/nuSyst/nuSyst_ZEXPPCA/*.root"
 ismc = true
 disable = false
-add_systematics = true
+add_systematics = false
 
 [[sample]]
 name = "rock"
 path = "/pnfs/icarus/persistent/users/spine/NuMI/FHCv09_89_01_02p02_Rock_muons/*.root"
 ismc = true
 disable = false
-add_systematics = true
+add_systematics = false
 
 
 [[sample]]
@@ -586,7 +586,7 @@ branch = [
 name = "selected_antineutrino_muon"
 sim_only = false
 add_exposure = true
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },
@@ -663,7 +663,7 @@ branch = [
 name = "selected_antineutrino_pion"
 sim_only = false
 add_exposure = true
-add_systematics = true
+add_systematics = false
 mode = "reco"
 cut = [
     { name = "fiducial_cut",              type = "reco" },

@@ -790,7 +790,7 @@ namespace mctruth
             int count = 0;
             for (const auto & p : obj.prim)
             {
-                if ( (p.pdg==211 || p.pdg==-211) && (p.genE - 0.13957) > 0.05 )
+                if ( (p.pdg==211 || p.pdg==-211 || p.pdg==111) && (p.genE - 0.13957) > 0.05 )
                 {
                     count++;
                 }

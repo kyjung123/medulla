@@ -570,6 +570,7 @@ branch = [
     { name = "Q2_exp", type = "true" },
     { name = "W_exp", type = "true" },
     { name = "muon_pT_wrt_beam", type = "both" },
+    { name = "single_pion_pandora",           type = "mctruth"},
 
     #For gundam
     {name = "is_nu",            type = "both"},
@@ -699,6 +700,7 @@ branch = [
     { name = "count_proton",         type = "true" },
     { name = "count_pip",         type = "true" },
     { name = "count_pim",         type = "true" },
+    { name = "single_pion_pandora",           type = "mctruth"},
 
     #For gundam
     {name = "is_nu",            type = "both"},
