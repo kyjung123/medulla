@@ -3042,28 +3042,32 @@ namespace vars
     REGISTER_VAR_SCOPE(RegistrationScope::True, muon_michel_energy, muon_michel_energy);
 
     template<class T>
-        double pion_nearest_shower_distance(const T & obj)
+    double pion_nearest_shower_distance(const T & obj)
+    {
+        size_t pi = selectors::leading_pion(obj);
+        if(pi == kNoMatch) return PLACEHOLDERVALUE;
+
+        auto & pion(obj.particles[pi]);
+        utilities::three_vector pion_end = {pvars::end_x(pion), pvars::end_y(pion), pvars::end_z(pion)};
+        int64_t pion_id = pion.id;
+
+        double best_dist = std::numeric_limits<double>::infinity();
+        bool found = false;
+        for(size_t i(0); i < obj.particles.size(); ++i)
         {
-            size_t pi = selectors::leading_pion(obj);
-            if(pi == kNoMatch) return PLACEHOLDERVALUE;
-
-            auto & pion(obj.particles[pi]);
-            utilities::three_vector pion_end = {pvars::end_x(pion), pvars::end_y(pion), pvars::end_z(pion)};
-            int64_t pion_id = pion.id;
-
-            double best_dist = PLACEHOLDERVALUE;
-            for(size_t i(0); i < obj.particles.size(); ++i)
+            const auto & p = obj.particles[i];
+            if (p.id == pion_id) continue;
+            if (p.shape != 2) continue;
+            utilities::three_vector particle_vtx = {pvars::start_x(p), pvars::start_y(p), pvars::start_z(p)};
+            double Atslc = utilities::magnitude(utilities::subtract(pion_end, particle_vtx));
+            if (Atslc < best_dist)
             {
-                const auto & p = obj.particles[i];
-                if (p.id == pion_id) continue;
-                if (p.shape != 2) continue;
-                utilities::three_vector particle_vtx = {pvars::start_x(p), pvars::start_y(p), pvars::start_z(p)};
-                double Atslc = utilities::magnitude(utilities::subtract(pion_end, particle_vtx));
-                if (best_dist == PLACEHOLDERVALUE || Atslc < best_dist)
-                    best_dist = Atslc;
+                best_dist = Atslc;
+                found = true;
             }
-            return best_dist;
         }
+        return found ? best_dist : PLACEHOLDERVALUE;
+    }
     REGISTER_VAR_SCOPE(RegistrationScope::Both, pion_nearest_shower_distance, pion_nearest_shower_distance);
 
     template<class T>
