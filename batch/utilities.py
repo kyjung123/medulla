@@ -5,7 +5,7 @@ import sqlite3
 import time
 import toml
 from catalog import resolve_samples
-from glob import glob
+from glob import glob, has_magic
 import subprocess
 from pathlib import Path
 from typing import Optional
@@ -100,33 +100,113 @@ def get_samples(
     samples = cfg.get('sample', [])
     enabled_samples = [s for s in samples if not s.get('disable', False)]
 
-    # Process the samples and batch them if requested.
+    # Resolve sample paths and batch them if requested.
     batches = []
+    config_dir = Path(tml).resolve().parent
+
     for sample in enabled_samples:
-#        paths = glob(sample['path'])
-        sample_paths = sample['path']
-        if isinstance(sample_paths, str):
-            paths = glob(sample_paths)
-        else:
+        path_file = sample.get('path_file')
+
+        if path_file is not None and 'path' in sample:
+            raise ValueError(
+                    f"Sample {sample.get('name', '<unknown>')} defines both "
+                    "'path' and 'path_file'; use only one."
+                    )
+
+        if path_file is not None:
+            list_path = Path(path_file).expanduser()
+
+            # Relative path_file is resolved relative to the TOML.
+            if not list_path.is_absolute():
+                list_path = config_dir / list_path
+
+            if not list_path.is_file():
+                raise FileNotFoundError(
+                        f"Path list not found for sample "
+                        f"{sample.get('name', '<unknown>')}: {list_path}"
+                        )
+
+            sample_paths = []
+
+            with list_path.open() as path_stream:
+                for line in path_stream:
+                    path = line.strip()
+
+                    # Ignore empty lines and comments.
+                    if not path or path.startswith('#'):
+                        continue
+
+                    # Relative entries are resolved relative to the list file.
+                    if not os.path.isabs(path) and '://' not in path:
+                        path = str(list_path.parent / path)
+
+                    sample_paths.append(path)
+
             paths = []
+
             for path in sample_paths:
-                paths.extend(glob(path))
-        paths = sorted(paths)
+                # Exact paths are used directly to avoid thousands of
+                # individual PNFS stat operations.
+                paths.extend(glob(path) if has_magic(path) else [path])
+
+        else:
+            if 'path' not in sample:
+                raise ValueError(
+                        f"Sample {sample.get('name', '<unknown>')} must define "
+                        "either 'path' or 'path_file'."
+                        )
+
+            sample_paths = sample['path']
+
+            if isinstance(sample_paths, str):
+                paths = glob(sample_paths)
+            else:
+                paths = []
+
+                for path in sample_paths:
+                    paths.extend(glob(path))
+
+        paths = sorted(set(paths))
+
         if len(paths) == 0:
-            raise FileNotFoundError(f"No files found for sample {sample.get('name', '<unknown>')} with path {sample['path']}")
+            source = (
+                    f"path_file {list_path}"
+                    if path_file is not None
+                    else f"path {sample['path']}"
+                    )
+
+            raise FileNotFoundError(
+                    f"No files found for sample "
+                    f"{sample.get('name', '<unknown>')} with {source}"
+                    )
+
         if batch_size is None or batch_size <= 0:
-            batches.append(sample)
+            new_sample = sample.copy()
+
+            if path_file is not None:
+                new_sample.pop('path_file', None)
+                new_sample['path'] = paths
+
+            batches.append(new_sample)
+
         else:
             for i in range(0, len(paths), batch_size):
-                batch_paths = paths[i:i+batch_size]
+                batch_paths = paths[i:i + batch_size]
+
                 if len(batch_paths) == 0:
                     continue
+
                 new_sample = sample.copy()
+
+                # Worker job TOML should contain only path = [...],
+                # not path_file.
+                new_sample.pop('path_file', None)
                 new_sample['path'] = batch_paths
+
                 batches.append(new_sample)
 
-    # Return the list of enabled samples.
     return batches
+
 
 def create_systematics_cfg(
     base_cfg : dict,
