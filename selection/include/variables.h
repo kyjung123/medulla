@@ -1424,46 +1424,42 @@ namespace vars
     REGISTER_VAR_SCOPE(RegistrationScope::True, pion_children_count, vars::pion_children_count);
     REGISTER_VAR_SCOPE(RegistrationScope::True, pion_child0_pdg,     vars::pion_child0_pdg);
 
-    template <class T>                                                                                                                                                                                                                     
-    double muon_michel_tag(const T& obj)                                                                                                                                                                                                   
-    {                                                                                                                                                                                                                                      
-        size_t mu = selectors::leading_muon(obj);//gaurantee it is reco pion candidate                                                                                                                                                     
-        size_t index(kNoMatch);                                                                                                                                                                                                            
-        bool michel_tagged = false;                                                                                                                                                                                                        
-        if(mu == kNoMatch)                                                                                                                                                                                                                 
-            return 0.0;                                                                                                                                                                                                                    
-        else                                                                                                                                                                                                                               
-        {                                                                                                                                                                                                                                  
-            auto & muon(obj.particles[mu]);                                                                                                                                                                                                
-            utilities::three_vector muon_end = {pvars::end_x(muon), pvars::end_y(muon), pvars::end_z(muon)};                                                                                                                               
-//            std::cout<<pvars::end_x(muon)<<std::endl;                                                                                                                                                                                    
-            int64_t muon_id = muon.id;                                                                                                                                                                                                     
-            for(size_t i(0); i < obj.particles.size(); ++i)                                                                                                                                                                                
-            {                                                                                                                                                                                                                              
-                const auto & p = obj.particles[i];                                                                                                                                                                                         
-                if (p.id == muon_id) continue;                                                                                                                                                                                             
-                utilities::three_vector particle_vtx = {pvars::start_x(p), pvars::start_y(p), pvars::start_z(p)};                                                                                                                          
-                double Atslc = utilities::magnitude(utilities::subtract(muon_end, particle_vtx));                                                                                                                                          
-//                std::cout<<"p.shape : "<<p.shape<<", pdg : "<< p.pdg_code<<", p.id: "<<p.id<<std::endl;                                                                                                                                  
-//                std::cout<<"Atslc : "<<Atslc<<std::endl;                                                                                                                                                                                 
-                if (p.shape==2 && Atslc<10)                                                                                                                                                                                                 
-                {                                                                                                                                                                                                                          
-                    michel_tagged = true;                                                                                                                                                                                                  
-                }                                                                                                                                                                                                                          
-                                                                                                                                                                                                                                           
-            }                                                                                                                                                                                                                              
-            if (michel_tagged==true)                                                                                                                                                                                                       
-            {                                                                                                                                                                                                                              
-                return 1.0;                                                                                                                                                                                                                
-            }                                                                                                                                                                                                                              
-            else                                                                                                                                                                                                                           
-            {                                                                                                                                                                                                                              
-                return 0.0;                                                                                                                                                                                                                
-            }                                                                                                                                                                                                                              
-        }                                                                                                                                                                                                                                  
-    }                                                                                                                                                                                                                                      
-                                                                                                                                                                                                                                           
-    REGISTER_VAR_SCOPE(RegistrationScope::Both, muon_michel_tag, muon_michel_tag);                                                                                                                                                         
+
+    template <class T>
+        double muon_michel_tag(const T& obj, std::vector<double> params={10.0})
+        {
+            size_t mu = selectors::leading_muon(obj);//gaurantee it is reco pion candidate
+            size_t index(kNoMatch);
+            bool michel_tagged = false;
+            if(mu == kNoMatch)
+                return 0.0;
+            else
+            {
+                auto & muon(obj.particles[mu]);
+                utilities::three_vector muon_end = {pvars::end_x(muon), pvars::end_y(muon), pvars::end_z(muon)};
+                int64_t muon_id = muon.id;
+                for(size_t i(0); i < obj.particles.size(); ++i)
+                {
+                    const auto & p = obj.particles[i];
+                    if (p.id == muon_id) continue;
+                    utilities::three_vector particle_vtx = {pvars::start_x(p), pvars::start_y(p), pvars::start_z(p)};
+                    double Atslc = utilities::magnitude(utilities::subtract(muon_end, particle_vtx));
+                    if (p.shape==2 && Atslc<params[0])
+                    {
+                        michel_tagged = true;
+                    }
+                }
+                if (michel_tagged==true)
+                {
+                    return 1.0;
+                }
+                else
+                {
+                    return 0.0;
+                }
+            }
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::Both, muon_michel_tag, muon_michel_tag);
 
     namespace michel_util {
         struct V3 { double x, y, z; };
@@ -1744,6 +1740,7 @@ namespace vars
         const size_t mu_idx = selectors::leading_muon(obj);
         const size_t pi_idx = selectors::leading_pion(obj);
         if (mu_idx == kNoMatch || mu_idx >= obj.particles.size()) return -5.0;
+        if (pi_idx == kNoMatch || pi_idx >= obj.particles.size()) return -5.0;
 
         auto idx = find_descendant_michel_index_direct(obj, mu_idx);
         if (!idx) return -5.0;
@@ -3010,6 +3007,92 @@ namespace vars
         return std::sqrt(mN*mN + 2*mN*(visible_energy_calosub(obj) - pvars::energy(m)/1000.0) - Q2(obj));
     }
     REGISTER_VAR_SCOPE(RegistrationScope::Both, W_calosub, W_calosub);
+
+
+
+    template <class T>
+        double muon_michel_distance(const T& obj)
+        {
+            const size_t mu_idx = selectors::leading_muon(obj);
+            if (mu_idx == kNoMatch || mu_idx >= obj.particles.size()) return -5.0;
+
+            auto idx = find_descendant_michel_index_direct(obj, mu_idx);
+            if (!idx) return -5.0;
+
+            const auto& muon   = obj.particles[mu_idx];
+            const auto& michel = obj.particles[*idx];
+
+            return michel_util::mag(
+                    michel_util::sub(michel_util::end_pos(muon), michel_util::start_pos(michel))
+                    );
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::True, muon_michel_distance, muon_michel_distance);
+
+    template <class T>
+        double muon_michel_energy(const T& obj)
+        {
+            const size_t mu_idx = selectors::leading_muon(obj);
+            if (mu_idx == kNoMatch || mu_idx >= obj.particles.size()) return -5.0;
+
+            auto idx = find_descendant_michel_index_direct(obj, mu_idx);
+            if (!idx) return -5.0;
+
+            return obj.particles[*idx].ke;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::True, muon_michel_energy, muon_michel_energy);
+
+    template<class T>
+        double pion_nearest_shower_distance(const T & obj)
+        {
+            size_t pi = selectors::leading_pion(obj);
+            if(pi == kNoMatch) return PLACEHOLDERVALUE;
+
+            auto & pion(obj.particles[pi]);
+            utilities::three_vector pion_end = {pvars::end_x(pion), pvars::end_y(pion), pvars::end_z(pion)};
+            int64_t pion_id = pion.id;
+
+            double best_dist = PLACEHOLDERVALUE;
+            for(size_t i(0); i < obj.particles.size(); ++i)
+            {
+                const auto & p = obj.particles[i];
+                if (p.id == pion_id) continue;
+                if (p.shape != 2) continue;
+                utilities::three_vector particle_vtx = {pvars::start_x(p), pvars::start_y(p), pvars::start_z(p)};
+                double Atslc = utilities::magnitude(utilities::subtract(pion_end, particle_vtx));
+                if (best_dist == PLACEHOLDERVALUE || Atslc < best_dist)
+                    best_dist = Atslc;
+            }
+            return best_dist;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::Both, pion_nearest_shower_distance, pion_nearest_shower_distance);
+
+    template<class T>
+        double muon_nearest_shower_distance(const T & obj)
+        {
+            size_t mu = selectors::leading_muon(obj);
+            if(mu == kNoMatch) return PLACEHOLDERVALUE;
+
+            auto & muon(obj.particles[mu]);
+            utilities::three_vector muon_end = {pvars::end_x(muon), pvars::end_y(muon), pvars::end_z(muon)};
+            int64_t muon_id = muon.id;
+
+            double best_dist = PLACEHOLDERVALUE;
+            for(size_t i(0); i < obj.particles.size(); ++i)
+            {
+                const auto & p = obj.particles[i];
+                if (p.id == muon_id) continue;
+                if (p.shape != 2) continue;
+                utilities::three_vector particle_vtx = {pvars::start_x(p), pvars::start_y(p), pvars::start_z(p)};
+                double Atslc = utilities::magnitude(utilities::subtract(muon_end, particle_vtx));
+                if (best_dist == PLACEHOLDERVALUE || Atslc < best_dist)
+                    best_dist = Atslc;
+            }
+            return best_dist;
+        }
+    REGISTER_VAR_SCOPE(RegistrationScope::Both, muon_nearest_shower_distance, muon_nearest_shower_distance);
+
+
+
 }
 
 

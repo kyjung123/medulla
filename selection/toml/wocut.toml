@@ -81,11 +81,11 @@ branch = [
     { name = "category",               type = "true"    },
 
     # Interaction-level selection variables
-    { name = "photon_multiplicity",   type = "reco", parameters = [25.0,]},
-    { name = "electron_multiplicity", type = "reco", parameters = [25.0,]},
-    { name = "muon_multiplicity",     type = "reco", parameters = [143.425,]},
-    { name = "pion_multiplicity",     type = "reco", parameters = [25,]},
-    { name = "proton_multiplicity",   type = "reco", parameters = [50.0,]},
+    { name = "photon_multiplicity",   type = "both", parameters = [25.0,]},
+    { name = "electron_multiplicity", type = "both", parameters = [25.0,]},
+    { name = "muon_multiplicity",     type = "both", parameters = [143.425,]},
+    { name = "pion_multiplicity",     type = "both", parameters = [25,]},
+    { name = "proton_multiplicity",   type = "both", parameters = [50.0,]},
     { name = "hadronic_invariant_mass", type = "true" },
     { name = "four_mom_transfer_squared",     type = "both"},
 

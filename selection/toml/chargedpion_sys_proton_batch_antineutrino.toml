@@ -1,0 +1,162 @@
+[general]
+output = "trial"
+primfn = "default_primary_classification"
+
+pidfn = "default_pid"
+
+fsthresh = [
+    "@photon_threshold",
+    "@electron_threshold",
+    "@muon_threshold",
+    "@pion_threshold",
+    "@proton_threshold",
+]
+
+[parameters]
+photon_threshold = 25.0
+electron_threshold = 25.0
+muon_threshold = 143.425
+pion_threshold = 50.0
+proton_threshold = 50.0
+flash_low_t = -0.0
+flash_high_t = 9.6
+
+
+[[category]] # 0 : nu_mu CC, 1 mu-, 1 pi+, Np (N >= 1) -- signal
+cuts = [
+    { name = "neutrino",             type = "true" },
+    { name = "fiducial_cut",         type = "true" },
+    { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
+    { name = "iscc",                 type = "mctruth" },
+    { name = "single_muon_minus",    type = "mctruth", parameters = ["@muon_threshold"] },
+    { name = "single_positive_pion", type = "mctruth", parameters = ["@pion_threshold"] },
+    { name = "has_proton",           type = "mctruth", parameters = ["@proton_threshold"] },
+]
+
+[[category]] # 1 : nu_mu CC, 1 mu-, 1 pi+, zero protons
+cuts = [
+    { name = "neutrino",             type = "true" },
+    { name = "fiducial_cut",         type = "true" },
+    { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
+    { name = "iscc",                 type = "mctruth" },
+    { name = "single_muon_minus",    type = "mctruth", parameters = ["@muon_threshold"] },
+    { name = "single_positive_pion", type = "mctruth", parameters = ["@pion_threshold"] },
+    { name = "!has_proton",          type = "mctruth", parameters = ["@proton_threshold"] },
+]
+
+[[category]] # 2 : nu_mu CC, 1 mu-, 1 pi-, any Np -- wrong-sign pion
+cuts = [
+    { name = "neutrino",             type = "true" },
+    { name = "fiducial_cut",         type = "true" },
+    { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
+    { name = "iscc",                 type = "mctruth" },
+    { name = "single_muon_minus",    type = "mctruth", parameters = ["@muon_threshold"] },
+    { name = "single_negative_pion", type = "mctruth", parameters = ["@pion_threshold"] },
+]
+
+[[category]] # 3 : nu_mu CC, 1 mu-, multiple charged pions, any Np
+cuts = [
+    { name = "neutrino",               type = "true" },
+    { name = "fiducial_cut",           type = "true" },
+    { name = "is_neutrino_pdg",        type = "mctruth", parameters = [14] },
+    { name = "iscc",                   type = "mctruth" },
+    { name = "single_muon_minus",      type = "mctruth", parameters = ["@muon_threshold"] },
+    { name = "multiple_charged_pions", type = "mctruth", parameters = ["@pion_threshold"] },
+]
+
+[[category]] # 4 : nu_mu CC, 1 mu-, zero charged pions, any Np
+cuts = [
+    { name = "neutrino",          type = "true" },
+    { name = "fiducial_cut",      type = "true" },
+    { name = "is_neutrino_pdg",   type = "mctruth", parameters = [14] },
+    { name = "iscc",              type = "mctruth" },
+    { name = "single_muon_minus", type = "mctruth", parameters = ["@muon_threshold"] },
+    { name = "no_charged_pions",  type = "mctruth", parameters = ["@pion_threshold"] },
+]
+
+[[category]] # 5 : Other in-FV nu_mu CC
+cuts = [
+    { name = "neutrino",        type = "true" },
+    { name = "fiducial_cut",    type = "true" },
+    { name = "is_neutrino_pdg", type = "mctruth", parameters = [14] },
+    { name = "iscc",            type = "mctruth" },
+]
+
+[[category]] # 6 : In-FV anti-nu_mu CC -- wrong-sign beam
+cuts = [
+    { name = "neutrino",        type = "true" },
+    { name = "fiducial_cut",    type = "true" },
+    { name = "is_neutrino_pdg", type = "mctruth", parameters = [-14] },
+    { name = "iscc",            type = "mctruth" },
+]
+
+[[category]] # 7 : Other-flavor in-FV CC
+cuts = [
+    { name = "neutrino",     type = "true" },
+    { name = "fiducial_cut", type = "true" },
+    { name = "iscc",         type = "mctruth" },
+]
+
+[[category]] # 8 : In-FV NC, all neutrino flavors and signs
+cuts = [
+    { name = "neutrino",     type = "true" },
+    { name = "fiducial_cut", type = "true" },
+    { name = "!iscc",        type = "mctruth" },
+]
+
+[[category]] # 9 : Out-of-FV neutrino
+cuts = [
+    { name = "neutrino",      type = "true" },
+    { name = "!fiducial_cut", type = "true" },
+]
+
+[[category]] # 10 : Cosmic
+cuts = [
+    { name = "!neutrino", type = "true" },
+]
+
+#CV  High_Coh  Int_high  Int_low  WireGap
+#[kyjung@icarusgpvm05 Nu_det_sys]$ pwd
+#/pnfs/icarus/persistent/users/spine/NuMI/Nu_det_sys
+
+
+[[sample]]
+name = "nominal"
+path = "/pnfs/icarus/persistent/users/kyjung/nuSyst/nuSyst_ZEXPPCA/*.root"
+ismc = true
+disable = false
+add_systematics = false
+
+
+
+
+[[tree]]
+name = "selected_antineutrino"
+sim_only = false
+add_exposure = true
+add_systematics = true
+mode = "reco"
+cut = [
+    { name = "fiducial_cut",              type = "reco" },
+    { name = "flash_cut",                 type = "reco",  parameters = [0.0, 9.6] },
+    { name = "no_photons",                type = "reco",  parameters = [25.0] },
+    { name = "no_electrons",              type = "reco",  parameters = [25.0] },
+    { name = "single_muon",               type = "reco",  parameters = ["@muon_threshold"] },
+    { name = "single_pion",               type = "reco",  parameters = ["@pion_threshold"] },
+    { name = "trigger_emulation_cut",     type = "event", decrements_exposure = false },
+    { name = "data_quality_cut",          type = "event", decrements_exposure = true },
+]
+branch = [
+{ name = "pion_nearest_shower_distance", type = "both" },
+{ name = "muon_nearest_shower_distance",  type = "both" },
+{ name = "pion_michel_distance", type = "true" },
+{ name = "muon_michel_distance",  type = "true" },
+{ name = "true_pion_michel_tag",         type = "true" },   # truth reference용
+{ name = "pion_michel_distance",         type = "true" },   # 순수 π→μ→e 체인 truth distance
+{ name = "category",                     type = "true" },   # signal/background 카테고리별로 나눠보기 위함
+{ name = "pdg",                          type = "mctruth" },
+
+]
+
+
+
