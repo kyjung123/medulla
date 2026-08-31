@@ -47,10 +47,10 @@ flux_pca = file_flux['pca;1/principal_components;1']
 #sample= "signal_multiple"
 
 
-sample= "selected_one_proton_michel"
+#sample= "selected_one_proton_michel"
 #sample= "selected_renzo_low_threshold"
 #sample= "selected_multiple"
-#sample= "signal_N_proton"
+sample= "signal_N_proton"
 
 tree_in_path = f"events/nominal/{sample};1"
 tree_out_name = f"{sample}_NuMIfluxsimTree"

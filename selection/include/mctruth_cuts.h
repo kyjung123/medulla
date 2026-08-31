@@ -351,6 +351,9 @@ namespace mctruth
     }
     REGISTER_CUT_SCOPE(RegistrationScope::MCTruth, is_below_max_e_transfer, is_below_max_e_transfer);
 
+    template<typename T>
+       bool neutrino_mc_truth(const T & obj) { return obj.index >=0; }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, neutrino_mc_truth, neutrino_mc_truth);
 } // namespace mctruth
 #endif
 

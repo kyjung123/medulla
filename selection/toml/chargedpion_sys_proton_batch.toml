@@ -25,7 +25,8 @@ flash_high_t = 9.6
 
 [[category]] # 0 : nu_mu CC, 1 mu-, 1 pi+, Np (N >= 1) -- signal
 cuts = [
-    { name = "neutrino",             type = "true" },
+#{ name = "neutrino",             type = "true" },
+    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",         type = "true" },
     { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
     { name = "iscc",                 type = "mctruth" },
@@ -36,7 +37,8 @@ cuts = [
 
 [[category]] # 1 : nu_mu CC, 1 mu-, 1 pi+, zero protons
 cuts = [
-    { name = "neutrino",             type = "true" },
+#{ name = "neutrino",             type = "true" },
+    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",         type = "true" },
     { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
     { name = "iscc",                 type = "mctruth" },
@@ -47,7 +49,8 @@ cuts = [
 
 [[category]] # 2 : nu_mu CC, 1 mu-, 1 pi-, any Np -- wrong-sign pion
 cuts = [
-    { name = "neutrino",             type = "true" },
+#{ name = "neutrino",             type = "true" },
+    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",         type = "true" },
     { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
     { name = "iscc",                 type = "mctruth" },
@@ -57,7 +60,8 @@ cuts = [
 
 [[category]] # 3 : nu_mu CC, 1 mu-, multiple charged pions, any Np
 cuts = [
-    { name = "neutrino",               type = "true" },
+#{ name = "neutrino",             type = "true" },
+    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",           type = "true" },
     { name = "is_neutrino_pdg",        type = "mctruth", parameters = [14] },
     { name = "iscc",                   type = "mctruth" },
@@ -67,7 +71,8 @@ cuts = [
 
 [[category]] # 4 : nu_mu CC, 1 mu-, zero charged pions, any Np
 cuts = [
-    { name = "neutrino",          type = "true" },
+#{ name = "neutrino",             type = "true" },
+    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",      type = "true" },
     { name = "is_neutrino_pdg",   type = "mctruth", parameters = [14] },
     { name = "iscc",              type = "mctruth" },
@@ -77,7 +82,8 @@ cuts = [
 
 [[category]] # 5 : Other in-FV nu_mu CC
 cuts = [
-    { name = "neutrino",        type = "true" },
+#{ name = "neutrino",             type = "true" },
+    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",    type = "true" },
     { name = "is_neutrino_pdg", type = "mctruth", parameters = [14] },
     { name = "iscc",            type = "mctruth" },
@@ -85,7 +91,8 @@ cuts = [
 
 [[category]] # 6 : In-FV anti-nu_mu CC -- wrong-sign beam
 cuts = [
-    { name = "neutrino",        type = "true" },
+#{ name = "neutrino",             type = "true" },
+    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",    type = "true" },
     { name = "is_neutrino_pdg", type = "mctruth", parameters = [-14] },
     { name = "iscc",            type = "mctruth" },
@@ -93,27 +100,31 @@ cuts = [
 
 [[category]] # 7 : Other-flavor in-FV CC
 cuts = [
-    { name = "neutrino",     type = "true" },
+#{ name = "neutrino",             type = "true" },
+    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut", type = "true" },
     { name = "iscc",         type = "mctruth" },
 ]
 
 [[category]] # 8 : In-FV NC, all neutrino flavors and signs
 cuts = [
-    { name = "neutrino",     type = "true" },
+#{ name = "neutrino",             type = "true" },
+    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut", type = "true" },
     { name = "!iscc",        type = "mctruth" },
 ]
 
 [[category]] # 9 : Out-of-FV neutrino
 cuts = [
-    { name = "neutrino",      type = "true" },
+#{ name = "neutrino",             type = "true" },
+    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "!fiducial_cut", type = "true" },
 ]
 
 [[category]] # 10 : Cosmic
 cuts = [
-    { name = "!neutrino", type = "true" },
+#{ name = "!neutrino",             type = "true" },
+    { name = "!neutrino_mc_truth",    type = "mctruth" },
 ]
 
 #CV  High_Coh  Int_high  Int_low  WireGap
@@ -123,7 +134,8 @@ cuts = [
 
 [[sample]]
 name = "nominal"
-path = "/pnfs/icarus/persistent/users/kyjung/nuSyst/nuSyst_ZEXPPCA/*.root"
+#path = "/pnfs/icarus/persistent/users/kyjung/nuSyst/nuSyst_ZEXPPCA/*.root"
+path_file = "/pnfs/icarus/persistent/users/kyjung/nuSyst/nuSyst_ZEXPPCA/n_failed_events_0.list"
 ismc = true
 disable = false
 add_systematics = true
@@ -846,7 +858,8 @@ add_exposure = true
 add_systematics = true
 mode = "true"
 cut = [
-{ name = "neutrino",             type = "true" },
+#{ name = "neutrino",             type = "true" },
+    { name = "neutrino_mc_truth",    type = "mctruth" },
 { name = "fiducial_cut",         type = "true" },
 { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
 { name = "iscc",                 type = "mctruth" },

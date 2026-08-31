@@ -114,33 +114,55 @@ def get_samples(
                     )
 
         if path_file is not None:
-            list_path = Path(path_file).expanduser()
-
-            # Relative path_file is resolved relative to the TOML.
-            if not list_path.is_absolute():
-                list_path = config_dir / list_path
-
-            if not list_path.is_file():
-                raise FileNotFoundError(
-                        f"Path list not found for sample "
-                        f"{sample.get('name', '<unknown>')}: {list_path}"
-                        )
+            # Accept either:
+            #   path_file = "files.list"
+            # or:
+            #   path_file = ["part1.list", "part2.list"]
+            if isinstance(path_file, str):
+                path_files = [path_file]
+            elif (
+                isinstance(path_file, list)
+                and len(path_file) > 0
+                and all(isinstance(item, str) for item in path_file)
+            ):
+                path_files = path_file
+            else:
+                raise ValueError(
+                    f"Sample {sample.get('name', '<unknown>')} has an invalid "
+                    "'path_file'; expected a string or a non-empty list of strings."
+                )
 
             sample_paths = []
+            list_paths = []
 
-            with list_path.open() as path_stream:
-                for line in path_stream:
-                    path = line.strip()
+            for path_file_entry in path_files:
+                list_path = Path(path_file_entry).expanduser()
 
-                    # Ignore empty lines and comments.
-                    if not path or path.startswith('#'):
-                        continue
+                # Relative path_file is resolved relative to the TOML.
+                if not list_path.is_absolute():
+                    list_path = config_dir / list_path
 
-                    # Relative entries are resolved relative to the list file.
-                    if not os.path.isabs(path) and '://' not in path:
-                        path = str(list_path.parent / path)
+                if not list_path.is_file():
+                    raise FileNotFoundError(
+                        f"Path list not found for sample "
+                        f"{sample.get('name', '<unknown>')}: {list_path}"
+                    )
 
-                    sample_paths.append(path)
+                list_paths.append(list_path)
+
+                with list_path.open() as path_stream:
+                    for line in path_stream:
+                        path = line.strip()
+
+                        # Ignore empty lines and comments.
+                        if not path or path.startswith('#'):
+                            continue
+
+                        # Relative entries are resolved relative to the list file.
+                        if not os.path.isabs(path) and '://' not in path:
+                            path = str(list_path.parent / path)
+
+                        sample_paths.append(path)
 
             paths = []
 
@@ -170,7 +192,7 @@ def get_samples(
 
         if len(paths) == 0:
             source = (
-                    f"path_file {list_path}"
+                    f"path_file {list_paths}"
                     if path_file is not None
                     else f"path {sample['path']}"
                     )
@@ -656,3 +678,4 @@ def check_git_branch(
         stderr=subprocess.DEVNULL,
     )
     return result.returncode == 0
+
