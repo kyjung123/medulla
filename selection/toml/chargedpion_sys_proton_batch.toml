@@ -25,8 +25,8 @@ flash_high_t = 9.6
 
 [[category]] # 0 : nu_mu CC, 1 mu-, 1 pi+, Np (N >= 1) -- signal
 cuts = [
-#{ name = "neutrino",             type = "true" },
-    { name = "neutrino_mc_truth",    type = "mctruth" },
+    { name = "neutrino",             type = "true" },
+#    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",         type = "true" },
     { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
     { name = "iscc",                 type = "mctruth" },
@@ -37,8 +37,8 @@ cuts = [
 
 [[category]] # 1 : nu_mu CC, 1 mu-, 1 pi+, zero protons
 cuts = [
-#{ name = "neutrino",             type = "true" },
-    { name = "neutrino_mc_truth",    type = "mctruth" },
+    { name = "neutrino",             type = "true" },
+#    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",         type = "true" },
     { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
     { name = "iscc",                 type = "mctruth" },
@@ -49,8 +49,8 @@ cuts = [
 
 [[category]] # 2 : nu_mu CC, 1 mu-, 1 pi-, any Np -- wrong-sign pion
 cuts = [
-#{ name = "neutrino",             type = "true" },
-    { name = "neutrino_mc_truth",    type = "mctruth" },
+    { name = "neutrino",             type = "true" },
+#    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",         type = "true" },
     { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
     { name = "iscc",                 type = "mctruth" },
@@ -60,8 +60,8 @@ cuts = [
 
 [[category]] # 3 : nu_mu CC, 1 mu-, multiple charged pions, any Np
 cuts = [
-#{ name = "neutrino",             type = "true" },
-    { name = "neutrino_mc_truth",    type = "mctruth" },
+    { name = "neutrino",             type = "true" },
+#    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",           type = "true" },
     { name = "is_neutrino_pdg",        type = "mctruth", parameters = [14] },
     { name = "iscc",                   type = "mctruth" },
@@ -71,8 +71,8 @@ cuts = [
 
 [[category]] # 4 : nu_mu CC, 1 mu-, zero charged pions, any Np
 cuts = [
-#{ name = "neutrino",             type = "true" },
-    { name = "neutrino_mc_truth",    type = "mctruth" },
+    { name = "neutrino",             type = "true" },
+#    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",      type = "true" },
     { name = "is_neutrino_pdg",   type = "mctruth", parameters = [14] },
     { name = "iscc",              type = "mctruth" },
@@ -82,8 +82,8 @@ cuts = [
 
 [[category]] # 5 : Other in-FV nu_mu CC
 cuts = [
-#{ name = "neutrino",             type = "true" },
-    { name = "neutrino_mc_truth",    type = "mctruth" },
+    { name = "neutrino",             type = "true" },
+#    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",    type = "true" },
     { name = "is_neutrino_pdg", type = "mctruth", parameters = [14] },
     { name = "iscc",            type = "mctruth" },
@@ -91,8 +91,8 @@ cuts = [
 
 [[category]] # 6 : In-FV anti-nu_mu CC -- wrong-sign beam
 cuts = [
-#{ name = "neutrino",             type = "true" },
-    { name = "neutrino_mc_truth",    type = "mctruth" },
+    { name = "neutrino",             type = "true" },
+#    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut",    type = "true" },
     { name = "is_neutrino_pdg", type = "mctruth", parameters = [-14] },
     { name = "iscc",            type = "mctruth" },
@@ -100,31 +100,31 @@ cuts = [
 
 [[category]] # 7 : Other-flavor in-FV CC
 cuts = [
-#{ name = "neutrino",             type = "true" },
-    { name = "neutrino_mc_truth",    type = "mctruth" },
+    { name = "neutrino",             type = "true" },
+#    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut", type = "true" },
     { name = "iscc",         type = "mctruth" },
 ]
 
 [[category]] # 8 : In-FV NC, all neutrino flavors and signs
 cuts = [
-#{ name = "neutrino",             type = "true" },
-    { name = "neutrino_mc_truth",    type = "mctruth" },
+    { name = "neutrino",             type = "true" },
+#    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "fiducial_cut", type = "true" },
     { name = "!iscc",        type = "mctruth" },
 ]
 
 [[category]] # 9 : Out-of-FV neutrino
 cuts = [
-#{ name = "neutrino",             type = "true" },
-    { name = "neutrino_mc_truth",    type = "mctruth" },
+    { name = "neutrino",             type = "true" },
+#    { name = "neutrino_mc_truth",    type = "mctruth" },
     { name = "!fiducial_cut", type = "true" },
 ]
 
 [[category]] # 10 : Cosmic
 cuts = [
-#{ name = "!neutrino",             type = "true" },
-    { name = "!neutrino_mc_truth",    type = "mctruth" },
+    { name = "neutrino",             type = "true" },
+#    { name = "neutrino_mc_truth",    type = "mctruth" },
 ]
 
 #CV  High_Coh  Int_high  Int_low  WireGap
@@ -135,7 +135,8 @@ cuts = [
 [[sample]]
 name = "nominal"
 #path = "/pnfs/icarus/persistent/users/kyjung/nuSyst/nuSyst_ZEXPPCA/*.root"
-path_file = "/pnfs/icarus/persistent/users/kyjung/nuSyst/nuSyst_ZEXPPCA/n_failed_events_0.list"
+#path_file = "/pnfs/icarus/persistent/users/kyjung/nuSyst/nuSyst_ZEXPPCA/n_failed_events_0.list"
+path_file = ["/pnfs/icarus/persistent/users/kyjung/nuSyst/nuSyst_ZEXPPCA/n_failed_events_0.list","/pnfs/icarus/persistent/users/kyjung/nuSyst/nuSyst_ZEXPPCA_det_CV/n_failed_event.list"]
 ismc = true
 disable = false
 add_systematics = true
@@ -700,153 +701,153 @@ branch = [
     { name = "containment",   type = "both_particle", selector = "second_leading_pion" },
 ]
 
-#[[tree]]
-#name = "selected_one_proton_michel_pion"
-#sim_only = false
-#mode = "reco"
-#cut = [
-#    { name = "fiducial_cut",              type = "reco" },
-#    { name = "flash_cut",                 type = "reco",  parameters = [0.0, 9.6] },
-#    { name = "no_photons",                type = "reco",  parameters = ["@photon_threshold"] },
-#    { name = "no_electrons",              type = "reco",  parameters = ["@electron_threshold"] },
-#    { name = "single_muon",               type = "reco",  parameters = ["@muon_threshold"] },
-#    { name = "single_pion",               type = "reco",  parameters = ["@pion_threshold"] },
-#    { name = "single_proton",               type = "reco",  parameters = ["@proton_threshold"] },
-#    { name = "pion_michel_tag_cut",       type = "reco",  parameters = [20.0] },
-#    { name = "trigger_emulation_cut",     type = "event", decrements_exposure = false },
-#    { name = "data_quality_cut",          type = "event", decrements_exposure = true },
-#    { name = "is_pid_threshold", type = "reco_particle", parameters = [3.0, 50.0] },
-#    { name = "is_primary", type = "reco_particle" }
-#]
-#branch = [
-#    { name = "pion_michel_tag", type = "both", parameters = [20.0]},
-#    { name = "prim_proton_process",                type = "mctruth" },
-#    { name = "prim_muon_process",                type = "mctruth" },
-#    { name = "prim_pion_process",                type = "mctruth" },
-#    { name = "pion_plus_num_pandora",                type = "mctruth" },
-#    { name = "pion_minus_num_pandora",                type = "mctruth" },
-#    { name = "proton_num_pandora",                type = "mctruth" },
-#    { name = "muon_num_pandora",                type = "mctruth" },
-#    { name = "no_photon_pandora",            type = "mctruth"},
-#    { name = "no_electron_pandora",          type = "mctruth"},
-#    { name = "single_muon_pandora",           type = "mctruth"},
-#    { name = "single_pion_pandora",           type = "mctruth"},
-#    { name = "single_proton_pandora",         type = "mctruth"},
-#    { name = "pion_process_not_9_or_10",         type = "mctruth"},
-#    { name = "interaction_mode",       type = "mctruth" },
-#    { name = "ke", type = "both_particle" },
-#    { name = "is_primary", type = "both_particle" },
-#    { name = "pdg_code", type = "both_particle" },
-#    { name = "semantic_type", type = "both_particle" },
-#    { name = "cos_wrt_beam",   type = "reco_particle"},
-#    { name = "pid", type = "both_particle" },
-#    { name = "opening_angle", type = "reco" },
-#    { name = "opening_angle", type = "mctruth" },
-#    { name = "category",      type = "true" },
-#    { name = "start_dedx",      type = "reco_particle"   },
-#    { name = "length",            type = "both_particle" },
-#    { name = "pion_group_code", type = "true" },
-#    { name = "pion_children_count", type = "true" },
-#    { name = "end_x",             type = "both_particle"},
-#    { name = "end_y",             type = "both_particle"},
-#    { name = "end_z",             type = "both_particle"},
-#    { name = "photon_multiplicity",   type = "reco",    parameters = [25.0,]},
-#    { name = "photon_multiplicity",   type = "mctruth", parameters = [25.0,]},
-#    { name = "electron_multiplicity", type = "reco",    parameters = [25.0,]},
-#    { name = "electron_multiplicity", type = "mctruth", parameters = [25.0,]},
-#    { name = "muon_multiplicity",     type = "reco",    parameters = ["@muon_threshold",]},
-#    { name = "muon_multiplicity",     type = "mctruth", parameters = ["@muon_threshold",]},
-#    { name = "pion_multiplicity",     type = "reco",    parameters = ["@pion_threshold",]},
-#    { name = "pion_multiplicity",     type = "mctruth", parameters = ["@pion_threshold",]},
-#    { name = "proton_multiplicity",   type = "reco",    parameters = ["@proton_threshold",]},
-#    { name = "proton_multiplicity",   type = "mctruth", parameters = ["@proton_threshold",]},
-#    { name = "leading_muon_cos_wrt_beam",   type = "mctruth" },
-#    { name = "leading_pion_cos_wrt_beam",   type = "mctruth" },
-#    { name = "leading_proton_cos_wrt_beam", type = "mctruth" },
-#    { name = "leadingpion_match_id_max", type = "both" },
-#    { name = "leadingpion_match_overlap_max", type = "both" },
-#    { name = "leadingproton_match_id_max", type = "both" },
-#    { name = "leadingproton_match_overlap_max", type = "both" },
-#    { name = "containment",   type = "both_particle"},
-#    { name = "nneutron_G4",         type = "mctruth" },
-#    { name = "npiplus_G4",         type = "mctruth" },
-#    { name = "npiminus_G4",         type = "mctruth" },
-#    { name = "nproton_G4",         type = "mctruth" },
-#]
-#
-#[[tree]]
-#name = "selected_one_proton_michel_proton"
-#sim_only = false
-#mode = "reco"
-#cut = [
-#    { name = "fiducial_cut",              type = "reco" },
-#    { name = "flash_cut",                 type = "reco",  parameters = [0.0, 9.6] },
-#    { name = "no_photons",                type = "reco",  parameters = ["@photon_threshold"] },
-#    { name = "no_electrons",              type = "reco",  parameters = ["@electron_threshold"] },
-#    { name = "single_muon",               type = "reco",  parameters = ["@muon_threshold"] },
-#    { name = "single_pion",               type = "reco",  parameters = ["@pion_threshold"] },
-#    { name = "single_proton",               type = "reco",  parameters = ["@proton_threshold"] },
-#    { name = "pion_michel_tag_cut",       type = "reco",  parameters = [20.0] },
-#    { name = "trigger_emulation_cut",     type = "event", decrements_exposure = false },
-#    { name = "data_quality_cut",          type = "event", decrements_exposure = true },
-#    { name = "is_pid_threshold", type = "reco_particle", parameters = [4.0, 50.0] },
-#    { name = "is_primary", type = "reco_particle" }
-#]
-#branch = [
-#    { name = "interaction_mode",       type = "mctruth" },
-#    { name = "prim_proton_process",                type = "mctruth" },
-#    { name = "prim_muon_process",                type = "mctruth" },
-#    { name = "prim_pion_process",                type = "mctruth" },
-#    { name = "pion_plus_num_pandora",                type = "mctruth" },
-#    { name = "pion_minus_num_pandora",                type = "mctruth" },
-#    { name = "proton_num_pandora",                type = "mctruth" },
-#    { name = "muon_num_pandora",                type = "mctruth" },
-#    { name = "no_photon_pandora",            type = "mctruth"},
-#    { name = "no_electron_pandora",          type = "mctruth"},
-#    { name = "single_muon_pandora",           type = "mctruth"},
-#    { name = "single_pion_pandora",           type = "mctruth"},
-#    { name = "single_proton_pandora",         type = "mctruth"},
-#    { name = "pion_process_not_9_or_10",         type = "mctruth"},
-#    { name = "pion_michel_tag", type = "both", parameters = [20.0]},
-#    { name = "ke", type = "both_particle" },
-#    { name = "is_primary", type = "both_particle" },
-#    { name = "pdg_code", type = "both_particle" },
-#    { name = "semantic_type", type = "both_particle" },
-#    { name = "cos_wrt_beam",   type = "reco_particle"},
-#    { name = "pid", type = "both_particle" },
-#    { name = "opening_angle", type = "reco" },
-#    { name = "opening_angle", type = "mctruth" },
-#    { name = "category",      type = "true" },
-#    { name = "start_dedx",      type = "reco_particle"   },
-#    { name = "length",            type = "both_particle" },
-#    { name = "pion_group_code", type = "true" },
-#    { name = "pion_children_count", type = "true" },
-#    { name = "end_x",             type = "both_particle"},
-#    { name = "end_y",             type = "both_particle"},
-#    { name = "end_z",             type = "both_particle"},
-#    { name = "photon_multiplicity",   type = "reco",    parameters = [25.0,]},
-#    { name = "photon_multiplicity",   type = "mctruth", parameters = [25.0,]},
-#    { name = "electron_multiplicity", type = "reco",    parameters = [25.0,]},
-#    { name = "electron_multiplicity", type = "mctruth", parameters = [25.0,]},
-#    { name = "muon_multiplicity",     type = "reco",    parameters = ["@muon_threshold",]},
-#    { name = "muon_multiplicity",     type = "mctruth", parameters = ["@muon_threshold",]},
-#    { name = "pion_multiplicity",     type = "reco",    parameters = ["@pion_threshold",]},
-#    { name = "pion_multiplicity",     type = "mctruth", parameters = ["@pion_threshold",]},
-#    { name = "proton_multiplicity",   type = "reco",    parameters = ["@proton_threshold",]},
-#    { name = "proton_multiplicity",   type = "mctruth", parameters = ["@proton_threshold",]},
-#    { name = "leading_muon_cos_wrt_beam",   type = "mctruth" },
-#    { name = "leading_pion_cos_wrt_beam",   type = "mctruth" },
-#    { name = "leading_proton_cos_wrt_beam", type = "mctruth" },
-#    { name = "leadingpion_match_id_max", type = "both" },
-#    { name = "leadingpion_match_overlap_max", type = "both" },
-#    { name = "leadingproton_match_id_max", type = "both" },
-#    { name = "leadingproton_match_overlap_max", type = "both" },
-#    { name = "containment",   type = "both_particle"},
-#    { name = "nneutron_G4",         type = "mctruth" },
-#    { name = "npiplus_G4",         type = "mctruth" },
-#    { name = "npiminus_G4",         type = "mctruth" },
-#    { name = "nproton_G4",         type = "mctruth" },
-#]
+[[tree]]
+name = "selected_one_proton_michel_pion"
+sim_only = false
+mode = "reco"
+cut = [
+    { name = "fiducial_cut",              type = "reco" },
+    { name = "flash_cut",                 type = "reco",  parameters = [0.0, 9.6] },
+    { name = "no_photons",                type = "reco",  parameters = ["@photon_threshold"] },
+    { name = "no_electrons",              type = "reco",  parameters = ["@electron_threshold"] },
+    { name = "single_muon",               type = "reco",  parameters = ["@muon_threshold"] },
+    { name = "single_pion",               type = "reco",  parameters = ["@pion_threshold"] },
+    { name = "single_proton",               type = "reco",  parameters = ["@proton_threshold"] },
+    { name = "pion_michel_tag_cut",       type = "reco",  parameters = [20.0] },
+    { name = "trigger_emulation_cut",     type = "event", decrements_exposure = false },
+    { name = "data_quality_cut",          type = "event", decrements_exposure = true },
+    { name = "is_pid_threshold", type = "reco_particle", parameters = [3.0, 50.0] },
+    { name = "is_primary", type = "reco_particle" }
+]
+branch = [
+    { name = "pion_michel_tag", type = "both", parameters = [20.0]},
+    { name = "prim_proton_process",                type = "mctruth" },
+    { name = "prim_muon_process",                type = "mctruth" },
+    { name = "prim_pion_process",                type = "mctruth" },
+    { name = "pion_plus_num_pandora",                type = "mctruth" },
+    { name = "pion_minus_num_pandora",                type = "mctruth" },
+    { name = "proton_num_pandora",                type = "mctruth" },
+    { name = "muon_num_pandora",                type = "mctruth" },
+    { name = "no_photon_pandora",            type = "mctruth"},
+    { name = "no_electron_pandora",          type = "mctruth"},
+    { name = "single_muon_pandora",           type = "mctruth"},
+    { name = "single_pion_pandora",           type = "mctruth"},
+    { name = "single_proton_pandora",         type = "mctruth"},
+    { name = "pion_process_not_9_or_10",         type = "mctruth"},
+    { name = "interaction_mode",       type = "mctruth" },
+    { name = "ke", type = "both_particle" },
+    { name = "is_primary", type = "both_particle" },
+    { name = "pdg_code", type = "both_particle" },
+    { name = "semantic_type", type = "both_particle" },
+    { name = "cos_wrt_beam",   type = "reco_particle"},
+    { name = "pid", type = "both_particle" },
+    { name = "opening_angle", type = "reco" },
+    { name = "opening_angle", type = "mctruth" },
+    { name = "category",      type = "true" },
+    { name = "start_dedx",      type = "reco_particle"   },
+    { name = "length",            type = "both_particle" },
+    { name = "pion_group_code", type = "true" },
+    { name = "pion_children_count", type = "true" },
+    { name = "end_x",             type = "both_particle"},
+    { name = "end_y",             type = "both_particle"},
+    { name = "end_z",             type = "both_particle"},
+    { name = "photon_multiplicity",   type = "reco",    parameters = [25.0,]},
+    { name = "photon_multiplicity",   type = "mctruth", parameters = [25.0,]},
+    { name = "electron_multiplicity", type = "reco",    parameters = [25.0,]},
+    { name = "electron_multiplicity", type = "mctruth", parameters = [25.0,]},
+    { name = "muon_multiplicity",     type = "reco",    parameters = ["@muon_threshold",]},
+    { name = "muon_multiplicity",     type = "mctruth", parameters = ["@muon_threshold",]},
+    { name = "pion_multiplicity",     type = "reco",    parameters = ["@pion_threshold",]},
+    { name = "pion_multiplicity",     type = "mctruth", parameters = ["@pion_threshold",]},
+    { name = "proton_multiplicity",   type = "reco",    parameters = ["@proton_threshold",]},
+    { name = "proton_multiplicity",   type = "mctruth", parameters = ["@proton_threshold",]},
+    { name = "leading_muon_cos_wrt_beam",   type = "mctruth" },
+    { name = "leading_pion_cos_wrt_beam",   type = "mctruth" },
+    { name = "leading_proton_cos_wrt_beam", type = "mctruth" },
+    { name = "leadingpion_match_id_max", type = "both" },
+    { name = "leadingpion_match_overlap_max", type = "both" },
+    { name = "leadingproton_match_id_max", type = "both" },
+    { name = "leadingproton_match_overlap_max", type = "both" },
+    { name = "containment",   type = "both_particle"},
+    { name = "nneutron_G4",         type = "mctruth" },
+    { name = "npiplus_G4",         type = "mctruth" },
+    { name = "npiminus_G4",         type = "mctruth" },
+    { name = "nproton_G4",         type = "mctruth" },
+]
+
+[[tree]]
+name = "selected_one_proton_michel_proton"
+sim_only = false
+mode = "reco"
+cut = [
+    { name = "fiducial_cut",              type = "reco" },
+    { name = "flash_cut",                 type = "reco",  parameters = [0.0, 9.6] },
+    { name = "no_photons",                type = "reco",  parameters = ["@photon_threshold"] },
+    { name = "no_electrons",              type = "reco",  parameters = ["@electron_threshold"] },
+    { name = "single_muon",               type = "reco",  parameters = ["@muon_threshold"] },
+    { name = "single_pion",               type = "reco",  parameters = ["@pion_threshold"] },
+    { name = "single_proton",               type = "reco",  parameters = ["@proton_threshold"] },
+    { name = "pion_michel_tag_cut",       type = "reco",  parameters = [20.0] },
+    { name = "trigger_emulation_cut",     type = "event", decrements_exposure = false },
+    { name = "data_quality_cut",          type = "event", decrements_exposure = true },
+    { name = "is_pid_threshold", type = "reco_particle", parameters = [4.0, 50.0] },
+    { name = "is_primary", type = "reco_particle" }
+]
+branch = [
+    { name = "interaction_mode",       type = "mctruth" },
+    { name = "prim_proton_process",                type = "mctruth" },
+    { name = "prim_muon_process",                type = "mctruth" },
+    { name = "prim_pion_process",                type = "mctruth" },
+    { name = "pion_plus_num_pandora",                type = "mctruth" },
+    { name = "pion_minus_num_pandora",                type = "mctruth" },
+    { name = "proton_num_pandora",                type = "mctruth" },
+    { name = "muon_num_pandora",                type = "mctruth" },
+    { name = "no_photon_pandora",            type = "mctruth"},
+    { name = "no_electron_pandora",          type = "mctruth"},
+    { name = "single_muon_pandora",           type = "mctruth"},
+    { name = "single_pion_pandora",           type = "mctruth"},
+    { name = "single_proton_pandora",         type = "mctruth"},
+    { name = "pion_process_not_9_or_10",         type = "mctruth"},
+    { name = "pion_michel_tag", type = "both", parameters = [20.0]},
+    { name = "ke", type = "both_particle" },
+    { name = "is_primary", type = "both_particle" },
+    { name = "pdg_code", type = "both_particle" },
+    { name = "semantic_type", type = "both_particle" },
+    { name = "cos_wrt_beam",   type = "reco_particle"},
+    { name = "pid", type = "both_particle" },
+    { name = "opening_angle", type = "reco" },
+    { name = "opening_angle", type = "mctruth" },
+    { name = "category",      type = "true" },
+    { name = "start_dedx",      type = "reco_particle"   },
+    { name = "length",            type = "both_particle" },
+    { name = "pion_group_code", type = "true" },
+    { name = "pion_children_count", type = "true" },
+    { name = "end_x",             type = "both_particle"},
+    { name = "end_y",             type = "both_particle"},
+    { name = "end_z",             type = "both_particle"},
+    { name = "photon_multiplicity",   type = "reco",    parameters = [25.0,]},
+    { name = "photon_multiplicity",   type = "mctruth", parameters = [25.0,]},
+    { name = "electron_multiplicity", type = "reco",    parameters = [25.0,]},
+    { name = "electron_multiplicity", type = "mctruth", parameters = [25.0,]},
+    { name = "muon_multiplicity",     type = "reco",    parameters = ["@muon_threshold",]},
+    { name = "muon_multiplicity",     type = "mctruth", parameters = ["@muon_threshold",]},
+    { name = "pion_multiplicity",     type = "reco",    parameters = ["@pion_threshold",]},
+    { name = "pion_multiplicity",     type = "mctruth", parameters = ["@pion_threshold",]},
+    { name = "proton_multiplicity",   type = "reco",    parameters = ["@proton_threshold",]},
+    { name = "proton_multiplicity",   type = "mctruth", parameters = ["@proton_threshold",]},
+    { name = "leading_muon_cos_wrt_beam",   type = "mctruth" },
+    { name = "leading_pion_cos_wrt_beam",   type = "mctruth" },
+    { name = "leading_proton_cos_wrt_beam", type = "mctruth" },
+    { name = "leadingpion_match_id_max", type = "both" },
+    { name = "leadingpion_match_overlap_max", type = "both" },
+    { name = "leadingproton_match_id_max", type = "both" },
+    { name = "leadingproton_match_overlap_max", type = "both" },
+    { name = "containment",   type = "both_particle"},
+    { name = "nneutron_G4",         type = "mctruth" },
+    { name = "npiplus_G4",         type = "mctruth" },
+    { name = "npiminus_G4",         type = "mctruth" },
+    { name = "nproton_G4",         type = "mctruth" },
+]
 
 
 

@@ -23,12 +23,10 @@ from math import nan
 
 
 file_name = '/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_recent_sys_det.root'
-#file_name = '/exp/icarus/data/users/kyjung/NuMi_1pi1p/icarus_charged_pion_proton_michel.root.root'
-#file_name = '/exp/icarus/data/users/kyjung/NUMI_cc1pion/icarus_charged_pion_proton_michel_half_sys.root'
 
 horn_current = 'fhc'
 file_nu = uproot.open(file_name)
-file_flux = uproot.open('/exp/icarus/data/users/kyjung/NUMI_cc1pion/2025-04-08_out_450.37_7991.98_79512.66.root')
+file_flux = uproot.open('/exp/icarus/data/users/kyjung/NuMI_1pi1p/2025-04-08_out_450.37_7991.98_79512.66.root')
 
 
 flux_g4numi = file_flux[f'g4numi_reweight_v03_01-->v03_02;1/{horn_current};1']
