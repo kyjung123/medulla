@@ -9,6 +9,7 @@
  * @author mueller@fnal.gov
  */
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 #include "trees.h"
@@ -202,6 +203,7 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
         nonmatched_tree = new TTree((table.get_string_field("name") + "_nonmatched").c_str(), (table.get_string_field("name") + "_nonmatched").c_str());
         for(auto & br : brs)
             nonmatched_tree->Branch(br.first.c_str(), &br.second);
+        nonmatched_tree->Branch("true_neutrino_id", &nu_id);
         nonmatched_tree->Branch("Run", &run);
         nonmatched_tree->Branch("Subrun", &subrun);
         nonmatched_tree->Branch("Evt", &event);
@@ -450,7 +452,7 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
             // Preserve the existing output convention: entries without a
             // valid truth-neutrino ID are written to the non-matched tree and
             // do not receive neutrino detector-systematic weights.
-            if(nu_id < 0)
+            if(nu_id < 0 || std::isnan(nu_id))
             {
                 if(nonmatched_tree)
                     nonmatched_tree->Fill();
@@ -575,6 +577,8 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
     // Fill the non-matched TTree if it has been created.
     if(nonmatched_tree)
     {
+        size_t n_valid_unmatched(0);
+
         // Non-matched signal candidates that are actually neutrinos can happen
         // due to file mismatching. Though the user is expected to ensure that
         // the input TTree and the input weights file correspond to the same
@@ -591,7 +595,18 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
             subrun = std::get<1>(key);
             event = std::get<2>(key);
             nonmatched_tree->Fill();
+            ++n_valid_unmatched;
         }
+
+        if(n_valid_unmatched > 0)
+        {
+            std::cerr
+                << "WARNING: " << n_valid_unmatched
+                << " selected neutrino candidates were not found in the weight CAFs. "
+                << "They were written to the nonmatched tree without systematic weights."
+                << std::endl;
+        }
+
         // The primary use case for the non-matched TTree is to capture cosmics
         // and failed truth matching. We explicitly write all entries of the
         // input tree that have a neutrino ID less than 0 to the non-matched
@@ -599,13 +614,8 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
         for(int i(0); i < input_tree->GetEntries(); ++i)
         {
             input_tree->GetEntry(i);
-            if(nu_id < 0)
-            {
-                run = reader.get_run();
-                subrun = reader.get_subrun();
-                event = reader.get_event();
+            if(nu_id < 0 || std::isnan(nu_id))
                 nonmatched_tree->Fill();
-            }
         }
         directory->WriteObject(nonmatched_tree, nonmatched_tree->GetName());
         delete nonmatched_tree;
@@ -655,3 +665,4 @@ void sys::trees::copy_with_weight_systematics(cfg::ConfigurationTable & config, 
     if(calc.is_initialized())
         calc.write_results();
 }
+

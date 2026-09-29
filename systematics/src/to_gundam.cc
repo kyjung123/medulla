@@ -7,6 +7,7 @@
 #include <TGraph.h>
 #include <TClonesArray.h>
 #include <TChain.h>
+#include <sys/resource.h>
 
 #include <vector>
 #include <string>
@@ -320,7 +321,8 @@ struct MergeWriter {
       p.out  = t.has_field("name_short") ? t.get_string_field("name_short") : p.full;
 
       p.arr = new TClonesArray("TGraph", 1);
-      out_tree->Branch(p.out.c_str(), &p.arr, 8000, 0);
+      new((*p.arr)[0]) TGraph();
+      out_tree->Branch(p.out.c_str(), &p.arr, 32000, 0);
 
       if(block.type == "multisigma" && flat_sigma_names.count(p.out) > 0){
         p.export_flat_sigma = true;
@@ -580,8 +582,11 @@ struct MergeWriter {
         if(!std::isfinite(p.single_weight)) p.single_weight = 1.0;
       }
 
-      p.arr->Clear("C");
-      new((*p.arr)[0]) TGraph(g.GetN(), g.GetX(), g.GetY());
+      TGraph* out_g = (TGraph*)(*p.arr)[0];
+      out_g->Set(g.GetN());
+      for(int k=0;k<g.GetN();++k){
+          out_g->SetPoint(k, g.GetX()[k], g.GetY()[k]);
+      }
     }
   }
 };
@@ -620,7 +625,7 @@ static void merge_prefix_under_directory(
   if(livetime) outdir->WriteObject(livetime, "Livetime");
 
   TTree* out_tree = new TTree(out_tree_name.c_str(), out_tree_name.c_str());
-  out_tree->SetAutoFlush(500);       // 500 entries마다 basket flush -> 메모리 해제
+  out_tree->SetAutoFlush(200);       // 500 entries마다 basket flush -> 메모리 해제
   out_tree->SetAutoSave(50000000);   // 50MB마다 디스크에 save
 
   MergeWriter w;
@@ -635,6 +640,21 @@ static void merge_prefix_under_directory(
   }
 
   bool want_syst = table.has_field("gundam_store_syst") ? table.get_bool_field("gundam_store_syst") : false;
+
+
+  auto has_active_sys = [&](const std::string& type){
+      for(cfg::ConfigurationTable& t : config.get_subtables("sys")){
+          if(t.get_string_field("type") == type) return true;
+      }
+      return false;
+  };
+
+  bool has_ms  = has_active_sys("multisigma");
+  bool has_var = has_active_sys("variation");
+  bool has_num = has_active_sys("NuMIfluxsim");
+
+  want_syst = want_syst && (has_ms || has_var || has_num);
+
   if(want_syst){
     w.book_syst_once(config, out_tree, "multisigma");
     w.book_syst_once(config, out_tree, "variation");
@@ -666,8 +686,10 @@ static void merge_prefix_under_directory(
 
     int forced_cut = cut_type_from_tree_name_safe(tname);
 
-    TTree* ms_tree   = want_syst ? find_syst_tree(indir, tname, kMultisigmaSuffixes) : nullptr;
-    TTree* var_tree  = want_syst ? find_syst_tree(indir, tname, kVariationSuffixes)  : nullptr;
+//    TTree* ms_tree   = want_syst ? find_syst_tree(indir, tname, kMultisigmaSuffixes) : nullptr;
+//    TTree* var_tree  = want_syst ? find_syst_tree(indir, tname, kVariationSuffixes)  : nullptr;
+    TTree* ms_tree   = (want_syst && has_ms)  ? find_syst_tree(indir, tname, kMultisigmaSuffixes) : nullptr;
+    TTree* var_tree  = (want_syst && has_var) ? find_syst_tree(indir, tname, kVariationSuffixes)  : nullptr;
     TTree* numi_tree = find_syst_tree(indir, tname, kFluxSuffixes);
     TTree* msim_tree = find_syst_tree(indir, tname, kMultisimSuffixes);
 
@@ -709,6 +731,9 @@ static void merge_prefix_under_directory(
     if(numi_tree) n = std::min(n, numi_tree->GetEntries());
     if(msim_tree) n = std::min(n, msim_tree->GetEntries());
 
+
+
+
     if(want_syst){
       if(ms_tree && ms_tree->GetEntries() != n_nom)
         std::cout << "WARN: entries mismatch: " << in_dir_path << "/" << tname
@@ -738,6 +763,17 @@ static void merge_prefix_under_directory(
       if(var_tree)  var_tree->GetEntry(i);
       if(numi_tree) numi_tree->GetEntry(i);
       if(msim_tree) msim_tree->GetEntry(i);
+
+      if(i > 0 && i % 2000 == 0){
+          struct rusage ru;
+          getrusage(RUSAGE_SELF, &ru);
+          TBranch* sample_br = out_tree->GetBranch("reinteractions_piplus_Geant4");
+          std::cout << "RSS_LOG tree=" << tname
+              << " i=" << i
+              << " maxrss_kb=" << ru.ru_maxrss
+              << " nbaskets=" << (sample_br ? sample_br->GetWriteBasket() : -1)
+              << std::endl;
+      }
 
       w.cut_type = forced_cut;
 
@@ -775,6 +811,22 @@ static void merge_prefix_under_directory(
         gDirectory->SaveSelf();
       }
     }
+    // ===== 여기 추가: 이번 입력 트리(in_tree/ms_tree/var_tree/numi_tree/msim_tree) 메모리 해제 =====
+    in_tree->ResetBranchAddresses();
+    if(ms_tree)   ms_tree->ResetBranchAddresses();
+    if(var_tree)  var_tree->ResetBranchAddresses();
+    if(numi_tree) numi_tree->ResetBranchAddresses();
+    if(msim_tree) msim_tree->ResetBranchAddresses();
+
+    if(msim_tree) indir->Delete((std::string(msim_tree->GetName())+";*").c_str());
+    if(numi_tree && numi_tree != msim_tree)
+        indir->Delete((std::string(numi_tree->GetName())+";*").c_str());
+    if(ms_tree)   indir->Delete((std::string(ms_tree->GetName())+";*").c_str());
+    if(var_tree)  indir->Delete((std::string(var_tree->GetName())+";*").c_str());
+    indir->Delete((tname+";*").c_str());
+
+
+
   }
 
   outdir->cd();

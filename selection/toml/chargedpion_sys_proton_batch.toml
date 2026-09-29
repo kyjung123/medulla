@@ -123,7 +123,7 @@ cuts = [
 
 [[category]] # 10 : Cosmic
 cuts = [
-    { name = "neutrino",             type = "true" },
+    { name = "!neutrino",             type = "true" },
 #    { name = "neutrino_mc_truth",    type = "mctruth" },
 ]
 
@@ -859,8 +859,7 @@ add_exposure = true
 add_systematics = true
 mode = "true"
 cut = [
-#{ name = "neutrino",             type = "true" },
-    { name = "neutrino_mc_truth",    type = "mctruth" },
+{ name = "neutrino",             type = "true" },
 { name = "fiducial_cut",         type = "true" },
 { name = "is_neutrino_pdg",      type = "mctruth", parameters = [14] },
 { name = "iscc",                 type = "mctruth" },

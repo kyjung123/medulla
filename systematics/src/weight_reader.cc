@@ -107,17 +107,29 @@ sys::WeightReader::WeightReader(const std::string & input)
         mc = std::make_unique<TTreeReaderArray<caf::SRTrueInteraction>>(*reader, "rec.mc.nu");
         nu_energy_structured = std::make_unique<TTreeReaderArray<Float_t>>(*reader, "rec.mc.nu.E");
     }
-    reader->Next();
 }
 
 // Advance to the next entry in the TChain.
 bool sys::WeightReader::next()
 {
-    this->progress_bar(entry+1, chain.GetEntries());
-    if(!chain.GetTree() || !reader) return false;
-    if(entry >= (size_t)chain.GetEntries()) return false;
-    if(!reader->Next()) return false;
-    chain.GetEntry(++entry);
+    if(!reader)
+        return false;
+
+    const size_t total = static_cast<size_t>(chain.GetEntries());
+    if(entry >= total)
+        return false;
+
+    // TTreeReader starts before the first entry, so the first call to Next()
+    // positions it on global chain entry zero.
+    if(!reader->Next())
+        return false;
+
+    // Keep the flat-CAF branches read through SetBranchAddress synchronized
+    // with the TTreeReader branches for the same global chain entry.
+    chain.GetEntry(entry);
+    ++entry;
+
+    this->progress_bar(entry, total);
     return true;
 }
 
@@ -229,3 +241,4 @@ void sys::WeightReader::progress_bar(size_t entry, size_t total) const
         progress_started = false;
     }
 }
+
