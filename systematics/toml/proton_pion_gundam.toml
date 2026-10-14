@@ -3,6 +3,7 @@ path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_mich
 
 [output]
 path = "/exp/icarus/data/users/kyjung/NuMI_1pi1p/icarus_charged_pion_proton_michel_recent_sys_det_gundam.root"
+include_nonmatched = true
 
 histogram_destination = 'variations/'
 
@@ -70,7 +71,7 @@ origin = 'events/offbeam/selected_one_proton_michel'
 destination = 'events/offbeam/'
 name = 'selected_one_proton_michel'
 action = 'copy'
-gundam_store_syst = false
+gundam_store_syst = true
 is_nu = false
 is_data = true
 

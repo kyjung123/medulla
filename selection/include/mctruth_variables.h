@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <limits>
 #include <utility>
 #include <vector>
 
@@ -728,6 +729,69 @@ namespace mctruth
             return count;
         }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, npiminus_G4, npiminus_G4);
+
+    /**
+     * @brief Index of the highest-energy G4 primary with an exact (signed) PDG.
+     * @details Only particles with start_process == kG4primary (0) are
+     * considered, so the result does not depend on whether `prim` also
+     * stores G4 secondaries (newer CAFs) or not (older CAFs). Used to bin the
+     * GEANT4 reinteraction covariance.
+     * @param obj the SRTrueInteraction to inspect.
+     * @param pdg signed PDG code (211, -211, 2212).
+     * @return index in `obj.prim`, or kNoMatch when no such particle exists.
+     */
+    template<typename T>
+    size_t g4primary_index_by_energy(const T & obj, int pdg)
+    {
+        size_t best = kNoMatch;
+        double best_e = -std::numeric_limits<double>::infinity();
+        for(size_t i = 0; i < obj.prim.size(); ++i)
+        {
+            const auto & p = obj.prim[i];
+            if(p.start_process != 0) continue; // G4 primaries only
+            if(p.pdg != pdg || !std::isfinite(p.genE)) continue;
+            if(p.genE > best_e)
+            {
+                best_e = p.genE;
+                best = i;
+            }
+        }
+        return best;
+    }
+
+    /**
+     * @brief Kinetic energy [MeV] of the leading G4 primary of a signed PDG,
+     * taken at the generation point (GENIE final state, after FSI).
+     */
+    template<typename T>
+    double g4primary_ke(const T & obj, int pdg, double mass_mev)
+    {
+        const size_t index = g4primary_index_by_energy(obj, pdg);
+        if(index == kNoMatch)
+            return kNoMatchValue;
+        return 1000.0 * obj.prim[index].genE - mass_mev;
+    }
+
+    template<typename T>
+    double g4rw_piplus_ke(const T & obj)
+    {
+        return g4primary_ke(obj, 211, PION_MASS);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, g4rw_piplus_ke, g4rw_piplus_ke);
+
+    template<typename T>
+    double g4rw_piminus_ke(const T & obj)
+    {
+        return g4primary_ke(obj, -211, PION_MASS);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, g4rw_piminus_ke, g4rw_piminus_ke);
+
+    template<typename T>
+    double g4rw_proton_ke(const T & obj)
+    {
+        return g4primary_ke(obj, 2212, PROTON_MASS);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, g4rw_proton_ke, g4rw_proton_ke);
 
     template<typename T>
         double prim_pion_process(const T & obj)

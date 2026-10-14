@@ -47,6 +47,21 @@ static bool starts_with(const std::string& s, const std::string& prefix){
   return s.rfind(prefix, 0) == 0;
 }
 
+static bool ends_with(const std::string& s, const std::string& suffix){
+  return s.size() >= suffix.size() &&
+         s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+static bool is_nonmatched_tree(const std::string& tname){
+  return ends_with(tname, "_nonmatched");
+}
+
+static std::string base_tree_name(const std::string& tname){
+  static const std::string suffix = "_nonmatched";
+  if(!is_nonmatched_tree(tname)) return tname;
+  return tname.substr(0, tname.size() - suffix.size());
+}
+
 // ------------------------------------------------------------
 // tree name -> cut_type
 // 여기만 바꾸면 allowed nominal tree + cut_type 둘 다 같이 바뀜
@@ -68,11 +83,12 @@ static const std::map<std::string, int> kTreeCutType = {
 
 static bool is_allowed_selected_tree(const std::string& tname){
   if(!starts_with(tname, "selected")) return false;
-  return kTreeCutType.count(tname) > 0;
+  return kTreeCutType.count(base_tree_name(tname)) > 0;
 }
 
 static bool is_allowed_signal_tree(const std::string& tname){
   if(!starts_with(tname, "signal")) return false;
+  if(is_nonmatched_tree(tname)) return false;
   return kTreeCutType.count(tname) > 0;
 }
 
@@ -134,7 +150,7 @@ static const std::vector<std::string> kMultisimSuffixes = {
 // cut_type mapping
 // ------------------------------------------------------------
 static int cut_type_from_tree_name_safe(const std::string& tname){
-  auto it = kTreeCutType.find(tname);
+  auto it = kTreeCutType.find(base_tree_name(tname));
   if(it != kTreeCutType.end()) return it->second;
 
   std::cout << "WARN: cut_type_from_tree_name_safe: unknown tree name '"
@@ -585,7 +601,7 @@ struct MergeWriter {
       TGraph* out_g = (TGraph*)(*p.arr)[0];
       out_g->Set(g.GetN());
       for(int k=0;k<g.GetN();++k){
-          out_g->SetPoint(k, g.GetX()[k], g.GetY()[k]);
+        out_g->SetPoint(k, g.GetX()[k], g.GetY()[k]);
       }
     }
   }
@@ -625,7 +641,7 @@ static void merge_prefix_under_directory(
   if(livetime) outdir->WriteObject(livetime, "Livetime");
 
   TTree* out_tree = new TTree(out_tree_name.c_str(), out_tree_name.c_str());
-  out_tree->SetAutoFlush(200);       // 500 entries마다 basket flush -> 메모리 해제
+  out_tree->SetAutoFlush(200);
   out_tree->SetAutoSave(50000000);   // 50MB마다 디스크에 save
 
   MergeWriter w;
@@ -641,20 +657,22 @@ static void merge_prefix_under_directory(
 
   bool want_syst = table.has_field("gundam_store_syst") ? table.get_bool_field("gundam_store_syst") : false;
 
-
   auto has_active_sys = [&](const std::string& type){
-      for(cfg::ConfigurationTable& t : config.get_subtables("sys")){
-          if(t.get_string_field("type") == type) return true;
-      }
-      return false;
+    for(cfg::ConfigurationTable& t : config.get_subtables("sys")){
+      if(t.get_string_field("type") == type) return true;
+    }
+    return false;
   };
 
-  bool has_ms  = has_active_sys("multisigma");
-  bool has_var = has_active_sys("variation");
-  bool has_num = has_active_sys("NuMIfluxsim");
+  const bool has_ms  = has_active_sys("multisigma");
+  const bool has_var = has_active_sys("variation");
+  const bool has_num = has_active_sys("NuMIfluxsim");
 
   want_syst = want_syst && (has_ms || has_var || has_num);
 
+  const bool include_nonmatched =
+    config.has_field("output.include_nonmatched") &&
+    config.get_bool_field("output.include_nonmatched");
   if(want_syst){
     w.book_syst_once(config, out_tree, "multisigma");
     w.book_syst_once(config, out_tree, "variation");
@@ -666,7 +684,6 @@ static void merge_prefix_under_directory(
 
   const bool table_is_nu   = table.get_bool_field("is_nu");
   const bool table_is_data = table.get_bool_field("is_data");
-  w.is_nu = table_is_nu ? 1 : 0;
 
   TIter nextkey(indir->GetListOfKeys());
   TKey* key;
@@ -679,6 +696,10 @@ static void merge_prefix_under_directory(
 
     if(!starts_with(tname, prefix)) continue;
     if(is_syst_tree_name(tname)) continue;
+    const bool tree_is_nonmatched = is_nonmatched_tree(tname);
+    const bool include_this_nonmatched = include_nonmatched &&
+      in_dir_path == "events/nominal" && !table_is_data && prefix == "selected";
+    if(tree_is_nonmatched && !include_this_nonmatched) continue;
     if(!is_allowed_nominal_tree(tname, prefix)) {
       std::cout << "SKIP nominal tree (not allowed): " << tname << "\n";
       continue;
@@ -686,16 +707,23 @@ static void merge_prefix_under_directory(
 
     int forced_cut = cut_type_from_tree_name_safe(tname);
 
-//    TTree* ms_tree   = want_syst ? find_syst_tree(indir, tname, kMultisigmaSuffixes) : nullptr;
-//    TTree* var_tree  = want_syst ? find_syst_tree(indir, tname, kVariationSuffixes)  : nullptr;
-    TTree* ms_tree   = (want_syst && has_ms)  ? find_syst_tree(indir, tname, kMultisigmaSuffixes) : nullptr;
-    TTree* var_tree  = (want_syst && has_var) ? find_syst_tree(indir, tname, kVariationSuffixes)  : nullptr;
-    TTree* numi_tree = find_syst_tree(indir, tname, kFluxSuffixes);
-    TTree* msim_tree = find_syst_tree(indir, tname, kMultisimSuffixes);
+    const bool tree_is_nu = table_is_nu && !tree_is_nonmatched;
+
+    // Nonmatched candidates have no corresponding weight trees. Leaving all
+    // pointers null makes every systematic graph and ppfx_cv_weight neutral.
+    TTree* ms_tree = (!tree_is_nonmatched && want_syst && has_ms)
+      ? find_syst_tree(indir, tname, kMultisigmaSuffixes) : nullptr;
+    TTree* var_tree = (!tree_is_nonmatched && want_syst && has_var)
+      ? find_syst_tree(indir, tname, kVariationSuffixes) : nullptr;
+    TTree* numi_tree = (!tree_is_nonmatched && has_num)
+      ? find_syst_tree(indir, tname, kFluxSuffixes) : nullptr;
+    TTree* msim_tree = !tree_is_nonmatched
+      ? find_syst_tree(indir, tname, kMultisimSuffixes) : nullptr;
 
     std::cout << "MERGE " << in_dir_path << "/" << tname
               << " -> " << out_dir_path << "/" << out_tree_name
               << " (cut_type=" << forced_cut << ")"
+              << " nonmatched=" << tree_is_nonmatched
               << "  ms=" << ms_tree
               << " var=" << var_tree
               << " numi=" << numi_tree
@@ -731,9 +759,6 @@ static void merge_prefix_under_directory(
     if(numi_tree) n = std::min(n, numi_tree->GetEntries());
     if(msim_tree) n = std::min(n, msim_tree->GetEntries());
 
-
-
-
     if(want_syst){
       if(ms_tree && ms_tree->GetEntries() != n_nom)
         std::cout << "WARN: entries mismatch: " << in_dir_path << "/" << tname
@@ -765,17 +790,18 @@ static void merge_prefix_under_directory(
       if(msim_tree) msim_tree->GetEntry(i);
 
       if(i > 0 && i % 2000 == 0){
-          struct rusage ru;
-          getrusage(RUSAGE_SELF, &ru);
-          TBranch* sample_br = out_tree->GetBranch("reinteractions_piplus_Geant4");
-          std::cout << "RSS_LOG tree=" << tname
-              << " i=" << i
-              << " maxrss_kb=" << ru.ru_maxrss
-              << " nbaskets=" << (sample_br ? sample_br->GetWriteBasket() : -1)
-              << std::endl;
+        struct rusage ru;
+        getrusage(RUSAGE_SELF, &ru);
+        TBranch* sample_br = out_tree->GetBranch("reinteractions_piplus_Geant4");
+        std::cout << "RSS_LOG tree=" << tname
+                  << " i=" << i
+                  << " maxrss_kb=" << ru.ru_maxrss
+                  << " nbaskets=" << (sample_br ? sample_br->GetWriteBasket() : -1)
+                  << std::endl;
       }
 
       w.cut_type = forced_cut;
+      w.is_nu = tree_is_nu ? 1 : 0;
 
       if(table_is_data){
         w.is_data  = 1;
@@ -793,14 +819,14 @@ static void merge_prefix_under_directory(
       }
 
       if(want_syst){
-        w.fill_one_syst_event("multisigma", table_is_nu);
-        w.fill_one_syst_event("variation",  table_is_nu);
-        w.fill_one_syst_event("NuMIfluxsim", table_is_nu);
+        w.fill_one_syst_event("multisigma", tree_is_nu);
+        w.fill_one_syst_event("variation",  tree_is_nu);
+        w.fill_one_syst_event("NuMIfluxsim", tree_is_nu);
       }
-      w.fill_one_syst_event("multisim", table_is_nu);
+      w.fill_one_syst_event("multisim", tree_is_nu);
 
-      if(std::isnan(w.ppfx_cv_weight) || w.ppfx_cv_weight <= 0)
-          w.ppfx_cv_weight = 1.0;
+      if(tree_is_nonmatched || !std::isfinite(w.ppfx_cv_weight) || w.ppfx_cv_weight <= 0)
+        w.ppfx_cv_weight = 1.0;
 
 
       out_tree->Fill();
@@ -811,7 +837,7 @@ static void merge_prefix_under_directory(
         gDirectory->SaveSelf();
       }
     }
-    // ===== 여기 추가: 이번 입력 트리(in_tree/ms_tree/var_tree/numi_tree/msim_tree) 메모리 해제 =====
+
     in_tree->ResetBranchAddresses();
     if(ms_tree)   ms_tree->ResetBranchAddresses();
     if(var_tree)  var_tree->ResetBranchAddresses();
@@ -820,13 +846,10 @@ static void merge_prefix_under_directory(
 
     if(msim_tree) indir->Delete((std::string(msim_tree->GetName())+";*").c_str());
     if(numi_tree && numi_tree != msim_tree)
-        indir->Delete((std::string(numi_tree->GetName())+";*").c_str());
-    if(ms_tree)   indir->Delete((std::string(ms_tree->GetName())+";*").c_str());
-    if(var_tree)  indir->Delete((std::string(var_tree->GetName())+";*").c_str());
+      indir->Delete((std::string(numi_tree->GetName())+";*").c_str());
+    if(ms_tree) indir->Delete((std::string(ms_tree->GetName())+";*").c_str());
+    if(var_tree) indir->Delete((std::string(var_tree->GetName())+";*").c_str());
     indir->Delete((tname+";*").c_str());
-
-
-
   }
 
   outdir->cd();
@@ -984,5 +1007,4 @@ int main(int argc, char* argv[])
   input->Close();
   return 0;
 }
-
 

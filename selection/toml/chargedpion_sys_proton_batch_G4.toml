@@ -206,6 +206,9 @@ branch = [
     { name = "nneutron_G4",         type = "mctruth" },
     { name = "npiplus_G4",         type = "mctruth" },
     { name = "npiminus_G4",         type = "mctruth" },
+    { name = "g4rw_piplus_ke",     type = "mctruth" },
+    { name = "g4rw_piminus_ke",    type = "mctruth" },
+    { name = "g4rw_proton_ke",     type = "mctruth" },
     { name = "nproton_G4",         type = "mctruth" },
     { name = "resnum",         type = "mctruth" },
     { name = "count_proton",         type = "true" },
@@ -340,6 +343,9 @@ branch = [
     { name = "nneutron_G4",         type = "mctruth" },
     { name = "npiplus_G4",         type = "mctruth" },
     { name = "npiminus_G4",         type = "mctruth" },
+    { name = "g4rw_piplus_ke",     type = "mctruth" },
+    { name = "g4rw_piminus_ke",    type = "mctruth" },
+    { name = "g4rw_proton_ke",     type = "mctruth" },
     { name = "nproton_G4",         type = "mctruth" },
     { name = "resnum",         type = "mctruth" },
     { name = "category",                type = "true"    },
@@ -472,6 +478,9 @@ branch = [
     { name = "nneutron_G4",         type = "mctruth" },
     { name = "npiplus_G4",         type = "mctruth" },
     { name = "npiminus_G4",         type = "mctruth" },
+    { name = "g4rw_piplus_ke",     type = "mctruth" },
+    { name = "g4rw_piminus_ke",    type = "mctruth" },
+    { name = "g4rw_proton_ke",     type = "mctruth" },
     { name = "nproton_G4",         type = "mctruth" },
     { name = "resnum",         type = "mctruth" },
     { name = "visible_energy",          type = "both"    },
@@ -655,6 +664,9 @@ branch = [
     { name = "nneutron_G4",         type = "mctruth" },
     { name = "npiplus_G4",         type = "mctruth" },
     { name = "npiminus_G4",         type = "mctruth" },
+    { name = "g4rw_piplus_ke",     type = "mctruth" },
+    { name = "g4rw_piminus_ke",    type = "mctruth" },
+    { name = "g4rw_proton_ke",     type = "mctruth" },
     { name = "nproton_G4",         type = "mctruth" },
 ]
 
@@ -729,6 +741,9 @@ branch = [
     { name = "nneutron_G4",         type = "mctruth" },
     { name = "npiplus_G4",         type = "mctruth" },
     { name = "npiminus_G4",         type = "mctruth" },
+    { name = "g4rw_piplus_ke",     type = "mctruth" },
+    { name = "g4rw_piminus_ke",    type = "mctruth" },
+    { name = "g4rw_proton_ke",     type = "mctruth" },
     { name = "nproton_G4",         type = "mctruth" },
 ]
 
@@ -860,6 +875,9 @@ branch = [
     { name = "nneutron_G4",         type = "mctruth" },
     { name = "npiplus_G4",         type = "mctruth" },
     { name = "npiminus_G4",         type = "mctruth" },
+    { name = "g4rw_piplus_ke",     type = "mctruth" },
+    { name = "g4rw_piminus_ke",    type = "mctruth" },
+    { name = "g4rw_proton_ke",     type = "mctruth" },
     { name = "nproton_G4",         type = "mctruth" },
 ]
 
