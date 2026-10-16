@@ -793,6 +793,48 @@ namespace mctruth
     }
     REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, g4rw_proton_ke, g4rw_proton_ke);
 
+    /**
+     * @brief Number of G4 primaries with an exact (signed) PDG.
+     * @details Same as npiplus_G4 etc. but restricted to start_process ==
+     * kG4primary (0), so the count does not depend on whether `prim` also
+     * stores G4 secondaries (newer CAFs) or not (older CAFs).
+     * @param obj the SRTrueInteraction to inspect.
+     * @param pdg signed PDG code (211, -211, 2212).
+     * @return number of G4 primaries with that PDG.
+     */
+    template<typename T>
+    double g4primary_count(const T & obj, int pdg)
+    {
+        size_t count(0);
+        for(const auto & p : obj.prim)
+        {
+            if(p.start_process != 0) continue; // G4 primaries only
+            if(p.pdg == pdg) ++count;
+        }
+        return count;
+    }
+
+    template<typename T>
+    double g4rw_npiplus(const T & obj)
+    {
+        return g4primary_count(obj, 211);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, g4rw_npiplus, g4rw_npiplus);
+
+    template<typename T>
+    double g4rw_npiminus(const T & obj)
+    {
+        return g4primary_count(obj, -211);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, g4rw_npiminus, g4rw_npiminus);
+
+    template<typename T>
+    double g4rw_nproton(const T & obj)
+    {
+        return g4primary_count(obj, 2212);
+    }
+    REGISTER_VAR_SCOPE(RegistrationScope::MCTruth, g4rw_nproton, g4rw_nproton);
+
     template<typename T>
         double prim_pion_process(const T & obj)
         {
