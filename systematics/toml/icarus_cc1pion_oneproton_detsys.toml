@@ -29,6 +29,8 @@ variable = 'reco_leading_muon_ke'
 bins = [0.0, 100.0, 200.0, 400.0, 600.0, 800.0, 1000.0, 1500.0, 2000.0, 3000.0, 4000.0, 5000.0]
 nuniverses = 1000
 variable_length = true
+pot_override_keys = ['nominal', 'var01m', 'var01p', 'var02m', 'var02p', 'var03m', 'var03p', 'var04m', 'var04p', 'var05', 'var06', 'var07', 'var08', 'var09']
+pot_override = [3.268964080664518e+20, 2.109961693016327e+20, 2.177393489197075e+20, 2.146904146627747e+20, 2.089502366678332e+20, 2.123722826697954e+20, 1.362680301821289e+20, 2.159145199417332e+20, 2.122939113063286e+20, 2.162811030648159e+20, 2.104380578726098e+20, 1.922854976729603e+20, 1.632116696073414e+20, 1.908296197838628e+20]
 
 # Detector weights are evaluated for the nominal MC trees. All other objects
 # are retained by output.copy_input rather than being rewritten tree by tree.

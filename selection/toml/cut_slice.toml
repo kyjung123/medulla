@@ -514,6 +514,52 @@ branch = [
 ]
 
 
+
+[[tree]]
+name = "FV_flash_mu_p_pi_michel_cut_no_shower"
+sim_only = false
+add_exposure = true
+add_systematics = true
+mode = "reco"
+cut = [
+    { name = "trigger_emulation_cut", type = "event", decrements_exposure = false },
+    { name = "data_quality_cut",      type = "event", decrements_exposure = true  },
+    { name = "fiducial_cut",              type = "reco" },
+    { name = "flash_cut",                 type = "reco",  parameters = [0.0, 9.6] },
+    { name = "single_muon",               type = "reco",  parameters = ["@muon_threshold"] },
+    { name = "single_proton",               type = "reco",  parameters = ["@proton_threshold"] },
+    { name = "single_pion",               type = "reco",  parameters = ["@pion_threshold"] },
+    { name = "pion_michel_tag_cut",       type = "reco",  parameters = [20.0] },
+]
+branch = [
+    # Interaction-level truth/reco branches
+    { name = "neutrino_id",             type = "true"    },
+    { name = "flash_time",         type = "reco"},
+    { name = "baseline",                type = "mctruth" },
+    { name = "cc",                      type = "mctruth" },
+    { name = "pdg",                     type = "mctruth" },
+    { name = "interaction_type",        type = "mctruth" },
+    { name = "interaction_mode",       type = "mctruth" },
+    { name = "category",                type = "true"    },
+    { name = "photon_multiplicity",   type = "both", parameters = [25.0,]},
+    { name = "electron_multiplicity", type = "both", parameters = [25.0,]},
+    { name = "muon_multiplicity",     type = "both", parameters = ["@muon_threshold",]},
+    { name = "pion_multiplicity",     type = "both", parameters = ["@pion_threshold",]},
+    { name = "proton_multiplicity",   type = "both", parameters = ["@pion_threshold",]},
+    { name = "count_pip",         type = "true" },
+    { name = "count_pim",         type = "true" },
+    { name = "pion_michel_tag", type = "both", parameters = [20.0]},
+    { name = "cos_wrt_beam",   type = "true_particle", selector = "leading_muon" },
+    { name = "ke",                type = "true_particle", selector = "leading_muon"   },
+    { name = "muon_cos_angle",     type = "both"},
+    { name = "leading_muon_cos_wrt_beam",   type = "mctruth" },
+    { name = "vertex_x",         type = "both" },
+    { name = "vertex_y",         type = "both" },
+    { name = "vertex_z",         type = "both" },
+]
+
+
+
 [[tree]]
 name = "signal_N_proton"
 sim_only = true
