@@ -1089,3 +1089,9 @@ name_short = 'ZExpPCAB4CCQE'
 type = "multisigma"
 nsigma = [-3,-2,-1,0,1,2,3]
 index = 133
+
+[[sys]]
+name = "BDTReweighter_RES_BS_to_DCC_RES_BS_to_DCC"
+name_short = 'BDTResBStoDCC'
+type = "multisim"
+index = 134
