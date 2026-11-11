@@ -233,14 +233,18 @@ struct MergeWriter {
   };
 
   const std::map<std::string, std::string> single_weight_names = {
-    {
-      "GENIEReWeight_SBNNuSyst_LQCDZExpFit_correction_ZExpAVariationResponse",
-      "LQCDZExpFitCorrection_weight"
-    },
-    {
-      "GENIEReWeight_SBNNuSyst_MINERvAZExpFit_correction_ZExpAVariationResponse",
-      "MINERvAZExpFitCorrection_weight"
-    }
+      {
+          "GENIEReWeight_SBNNuSyst_LQCDZExpFit_correction_ZExpAVariationResponse",
+          "LQCDZExpFitCorrection_weight"
+      },
+      {
+          "GENIEReWeight_SBNNuSyst_MINERvAZExpFit_correction_ZExpAVariationResponse",
+          "MINERvAZExpFitCorrection_weight"
+      },
+      {
+          "BDTReweighter_RES_BS_to_DCC_RES_BS_to_DCC",
+          "BDTResBStoDCC_weight"
+      }
   };
 
   std::vector<std::string> morph_names = {
@@ -594,8 +598,18 @@ struct MergeWriter {
       }
 
       if(p.export_single_weight && p.present_in_this_tree && !weights.empty()){
-        p.single_weight = weights.front();
-        if(!std::isfinite(p.single_weight)) p.single_weight = 1.0;
+          const bool is_bdt = (p.full == "BDTReweighter_RES_BS_to_DCC_RES_BS_to_DCC");
+          if(is_bdt) p.single_weight = (table_is_nu && weights.size() > 1) ? weights[1] : 1.0;
+          else       p.single_weight = weights.front();
+
+          // Unphysical flat weights fall back to 1
+          if(!std::isfinite(p.single_weight) || p.single_weight <= 0.0) p.single_weight = 1.0;
+
+          // Extreme BDT weights fall back to 1
+          constexpr double kBDTWeightMin = 0.01;
+          constexpr double kBDTWeightMax = 10.0;
+          if(is_bdt && (p.single_weight < kBDTWeightMin || p.single_weight > kBDTWeightMax))
+              p.single_weight = 1.0;
       }
 
       TGraph* out_g = (TGraph*)(*p.arr)[0];
